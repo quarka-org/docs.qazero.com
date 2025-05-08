@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunktemp=self.webpackChunktemp||[]).push([[7130],{1487:a=>{a.exports=JSON.parse('{"tag":{"label":"qa-zero","permalink":"/blog/tags/qa-zero","allTagsPath":"/blog/tags","count":1,"unlisted":false},"listMetadata":{"permalink":"/blog/tags/qa-zero","page":1,"postsPerPage":10,"totalPages":1,"totalCount":1,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
