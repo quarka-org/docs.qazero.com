@@ -7,62 +7,56 @@ title: Frequently Asked Questions
 
 This section addresses common questions about getting started with QA ZERO.
 
+---
+
 ## Understanding QA ZERO
 
 ### Is QA ZERO just a WordPress plugin?
-
-No, QA ZERO is an independent analytics server solution that uses WordPress as middleware for easy installation and management. While it's distributed as a WordPress plugin for convenience, it functions as a standalone analytics server that provides comprehensive website analytics.
+No. QA ZERO is an independent analytics infrastructure that happens to use WordPress *only* as a middleware layer for setup and system management. It is **not** a WordPress CMS plugin in the traditional sense — it does not interact with posts, pages, or themes as content. Instead, it uses WordPress purely as a lightweight UI and plugin framework.
 
 ### Why does QA ZERO use WordPress?
+WordPress is used exclusively as a familiar and extensible runtime environment. QA ZERO leverages WordPress's plugin system and admin interface for easy deployment and operation, but all analytics processing, data handling, and visualization are entirely independent from WordPress’s content features. Think of QA ZERO as a stand-alone server app that simply uses WordPress to "host" its management UI.
 
-QA ZERO uses WordPress primarily as an installation framework and management interface. This approach simplifies deployment while providing powerful analytics capabilities that operate independently of WordPress's core functions. WordPress serves as a familiar and user-friendly way to manage your analytics server.
+---
 
 ## Installation Questions
 
 ### Is QA ZERO compatible with my WordPress theme?
-
-Yes, QA ZERO is compatible with most WordPress themes since it operates largely independently of your theme. The WordPress integration layer is designed to work with standard WordPress themes. If you encounter any issues, please refer to the [Theme Layout](/docs/user-manual/site-environment/theme-layout) section.
+Theme compatibility is irrelevant. QA ZERO does **not** render or affect your WordPress site's front-end. Since it operates independently from WordPress's public pages and templates, your theme has no impact on its functionality. The plugin runs as a private analytics interface within the admin dashboard.
 
 ### Will QA ZERO slow down my website?
-
-QA ZERO is optimized for performance and has minimal impact on your website's loading speed. The tracking script is lightweight and loads asynchronously. The analytics server processes data independently of your website's operation. For more information, see the [Site Performance](/docs/user-manual/site-environment/site-performance) section.
+No. QA ZERO is optimized for performance. The tracking script loads asynchronously and does not block rendering. All analytics data is processed server-side in a way that is completely detached from your website's core operation.
 
 ### Can I use QA ZERO with a caching plugin?
+Yes. Since QA ZERO doesn't modify your visible site pages, it is compatible with most caching plugins. However, make sure the tracking script is excluded from page caching if needed. Details are available in the [Plugin Compatibility](#) section.
 
-Yes, QA ZERO is compatible with most popular caching plugins. However, you may need to configure your caching plugin to exclude the QA ZERO tracking script from being cached. See the [Plugin Compatibility](/docs/user-manual/site-environment/plugin-compatibility) section for details.
+---
 
 ## Setup Questions
 
 ### How long does it take to start seeing data?
-
-Data collection begins immediately after you enable tracking. However, it may take a few minutes for the data to appear in your dashboard as the analytics server processes the information. For meaningful heatmaps and analytics, we recommend collecting data for at least 24-48 hours.
+Tracking begins as soon as the script is active on your site. Most users see data in the dashboard within a few minutes. For more comprehensive results like heatmaps, we recommend letting QA ZERO collect data for at least 24–48 hours.
 
 ### Can I exclude certain users from being tracked?
-
-Yes, you can configure QA ZERO to exclude specific user roles, logged-in users, or specific IP addresses from tracking. These options are available in the Analytics Settings section of the management interface.
+Yes. You can exclude logged-in users, specific user roles, or IP addresses using the built-in settings in the QA ZERO admin panel.
 
 ### Do I need to add any code to my website?
+No manual code insertion is required. QA ZERO automatically injects the tracking script into your site's pages once activated.
 
-No, QA ZERO automatically adds the necessary tracking code to your website when you activate it through WordPress. The WordPress integration layer handles this for you, so no manual code insertion is required.
+---
 
 ## Privacy and Compliance Questions
 
 ### Is QA ZERO GDPR compliant?
-
-Yes, QA ZERO includes features to help you comply with GDPR and other privacy regulations:
-- IP anonymization
-- Cookie consent integration
-- Data retention controls
-- Data export and deletion tools
+Yes. QA ZERO is built with privacy in mind. It includes several tools to support GDPR and other privacy frameworks:
+- No reliance on cookies
+- IP address anonymization
+- Configurable data retention periods
+- Export and deletion tools for user data
+- Respect for opt-out signals from consent tools
 
 ### Does QA ZERO use cookies?
-
-QA ZERO is designed to operate without relying on cookies. It uses alternative tracking methods that don't require storing information on the visitor's device. This makes it easier to comply with privacy regulations while still providing comprehensive analytics.
+No. QA ZERO is designed to be 100% cookieless. It uses privacy-friendly fingerprinting and session correlation techniques that do not store data on the user’s device.
 
 ### Can visitors opt out of tracking?
-
-Yes, if you use a cookie consent solution, visitors can opt out of tracking. QA ZERO respects the visitor's privacy preferences and will not track users who have opted out.
-
-## Getting Help
-
-If your question isn't answered here, please check the [Troubleshooting](/docs/user-manual/troubleshooting/recording-issues) section or contact our support team at support@qazero.com.
+Yes. QA ZERO respects signals from consent tools (such as CookieYes) and disables tracking accordingly. If a visitor opts out, no data is recorded.
