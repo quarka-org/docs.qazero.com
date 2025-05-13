@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?><?xml-stylesheet type="text/xsl" href="atom.xsl"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://docs.qazero.com/blog</id>
-    <title>QA ZERO Documentation Blog</title>
+    <title>Welcome to the Official QA ZERO Documentation Blog</title>
     <updated>2023-05-01T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://docs.qazero.com/blog"/>
-    <subtitle>QA ZERO Documentation Blog</subtitle>
+    <subtitle>Welcome to the Official QA ZERO Documentation Blog</subtitle>
     <icon>https://docs.qazero.com/img/favicon.ico</icon>
     <entry>
         <title type="html"><![CDATA[Welcome to QA ZERO Documentation]]></title>
