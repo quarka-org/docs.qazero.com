@@ -5,8 +5,8 @@ import type * as Preset from '@docusaurus/preset-classic';
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: 'QA ZERO Documentation',
-  tagline: 'User and Developer Documentation for QA ZERO WordPress Analytics',
+  title: 'Welcome to the Official QA ZERO Documentation',
+  tagline: 'Everything you need to master QA ZERO – from setup to advanced analytics.',
   favicon: 'img/favicon.ico',
 
   // Set the production url of your site here
@@ -126,7 +126,7 @@ const config: Config = {
       title: 'QA ZERO Documentation',
       logo: {
         alt: 'QA ZERO Logo',
-        src: 'img/logo.svg',
+        src: 'img/logo.png',
       },
       items: [
         {
