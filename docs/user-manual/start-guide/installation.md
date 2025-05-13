@@ -5,7 +5,11 @@ title: Installation
 
 # Installation
 
-This guide will help you install QA ZERO on your WordPress website.
+This guide will help you install the QA ZERO analytics server using WordPress as the deployment platform.
+
+## Understanding the Installation Process
+
+While QA ZERO is distributed as a WordPress plugin for convenience, it's important to understand that you're actually installing an independent analytics server that uses WordPress as middleware. The WordPress plugin format simply provides an easy installation and management interface for the underlying analytics server.
 
 ## System Requirements
 
@@ -15,6 +19,7 @@ Before installing QA ZERO, ensure your system meets the following requirements:
 - PHP 7.4 or higher
 - MySQL 5.6 or higher
 - Modern web browser (Chrome, Firefox, Safari, Edge)
+- Sufficient server resources to run the analytics server (minimum 1GB RAM recommended)
 
 ## Installation Methods
 
@@ -36,13 +41,21 @@ Before installing QA ZERO, ensure your system meets the following requirements:
 6. Click **Install Now**
 7. After installation completes, click **Activate**
 
+## What Happens During Installation
+
+When you activate QA ZERO, the following components are set up:
+
+1. **WordPress Integration Layer**: Creates the management interface within your WordPress admin
+2. **Analytics Server Core**: Installs the independent analytics engine that processes visitor data
+3. **Data Collection Scripts**: Adds the necessary tracking code to your website
+
 ## Verifying Installation
 
 To verify that QA ZERO has been installed correctly:
 
 1. In your WordPress admin dashboard, you should see a new menu item labeled "QA ZERO"
-2. Click on the QA ZERO menu to access the dashboard
-3. You should see the QA ZERO welcome screen
+2. Click on the QA ZERO menu to access the analytics dashboard
+3. You should see the QA ZERO welcome screen with server status information
 
 ![QA ZERO Welcome Screen](/img/placeholder-image.png)
 
@@ -50,4 +63,4 @@ If you don't see the QA ZERO menu or encounter any errors, please refer to the [
 
 ## Next Steps
 
-After successfully installing QA ZERO, proceed to the [Initial Setup](/docs/user-manual/start-guide/initial-setup) guide to configure the plugin for your website.
+After successfully installing the QA ZERO analytics server, proceed to the [Initial Setup](/docs/user-manual/start-guide/initial-setup) guide to configure your analytics environment.
