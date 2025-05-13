@@ -19,18 +19,51 @@ const sidebars: SidebarsConfig = {
       },
       items: [
         'user-manual/introduction',
-        'user-manual/getting-started',
         {
           type: 'category',
-          label: 'Features',
+          label: '🧭 Start Guide',
           items: [
-            'user-manual/features/analytics',
-            'user-manual/features/heatmaps',
-            'user-manual/features/session-recording',
-            'user-manual/features/goals',
+            'user-manual/start-guide/installation',
+            'user-manual/start-guide/initial-setup',
+            'user-manual/start-guide/faq',
           ],
         },
-        'user-manual/configuration',
+        {
+          type: 'category',
+          label: '🔍 Screens and Operations',
+          items: [
+            'user-manual/screens-operations/overview',
+            'user-manual/screens-operations/heatmap-usage',
+            'user-manual/screens-operations/article-data',
+          ],
+        },
+        {
+          type: 'category',
+          label: '⚙ Site Environment Adjustments',
+          items: [
+            'user-manual/site-environment/plugin-compatibility',
+            'user-manual/site-environment/theme-layout',
+            'user-manual/site-environment/site-performance',
+          ],
+        },
+        {
+          type: 'category',
+          label: '🛠 Troubleshooting',
+          items: [
+            'user-manual/troubleshooting/recording-issues',
+            'user-manual/troubleshooting/data-loss',
+            'user-manual/troubleshooting/license-errors',
+          ],
+        },
+        {
+          type: 'category',
+          label: '🔐 Premium Version and License',
+          items: [
+            'user-manual/premium-license/free-vs-premium',
+            'user-manual/premium-license/activation',
+            'user-manual/premium-license/subscription',
+          ],
+        },
       ],
     },
   ],
