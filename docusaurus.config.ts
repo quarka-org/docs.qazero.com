@@ -7,7 +7,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'Welcome to the Official QA ZERO Documentation',
   tagline: 'Everything you need to master QA ZERO – from setup to advanced analytics.',
-  favicon: 'img/favicon.ico',
+  favicon: 'img/favicon.svg',
 
   // Set the production url of your site here
   url: 'https://docs.qazero.com',
