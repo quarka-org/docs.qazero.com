@@ -35,28 +35,28 @@ Possible causes:
 ### Check Data Collection Status
 
 1. Navigate to **QA ZERO > Dashboard**
-2. Look for the **Data Collection Status** indicator
-3. If it shows "Active," data collection is currently working
+2. Check the dashboard for recent data
+3. If recent data is visible, data collection is currently working
 
 ### Verify Recent Data
 
-1. Navigate to **QA ZERO > Analytics**
+1. Navigate to **QA ZERO > User**
 2. Set the date range to "Today" or "Yesterday"
 3. Check if recent data is being recorded
 4. If recent data exists but historical data is missing, the issue is likely with stored data rather than collection
 
-### Check Database Status
+### Check WordPress Database
 
-1. Navigate to **QA ZERO > Tools > Database**
-2. Run a **Database Integrity Check**
-3. Note any errors or warnings
+1. Use a database management tool like phpMyAdmin
+2. Check the WordPress database tables related to QA ZERO
+3. Verify that the tables exist and contain data
 
-![Database Integrity Check](/img/placeholder-image.png)
+![Database Check](/img/placeholder-image.png)
 
-### Review System Logs
+### Review WordPress Error Logs
 
-1. Navigate to **QA ZERO > Tools > Logs**
-2. Look for errors related to data processing or storage
+1. Check your WordPress error logs
+2. Look for errors related to QA ZERO
 3. Note the timestamps of any relevant errors
 
 ## Common Causes and Solutions
@@ -65,19 +65,20 @@ Possible causes:
 
 QA ZERO automatically removes old data based on your retention settings:
 
-1. Navigate to **QA ZERO > Settings > Data**
-2. Check the **Data Retention Period** setting
-3. If set to a short period (e.g., 30 days), older data will be automatically deleted
-4. Adjust the setting to a longer period if needed
-5. Note that changing this setting will not restore already deleted data
+1. Navigate to **QA ZERO > Settings**
+2. Select the **Site Management** tab
+3. Check the **Data Retention Period** setting
+4. If set to a short period (e.g., 30 days), older data will be automatically deleted
+5. Adjust the setting to a longer period if needed
+6. Note that changing this setting will not restore already deleted data
 
 ### Database Issues
 
 Database corruption can cause data loss:
 
-1. Navigate to **QA ZERO > Tools > Database**
-2. Run **Optimize Tables** to repair and optimize the database
-3. If issues persist, run **Repair Tables**
+1. Use a database management tool like phpMyAdmin
+2. Check the WordPress database tables related to QA ZERO
+3. Repair or optimize the database tables if needed
 
 For severe database issues:
 
@@ -89,27 +90,26 @@ For severe database issues:
 
 If the tracking script was temporarily disabled or broken:
 
-1. Navigate to **QA ZERO > Settings > Tracking**
-2. Verify that tracking is enabled
-3. Check the **Script Status** indicator
-4. If it shows "Warning" or "Error," click on the status for more information
+1. Navigate to **QA ZERO > Tag**
+2. Verify that the tracking code is properly installed
+3. If using a caching plugin, clear your cache
+4. Check your site again to see if tracking is working
 
 ### Plugin Conflicts
 
 Other plugins may interfere with QA ZERO's data collection or storage:
 
-1. Navigate to **QA ZERO > Tools > Diagnostics**
-2. Run a **Plugin Compatibility Check**
-3. Review any conflicts detected
-4. Resolve conflicts by updating or reconfiguring the conflicting plugins
+1. Temporarily deactivate other plugins one by one
+2. After each deactivation, check if QA ZERO data collection works
+3. If you identify a conflicting plugin, check the [Plugin Compatibility](/docs/user-manual/site-environment/plugin-compatibility) section for specific guidance
 
 ### Server Resource Limitations
 
 Limited server resources can prevent data processing:
 
-1. Navigate to **QA ZERO > Tools > System Info**
-2. Check the **Server Resources** section
-3. If values are below recommended levels, contact your hosting provider about upgrading
+1. Check your server's PHP memory limit and execution time
+2. Ensure your server meets the minimum requirements (PHP 5.6+, 64MB memory)
+3. If resources are limited, contact your hosting provider about upgrading
 
 ## Recovering Lost Data
 
@@ -118,65 +118,69 @@ Limited server resources can prevent data processing:
 If you have a backup of your WordPress database:
 
 1. Restore the database from backup
-2. Navigate to **QA ZERO > Tools > Database**
-3. Run **Sync Data** to ensure consistency
+2. Verify that QA ZERO tables are included in the backup
+3. Reactivate the plugin if necessary
 
-### Using Data Recovery Tool
+### Using WordPress Database Tools
 
-QA ZERO includes a data recovery tool for some scenarios:
+If you need to recover data from a corrupted database:
 
-1. Navigate to **QA ZERO > Tools > Recovery**
-2. Click **Scan for Recoverable Data**
-3. If recoverable data is found, click **Recover Data**
-4. Follow the prompts to complete the recovery process
+1. Use a database management tool like phpMyAdmin
+2. Check the WordPress database tables related to QA ZERO
+3. Repair or optimize the database tables if needed
+4. If necessary, consult with a database administrator
 
-![Data Recovery Tool](/img/placeholder-image.png)
+![Database Tools](/img/placeholder-image.png)
 
-### From Local Storage
+### From Browser Cache
 
-In some cases, data may still exist in visitors' browsers:
+In some cases, limited data may still exist in visitors' browsers:
 
-1. Navigate to **QA ZERO > Settings > Advanced**
-2. Enable **Local Storage Recovery**
-3. Save changes
-4. This will attempt to recover data from returning visitors' browsers
+1. Note that QA ZERO uses localStorage for some temporary data
+2. This data is limited and may not represent a complete recovery solution
+3. For reliable data recovery, always maintain regular database backups
 
 ## Preventing Future Data Loss
 
 ### Regular Backups
 
-Set up regular backups of your WordPress database:
+Set up regular database backups:
 
-1. Use a backup plugin like UpdraftPlus or BackupBuddy
-2. Schedule daily or weekly backups
-3. Store backups in a secure, off-site location
+1. Use a WordPress backup plugin or your hosting provider's backup tools
+2. Ensure that database backups include QA ZERO tables
+3. Configure backup frequency and retention
+4. Store backups in a secure location (local or cloud)
 
-### Optimal Settings
+![Backup Settings](/img/placeholder-image.png)
 
-Configure QA ZERO for reliable data collection:
+### Optimize Server Resources
 
-1. Navigate to **QA ZERO > Settings > Performance**
-2. Enable **Reliable Data Mode** (may slightly increase server load)
-3. Set **Processing Frequency** to "More Frequent"
-4. Save changes
+Reduce the risk of data processing failures:
 
-### Monitoring
+1. Ensure your server meets the minimum requirements (PHP 5.6+, 64MB memory)
+2. Consider upgrading your hosting plan if you have a high-traffic site
+3. Regularly check server logs for errors or warnings
+4. Keep WordPress and all plugins updated
 
-Set up monitoring to detect issues early:
+### Monitor Site Performance
 
-1. Navigate to **QA ZERO > Settings > Notifications**
-2. Enable **Data Collection Alerts**
-3. Enter your email address
-4. Select alert conditions (e.g., "No data collected for 24 hours")
-5. Save changes
+Monitor your site's performance:
+
+1. Regularly check the QA ZERO dashboard for any anomalies
+2. Use WordPress health check tools to monitor overall site health
+3. Set up uptime monitoring for your website
+4. Regularly check for plugin conflicts
 
 ## Getting Support
 
 If you've tried the troubleshooting steps above and still have issues:
 
-1. Navigate to **QA ZERO > Tools > System Info**
-2. Click **Copy System Info**
-3. Contact QA ZERO support with:
+1. Gather information about your system:
+   - WordPress version
+   - PHP version
+   - Server environment
+   - QA ZERO plugin version
+2. Contact QA ZERO support with:
    - Your system information
    - Description of the data loss
    - Time period affected
