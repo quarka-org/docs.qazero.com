@@ -12,7 +12,7 @@ This guide explains how to activate your QA ZERO premium license to unlock all p
 Before you can activate QA ZERO premium, you need to purchase a license:
 
 1. Visit the [QA ZERO website](https://qazero.com/pricing)
-2. Select your preferred license tier (Personal, Business, or Agency)
+2. Select your preferred license tier
 3. Complete the checkout process
 4. You will receive your license key via email
 5. The license key will also be available in your account dashboard
@@ -24,8 +24,9 @@ Before you can activate QA ZERO premium, you need to purchase a license:
 1. Log in to your WordPress admin dashboard
 2. Navigate to **QA ZERO > License**
 3. Enter your license key in the provided field
-4. Click **Activate License**
-5. If successful, you'll see a confirmation message and your license details
+4. Enter your email address in the provided field
+5. Click **Activate the license**
+6. If successful, you'll see a confirmation message and a celebration animation
 
 ![License Activation Screen](/img/placeholder-image.png)
 
@@ -40,31 +41,13 @@ If you encounter issues during activation:
 
 For more detailed troubleshooting, see the [License Errors](/docs/user-manual/troubleshooting/license-errors) section.
 
-## Manual Activation
-
-If automatic activation fails due to server restrictions, you can use manual activation:
-
-1. Navigate to **QA ZERO > License**
-2. Click the **Manual Activation** link
-3. Copy the site key displayed on the screen
-4. Visit the [Manual Activation page](https://qazero.com/manual-activation) on the QA ZERO website
-5. Log in to your account
-6. Paste your site key and click **Generate Activation Code**
-7. Copy the activation code provided
-8. Return to your WordPress dashboard
-9. Paste the activation code in the designated field
-10. Click **Activate License**
-
-![Manual Activation Process](/img/placeholder-image.png)
-
 ## Verifying Activation
 
 After activation, you can verify that your license is working correctly:
 
 1. Navigate to **QA ZERO > Dashboard**
-2. Look for the "Premium" badge in the top corner
-3. Check that premium features are now available
-4. Try accessing a premium feature like session recording
+2. Check that premium features are now available
+3. Try accessing a premium feature like session recording
 
 ## License Information
 
@@ -72,10 +55,8 @@ Once activated, you can view your license information:
 
 1. Navigate to **QA ZERO > License**
 2. View your license details:
-   - License type (Personal, Business, Agency)
-   - Expiration date
-   - Renewal status
-   - Sites activated (for multi-site licenses)
+   - Last authentication time
+   - Activation status
 
 ![License Information Screen](/img/placeholder-image.png)
 
@@ -84,21 +65,9 @@ Once activated, you can view your license information:
 If you need to move your license to another site:
 
 1. Navigate to **QA ZERO > License**
-2. Click **Deactivate License**
+2. Click **Deactivate this license**
 3. Confirm the deactivation
 4. Your license can now be activated on another site
-
-Note: For multi-site licenses (Business and Agency tiers), you can activate on multiple sites without deactivating.
-
-## License Upgrades
-
-To upgrade your license to a higher tier:
-
-1. Navigate to **QA ZERO > License**
-2. Click **Upgrade License**
-3. Select your desired upgrade option
-4. Complete the checkout process
-5. Your license will be automatically upgraded
 
 ## Common Activation Issues
 
@@ -115,9 +84,9 @@ Solution: Verify your license key and status in your QA ZERO account.
 
 This error occurs when:
 - You've activated the license on the maximum number of sites allowed by your license tier
-- You're trying to activate a Personal license on a second site
+- You're trying to activate a license on too many sites
 
-Solution: Deactivate the license on an unused site or upgrade to a higher tier.
+Solution: Deactivate the license on an unused site.
 
 ### "Connection Error" During Activation
 
@@ -126,7 +95,7 @@ This error occurs when:
 - A firewall is blocking the connection
 - Your hosting has restrictions on outbound connections
 
-Solution: Try manual activation or contact your hosting provider.
+Solution: Contact your hosting provider to ensure outbound connections are allowed.
 
 ## Getting Help
 
