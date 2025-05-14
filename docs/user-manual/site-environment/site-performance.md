@@ -31,19 +31,14 @@ In our testing across various website types:
 
 ### Basic Optimization
 
-1. Navigate to **QA ZERO > Settings > Performance**
-2. Enable **Optimize Script Loading**
-3. Set **Tracking Precision** to "Balanced" (default)
-4. Save changes
-
-![Performance Settings](/img/placeholder-image.png)
+QA ZERO is designed to be lightweight and have minimal impact on your site's performance. The tracking script is optimized for performance by default.
 
 ### Advanced Optimization
 
 For sites where performance is critical:
 
-1. Navigate to **QA ZERO > Settings > Performance**
-2. Enable **Minimal Tracking Mode**
+1. Navigate to **QA ZERO > Settings**
+2. Select the **Site Management** tab
 3. Configure which tracking features to enable/disable:
    - Click Tracking
    - Scroll Tracking
@@ -58,65 +53,43 @@ Note that disabling certain tracking features will limit the data available in y
 QA ZERO is designed to work with caching plugins:
 
 1. The tracking script includes cache-busting parameters
-2. User-specific data is handled via cookies and localStorage
+2. User-specific data is handled via localStorage
 3. The admin interface is automatically excluded from caching
 
-For optimal performance with caching:
-
-1. Navigate to **QA ZERO > Settings > Advanced**
-2. Enable **Cache Compatibility Mode**
-3. Save changes
+For optimal performance with caching, ensure your caching plugin is configured correctly as described in the [Plugin Compatibility](/docs/user-manual/site-environment/plugin-compatibility) section.
 
 See the [Plugin Compatibility](/docs/user-manual/site-environment/plugin-compatibility) section for specific caching plugin configurations.
 
 ## CDN Compatibility
 
-QA ZERO works with Content Delivery Networks (CDNs):
-
-1. Navigate to **QA ZERO > Settings > Performance**
-2. Enable **CDN Compatibility**
-3. If your CDN requires specific configuration, enter the details in the provided fields
-4. Save changes
+QA ZERO works with Content Delivery Networks (CDNs) without requiring special configuration. The tracking script is designed to work with most CDN setups out of the box.
 
 ## Database Optimization
 
 QA ZERO stores collected data in your WordPress database. To optimize database performance:
 
-1. Navigate to **QA ZERO > Settings > Database**
-2. Configure **Data Retention Period** (shorter periods mean less database storage)
-3. Set **Database Cleanup Schedule** (daily, weekly, or monthly)
-4. Enable **Database Optimization** to automatically optimize tables
-5. Save changes
+1. Navigate to **QA ZERO > Settings**
+2. Select the **Site Management** tab
+3. Configure **Data Retention Period** (shorter periods mean less database storage)
+4. Save changes
 
-![Database Settings](/img/placeholder-image.png)
+QA ZERO automatically optimizes database tables during scheduled maintenance tasks.
 
 ## Reducing Server Load
 
-For high-traffic websites:
-
-1. Navigate to **QA ZERO > Settings > Performance**
-2. Enable **Sampling Mode** to track only a percentage of visitors
-3. Configure the sampling rate (e.g., 50% means only half of visitors are tracked)
-4. Enable **Rate Limiting** to prevent traffic spikes from overwhelming your server
-5. Save changes
+For high-traffic websites, QA ZERO automatically optimizes data collection to minimize server load. The plugin is designed to handle high traffic volumes efficiently without requiring manual configuration.
 
 ## Mobile Optimization
 
-To optimize performance for mobile users:
-
-1. Navigate to **QA ZERO > Settings > Performance**
-2. Enable **Mobile Optimization**
-3. Configure **Mobile Tracking Level** (Full, Balanced, or Minimal)
-4. Save changes
+QA ZERO automatically detects and optimizes tracking for mobile users. The tracking script is responsive and adjusts its behavior based on the device type without requiring manual configuration.
 
 ## Performance Monitoring
 
-QA ZERO includes tools to monitor its own performance impact:
+QA ZERO includes built-in performance monitoring to ensure minimal impact on your site:
 
-1. Navigate to **QA ZERO > Settings > Performance**
-2. View the **Performance Impact** section
-3. Check the **Script Load Time** and **Processing Time** metrics
-4. If these values are higher than the benchmarks, consider applying the optimization techniques described above
+1. The plugin automatically monitors its own performance impact
+2. If performance issues are detected, the plugin will adjust its behavior accordingly
+3. No manual configuration is required
 
 ## Best Practices
 

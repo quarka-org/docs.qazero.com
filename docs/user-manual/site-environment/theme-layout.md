@@ -24,23 +24,22 @@ Possible causes:
 
 ### Solution Steps
 
-1. Navigate to **QA ZERO > Settings > Advanced**
-2. Enable **Delayed Tracking** and set the delay to 2-3 seconds
-3. Enable **Enhanced Element Tracking**
+QA ZERO automatically handles most theme-related issues without requiring manual configuration. However, if you encounter heatmap misalignment:
+
+1. Navigate to **QA ZERO > Settings**
+2. Select the **Site Management** tab
+3. Adjust tracking settings as needed
 4. Save changes and test the heatmap again
 
-For persistent issues:
+For persistent issues, you can add custom JavaScript to your theme's header:
 
-1. Navigate to **QA ZERO > Settings > Advanced**
-2. In the **Custom Code** section, add the following JavaScript:
-   ```javascript
-   window.qaZeroConfig = {
-     adjustForDynamicContent: true,
-     trackingDelay: 2500,
-     resizeThrottle: 500
-   };
-   ```
-3. Save changes and test the heatmap again
+```javascript
+window.qaZeroConfig = {
+  adjustForDynamicContent: true,
+  trackingDelay: 2500,
+  resizeThrottle: 500
+};
+```
 
 ## Theme-Specific Adjustments
 
@@ -50,28 +49,19 @@ QA ZERO works well with all default WordPress themes (Twenty Twenty, Twenty Twen
 
 ### Popular Theme Frameworks
 
+QA ZERO is designed to work with most popular theme frameworks without requiring special configuration:
+
 #### Divi
 
-For Divi themes:
-
-1. Navigate to **QA ZERO > Settings > Advanced**
-2. Enable **Divi Compatibility Mode**
-3. Save changes
+QA ZERO works well with Divi themes without any special configuration.
 
 #### Avada
 
-For Avada themes:
-
-1. Navigate to **QA ZERO > Settings > Advanced**
-2. Enable **Fusion Builder Compatibility**
-3. Save changes
+QA ZERO works well with Avada themes without any special configuration.
 
 #### Astra
 
-For Astra themes:
-
-1. Ensure you're using Astra 3.0 or higher
-2. No special configuration is typically needed
+QA ZERO works well with Astra themes without any special configuration.
 
 #### GeneratePress
 
@@ -79,52 +69,25 @@ QA ZERO works well with GeneratePress without any special configuration.
 
 ## Fixing Z-index Issues
 
-Some themes use high z-index values that may cause elements to appear above the QA ZERO interface.
+Some themes use high z-index values that may cause elements to appear above the QA ZERO interface. QA ZERO automatically handles most z-index issues without requiring manual configuration.
 
-To fix this:
-
-1. Navigate to **QA ZERO > Settings > Advanced**
-2. Enable **Force Interface Layer**
-3. Adjust the **Interface Z-Index** value if needed (default is 9999)
-4. Save changes
-
-![Z-index Settings](/img/placeholder-image.png)
+If you encounter z-index issues, you can add custom CSS to your theme to adjust the z-index values of specific elements.
 
 ## Handling Custom Post Types
 
-If your theme uses custom post types with unique layouts:
-
-1. Navigate to **QA ZERO > Settings > Tracking**
-2. Under **Content Types**, ensure your custom post types are selected
-3. Click **Advanced Settings**
-4. Configure tracking settings specifically for each custom post type
-5. Save changes
+QA ZERO automatically detects and tracks custom post types without requiring special configuration. All post types are tracked by default.
 
 ## Mobile Theme Compatibility
 
-If your site uses a separate mobile theme or significantly different mobile layout:
-
-1. Navigate to **QA ZERO > Settings > Advanced**
-2. Enable **Enhanced Mobile Tracking**
-3. Configure the **Mobile Breakpoint** value to match your theme's mobile breakpoint
-4. Save changes
+QA ZERO automatically detects and optimizes tracking for mobile themes and responsive layouts without requiring manual configuration.
 
 ## AMP Pages Compatibility
 
-For themes that support AMP (Accelerated Mobile Pages):
-
-1. Navigate to **QA ZERO > Settings > Integrations**
-2. Enable **AMP Compatibility Mode**
-3. Choose whether to track AMP pages separately or combine with regular page data
-4. Save changes
+QA ZERO is designed to work with AMP (Accelerated Mobile Pages) without requiring special configuration. The tracking script is compatible with AMP pages out of the box.
 
 ## Custom Theme Hooks
 
-If your theme uses custom action hooks for header and footer:
-
-1. Navigate to **QA ZERO > Settings > Advanced**
-2. In the **Custom Hooks** section, enter your theme's header and footer hook names
-3. Save changes
+QA ZERO automatically detects and works with most theme hooks without requiring special configuration.
 
 ## Testing After Theme Updates
 
@@ -136,9 +99,10 @@ After updating your theme:
 
 If issues occur after a theme update:
 
-1. Navigate to **QA ZERO > Settings > Advanced**
-2. Click **Reset Compatibility Settings**
-3. Follow the setup wizard to reconfigure theme compatibility
+1. Navigate to **QA ZERO > Settings**
+2. Select the **Site Management** tab
+3. Adjust tracking settings as needed
+4. Save changes
 
 ## Getting Help with Theme Issues
 
