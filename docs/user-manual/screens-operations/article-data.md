@@ -1,74 +1,66 @@
 ---
 sidebar_position: 3
-title: Article Data Analysis
+title: Page Analytics
 ---
 
-# Article Data Analysis
+# Page Analytics
 
-QA ZERO provides detailed analytics for individual articles and pages on your WordPress site. This section explains how to access and interpret this data to optimize your content.
+QA ZERO provides analytics for individual pages on your WordPress site. This section explains how to access and interpret this data to optimize your content.
 
-## Accessing Article Data
+## Accessing Page Analytics
 
-There are two ways to access article-specific data in QA ZERO:
+To access page-specific analytics in QA ZERO:
 
-### Method 1: From the Dashboard
+1. Log in to your WordPress admin dashboard
+2. Navigate to **QA ZERO > Behavior** in the main menu
+3. View the list of pages with their analytics data
+4. Click on any page title to view more detailed analytics
 
-1. Navigate to **QA ZERO > Dashboard**
-2. Scroll down to the **Popular Pages** section
-3. Click on any article title to view its detailed analytics
+![Page Selection Screen](/img/placeholder-image.png)
 
-### Method 2: From the Content Analytics Section
+## Page Overview
 
-1. Navigate to **QA ZERO > Analytics > Content**
-2. Browse or search for the article you want to analyze
-3. Click on the article title to view detailed analytics
+The Page Overview provides key metrics about how users interact with a specific page.
 
-![Article Selection Screen](/img/placeholder-image.png)
-
-## Article Overview Dashboard
-
-The Article Overview Dashboard provides a comprehensive view of how users interact with a specific article.
-
-![Article Overview Dashboard](/img/placeholder-image.png)
+![Page Overview](/img/placeholder-image.png)
 
 Key metrics include:
 
-- **Page Views**: Total number of times the article has been viewed
-- **Unique Visitors**: Number of individual users who viewed the article
-- **Average Time on Page**: How long users typically spend reading the article
+- **Page Views**: Total number of times the page has been viewed
+- **Unique Visitors**: Number of individual users who viewed the page
+- **Average Time on Page**: How long users typically spend on the page
 - **Bounce Rate**: Percentage of visitors who leave after viewing only this page
-- **Scroll Depth**: How far down the page users typically scroll
-- **Engagement Rate**: Combined metric of time on page and user interactions
+- **Entry Rate**: Percentage of sessions that begin on this page
+- **Exit Rate**: Percentage of sessions that end on this page
 
-## Reading Patterns
+## Landing Page Analysis
 
-The Reading Patterns section shows how users consume your content.
+For pages that serve as landing pages (entry points to your site), QA ZERO provides additional metrics:
 
-![Reading Patterns Visualization](/img/placeholder-image.png)
+![Landing Page Analysis](/img/placeholder-image.png)
 
-Key insights include:
+Key metrics include:
 
-- **Reading Flow**: Visual representation of how users read your content
-- **Attention Hotspots**: Areas that receive the most attention
-- **Skimming Behavior**: Sections that users tend to skim rather than read thoroughly
-- **Drop-off Points**: Locations where users typically stop reading
+- **Entry Sessions**: Number of sessions that began on this page
+- **Bounce Rate**: Percentage of visitors who left without viewing other pages
+- **Conversion Rate**: Percentage of visitors who completed a goal after landing on this page
+- **Growth Rate**: How traffic to this landing page is changing over time
 
-## Click Analysis
+## Page Interaction Data
 
-The Click Analysis section shows where users click within your article.
+The Page Interaction section shows how users engage with your page content.
 
-![Article Click Analysis](/img/placeholder-image.png)
+![Page Interaction Data](/img/placeholder-image.png)
 
 Key features include:
 
-- **Click Heatmap**: Visual representation of clicks throughout the article
-- **Link Performance**: Statistics for each link in the article
-- **CTA Performance**: How well call-to-action buttons perform
-- **Non-link Clicks**: Areas where users click that aren't links (potential confusion points)
+- **Click Analysis**: Where users click on your page (available via heatmap view)
+- **Scroll Depth**: How far down the page users typically scroll
+- **Time on Page**: Distribution of time spent by different visitors
 
 ## Traffic Sources
 
-The Traffic Sources section shows how users are finding your article.
+The Traffic Sources section shows how users are finding your page.
 
 ![Traffic Sources Chart](/img/placeholder-image.png)
 
@@ -79,48 +71,44 @@ Sources are categorized as:
 - **Social**: Visitors from social media platforms
 - **Referral**: Traffic from other websites
 - **Internal**: Users who navigated from another page on your site
-- **Email**: Visitors who clicked a link in an email
 
-## User Flow
+## Device Breakdown
 
-The User Flow section shows where users come from before viewing the article and where they go afterward.
+The Device Breakdown section shows what devices users are using to view your page.
 
-![User Flow Diagram](/img/placeholder-image.png)
+![Device Breakdown Chart](/img/placeholder-image.png)
 
-This helps you understand:
+Categories include:
 
-- **Entry Pages**: Which pages users visit before arriving at this article
-- **Exit Pages**: Where users go after reading this article
-- **Navigation Patterns**: Common paths users take through your content
+- **Desktop**: Users on desktop computers
+- **Tablet**: Users on tablet devices
+- **Mobile**: Users on smartphones
+- **Other**: Any other device types
 
-## Conversion Impact
+## Session Recordings
 
-The Conversion Impact section shows how this article contributes to your conversion goals.
+To view actual user sessions on a specific page:
 
-![Conversion Impact Chart](/img/placeholder-image.png)
+1. Navigate to **QA ZERO > User** in the main menu
+2. Use the page filter to select the page you want to analyze
+3. Browse the list of available recordings
+4. Click on a recording to play it
 
-Key metrics include:
-
-- **Goal Completions**: Number of conversions influenced by this article
-- **Conversion Rate**: Percentage of article viewers who complete a goal
-- **Value Contribution**: Estimated value generated by this article
-
-## Exporting Article Data
+## Exporting Page Data
 
 To export data for reporting or further analysis:
 
-1. Navigate to the article analytics page
+1. Navigate to the page analytics view
 2. Click the **Export** button in the top right corner
-3. Select your preferred format (PDF, CSV, Excel)
-4. Choose which data sections to include
-5. Click **Download**
+3. Choose your preferred format (CSV, TSV)
+4. Click **Download**
 
-## Using Article Data for Optimization
+## Using Page Analytics for Optimization
 
-Use article data to:
+Use page analytics to:
 
-- Identify and fix sections with high drop-off rates
-- Optimize underperforming calls-to-action
-- Improve internal linking strategy based on user flow
-- Create more content similar to high-performing articles
-- Adjust content length based on scroll depth and engagement metrics
+- Identify pages with high bounce rates that need improvement
+- Optimize landing pages with high traffic but low conversion
+- Understand which devices your audience uses to view specific content
+- Identify traffic sources that bring the most engaged visitors
+- Improve page content based on user interaction patterns
