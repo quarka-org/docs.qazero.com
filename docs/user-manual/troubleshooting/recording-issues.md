@@ -16,8 +16,9 @@ If you're not seeing any data in your QA ZERO dashboard:
 #### Verify Tracking is Enabled
 
 1. Navigate to **QA ZERO > Settings**
-2. Ensure the **Enable Tracking** option is turned on
-3. Save changes if needed
+2. Select the **Site Management** tab
+3. Ensure tracking options are enabled
+4. Save changes if needed
 
 #### Check Script Installation
 
@@ -30,9 +31,10 @@ If you're not seeing any data in your QA ZERO dashboard:
 
 If the script is missing:
 
-1. Navigate to **QA ZERO > Settings > Advanced**
-2. Try changing the **Script Insertion Method** to a different option
-3. Save changes and check your site again
+1. Navigate to **QA ZERO > Tag**
+2. Verify that the tracking code is properly installed
+3. If using a caching plugin, clear your cache
+4. Check your site again
 
 #### Check for JavaScript Errors
 
@@ -41,33 +43,22 @@ If the script is missing:
 3. Go to the Console tab
 4. Look for any errors related to QA ZERO
 
-If you see errors:
-
-1. Navigate to **QA ZERO > Settings > Advanced**
-2. Enable **Debug Mode**
-3. Save changes and reload your site
-4. Check the console for more detailed error information
-
 ### Partial Data Recording
 
 If some data is being recorded but not all:
 
 #### Check Tracking Configuration
 
-1. Navigate to **QA ZERO > Settings > Tracking**
-2. Verify that all desired tracking options are enabled:
-   - Page Views
-   - Clicks
-   - Scrolling
-   - Form Interactions
-   - etc.
-3. Save changes if needed
+1. Navigate to **QA ZERO > Settings**
+2. Select the **Site Management** tab
+3. Verify that all desired tracking options are enabled
+4. Save changes if needed
 
-#### Check Content Filtering
+#### Check Site Configuration
 
-1. Navigate to **QA ZERO > Settings > Content**
-2. Review the **Excluded Pages** and **Excluded Content Types** settings
-3. Ensure you haven't accidentally excluded content you want to track
+1. Navigate to **QA ZERO > Settings**
+2. Review the settings in all tabs to ensure proper configuration
+3. Make sure your site type and attributes are correctly set
 4. Save changes if needed
 
 ### Heatmap Not Displaying Correctly
@@ -76,21 +67,17 @@ If heatmaps are not displaying correctly on your pages:
 
 #### Check Page Compatibility
 
-1. Navigate to **QA ZERO > Heatmaps**
-2. Click on the problematic heatmap
-3. Click **Compatibility Check**
-4. Review any issues detected and follow the suggested solutions
+1. Navigate to **QA ZERO > Behavior**
+2. Select the page with the problematic heatmap
+3. Check if the page content has changed significantly since data collection
+4. If needed, clear old data and collect new heatmap data
 
-#### Adjust Heatmap Settings
+#### Adjust Browser View
 
-1. Navigate to **QA ZERO > Heatmaps**
-2. Click on the problematic heatmap
-3. Click **Settings**
-4. Try adjusting the following:
-   - **Tracking Delay**: Increase to 2-3 seconds for dynamic content
-   - **Element Tracking Method**: Try alternative methods
-   - **Viewport Detection**: Adjust based on your theme
-5. Save changes and check the heatmap again
+1. Navigate to **QA ZERO > Behavior**
+2. Select the page with the problematic heatmap
+3. Try switching between device views (desktop, tablet, mobile)
+4. Check if the heatmap displays correctly in different views
 
 ## Browser-Specific Issues
 
@@ -106,18 +93,17 @@ If recording issues occur specifically in Chrome:
 
 Safari's Intelligent Tracking Prevention (ITP) can affect analytics:
 
-1. Navigate to **QA ZERO > Settings > Advanced**
-2. Enable **Safari Compatibility Mode**
-3. Save changes
+1. QA ZERO is designed to work with Safari's privacy features
+2. No special configuration is typically needed
+3. If issues persist, check for browser-specific console errors
 
 ### Firefox
 
 If recording issues occur specifically in Firefox:
 
 1. Check if Enhanced Tracking Protection is blocking QA ZERO
-2. Navigate to **QA ZERO > Settings > Advanced**
-3. Enable **Firefox Compatibility Mode**
-4. Save changes
+2. QA ZERO is designed to work with Firefox's privacy features
+3. If issues persist, check for browser-specific console errors
 
 ## Plugin Conflict Resolution
 
@@ -133,8 +119,8 @@ If you suspect a plugin conflict:
 
 Ensure your server meets these requirements:
 
-- PHP 7.4 or higher
-- Memory limit: 128MB or higher
+- PHP 5.6 or higher
+- Memory limit: 64MB or higher
 - Max execution time: 30 seconds or higher
 - POST max size: 8MB or higher
 
@@ -147,16 +133,6 @@ Check these WordPress settings:
 
 ## Advanced Troubleshooting
 
-### Enable Debug Logging
-
-1. Navigate to **QA ZERO > Settings > Advanced**
-2. Enable **Debug Mode**
-3. Set **Log Level** to "Verbose"
-4. Save changes
-5. Perform the actions that aren't being recorded
-6. Navigate to **QA ZERO > Tools > Logs**
-7. Review the logs for error messages or warnings
-
 ### Manual Script Verification
 
 Add this code to your theme's header.php file (before the closing `</head>` tag) to force the tracking script:
@@ -165,19 +141,23 @@ Add this code to your theme's header.php file (before the closing `</head>` tag)
 <?php if (function_exists('qahm_zero_print_tracking_code')) { qahm_zero_print_tracking_code(); } ?>
 ```
 
-### Database Check
+### Database Verification
 
-1. Navigate to **QA ZERO > Tools > Database**
-2. Run **Database Integrity Check**
-3. If issues are found, use the **Repair Tables** option
+1. Use a database management tool like phpMyAdmin
+2. Check the WordPress database tables related to QA ZERO
+3. Verify that the tables exist and contain data
+4. If issues are found, consider reinstalling the plugin
 
 ## Getting Support
 
 If you've tried the troubleshooting steps above and still have issues:
 
-1. Navigate to **QA ZERO > Tools > System Info**
-2. Click **Copy System Info**
-3. Contact QA ZERO support with:
+1. Gather information about your system:
+   - WordPress version
+   - PHP version
+   - Server environment
+   - Browser and device information
+2. Contact QA ZERO support with:
    - Your system information
    - Description of the issue
    - Steps you've already taken to troubleshoot
