@@ -7,41 +7,55 @@ title: Configuration
 
 Learn how to configure QA ZERO to meet your specific needs.
 
-## General Settings
+## Goal Configuration
 
-The general settings allow you to configure:
+Configure conversion goals to track important user actions:
 
-- Data retention period
-- User role access
-- Default date ranges
-- Data sampling rates
+- Goal name and description
+- Completion targets and value
+- Goal types:
+  - Destination (page visit)
+  - Click (button/link interaction)
+  - Event (advanced tracking)
+- URL matching options (exact match or prefix)
 
-## Tracking Settings
+## Site Attributes
 
-Configure what QA ZERO tracks:
+Define your site's characteristics to optimize analytics:
 
-- Page views
-- Events
-- User information
-- Session recording
+- Target audience (personal or corporate)
+- Site category (general, media, service, e-commerce)
+- Membership functionality
+- Payment functionality
+- Monthly session goals
+
+## Site Management
+
+Manage tracking settings for your site:
+
+- Tracking tag implementation
+- URL parameter exclusions
+- Search parameter configuration
+- IP address exclusions
+- URL case sensitivity
+- HTML periodic retrieval
 
 ## Privacy Settings
 
 Ensure compliance with privacy regulations:
 
-- Cookie consent integration
-- Data anonymization
-- Personal data handling
-- Data export and deletion
+- Cookie consent mode
+- Anonymous user tracking options
+- Cross-domain user sharing
 
-## Integration Settings
+## Google API Integration
 
-Connect QA ZERO with other tools:
+Connect QA ZERO with Google services:
 
-- Google Analytics
-- Google Tag Manager
-- WordPress plugins
-- Third-party services
+- Google Search Console integration
+- Google Analytics integration
+- API authentication
+- Redirect URI configuration
 
 ## Coming Soon
 
