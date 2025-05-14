@@ -131,11 +131,12 @@ QA ZERO works with most form plugins, including:
 
 QA ZERO can track form submissions as conversion goals:
 
-1. Navigate to **QA ZERO > Goals**
-2. Click **Add New Goal**
-3. Select "Form Submission" as the goal type
-4. Select your form plugin and specific form
-5. Save the goal
+1. Navigate to **QA ZERO > Settings**
+2. Select the **Goal** tab
+3. Click **Add New Goal**
+4. Select "Form Submission" as the goal type
+5. Configure the form tracking settings
+6. Save the goal
 
 ![Form Goal Configuration](/img/placeholder-image.png)
 
@@ -155,8 +156,8 @@ QA ZERO is compatible with:
 
 QA ZERO offers enhanced tracking for e-commerce activities:
 
-1. Navigate to **QA ZERO > Settings > Integrations**
-2. Enable the integration for your e-commerce or membership plugin
+1. Navigate to **QA ZERO > Settings**
+2. Select the **Google** tab for API integrations
 3. Configure tracking options for purchases, registrations, or course completions
 
 ## Troubleshooting Plugin Conflicts
