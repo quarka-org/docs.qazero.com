@@ -5,21 +5,21 @@ title: Installation
 
 # Installation
 
-This guide will help you install the QA ZERO analytics server using WordPress as the deployment platform.
+This guide will help you install the QA ZERO WordPress analytics plugin.
 
 ## Understanding the Installation Process
 
-While QA ZERO is distributed as a WordPress plugin for convenience, it's important to understand that you're actually installing an independent analytics server that uses WordPress as middleware. The WordPress plugin format simply provides an easy installation and management interface for the underlying analytics server.
+QA ZERO is a WordPress plugin that provides comprehensive analytics and user behavior tracking capabilities. It integrates directly with your WordPress site to collect and analyze visitor data.
 
 ## System Requirements
 
 Before installing QA ZERO, ensure your system meets the following requirements:
 
-- WordPress 5.5 or higher
-- PHP 7.4 or higher
+- WordPress 4.5 or higher
+- PHP 5.6 or higher
 - MySQL 5.6 or higher
 - Modern web browser (Chrome, Firefox, Safari, Edge)
-- Sufficient server resources to run the analytics server (minimum 1GB RAM recommended)
+- Sufficient server resources (minimum 1GB RAM recommended)
 
 ## Installation Methods
 
