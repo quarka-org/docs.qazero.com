@@ -15,8 +15,8 @@ This guide will help you install and configure QA ZERO on your WordPress website
 
 ## Requirements
 
-- WordPress 5.5+
-- PHP 7.4+
+- WordPress 4.5+
+- PHP 5.6+
 
 ## Initial Configuration
 
