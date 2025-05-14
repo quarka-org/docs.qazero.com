@@ -56,10 +56,9 @@ This can occur if the license was deactivated from another location or if there 
 
 ### Check License Status
 
-1. Log in to your QA ZERO account at [https://qazero.com/account/](https://qazero.com/account/)
-2. Go to the **Licenses** section
-3. Check the status, expiration date, and activation count of your license
-4. If expired, renew your license
+1. Log in to your QA ZERO account at [https://mem.quarka.org/tsushin/](https://mem.quarka.org/tsushin/)
+2. Check the status, expiration date, and activation count of your license
+3. If expired, renew your license
 
 ![License Status in Account](/img/placeholder-image.png)
 
@@ -67,40 +66,30 @@ This can occur if the license was deactivated from another location or if there 
 
 If you've reached your activation limit:
 
-1. Log in to your QA ZERO account at [https://qazero.com/account/](https://qazero.com/account/)
-2. Go to the **Licenses** section
-3. View the list of sites where your license is activated
-4. Click **Deactivate** next to sites you no longer need
-5. Return to your WordPress site and activate the license again
+1. Navigate to **QA ZERO > License**
+2. Click **Deactivate License** to free up an activation slot
+3. You can then activate the license on another site
 
 ### Fix Connection Issues
 
-If you're experiencing connection errors:
+If you're experiencing connection issues:
 
-1. Navigate to **QA ZERO > Tools > System Info**
-2. Check the **Connectivity** section
-3. Verify that your site can connect to qazero.com
+1. Check if your server can connect to the license server at mem.quarka.org
+2. Verify that your server has outbound connection capabilities
+3. Temporarily disable any security plugins or firewalls
+4. Contact your hosting provider to ensure they don't block outbound connections
 
-If connection issues are detected:
+### Retry License Activation
 
-1. Check if your server has outbound connection restrictions
-2. Temporarily disable any security plugins or firewalls
-3. Contact your hosting provider to ensure they don't block outbound connections
-
-### Manual License Activation
-
-If automatic activation fails, you can try manual activation:
+If automatic activation fails, you can try these steps:
 
 1. Navigate to **QA ZERO > License**
-2. Click **Manual Activation**
-3. Copy the site key displayed
-4. Log in to your QA ZERO account
-5. Go to the **Manual Activation** section
-6. Paste your site key and generate an activation code
-7. Copy the activation code and paste it back in your WordPress site
-8. Click **Activate License**
+2. Check your internet connection
+3. Verify that your server can connect to mem.quarka.org
+4. Clear your browser cache
+5. Try activating the license again
 
-![Manual License Activation](/img/placeholder-image.png)
+![License Activation](/img/placeholder-image.png)
 
 ## License Tiers and Upgrades
 
@@ -108,23 +97,25 @@ If automatic activation fails, you can try manual activation:
 
 QA ZERO offers several license tiers:
 
-| Tier | Sites | Features | Support |
-|------|-------|----------|---------|
-| Free | 1 | Basic analytics, limited heatmaps | Community forum |
-| Personal | 1 | Full analytics, all heatmap types | Email support |
-| Business | 3 | All features + advanced reporting | Priority support |
-| Agency | 10 | All features + white labeling | Dedicated support |
+| Tier | Features | Limitations |
+|------|----------|-------------|
+| Free | Basic analytics, click heatmap | 1 page only |
+| Friend | Basic analytics, click heatmap | Limited pages |
+| Personal | Full analytics, all heatmap types | Standard support |
+| Light | Full analytics, all heatmap types | Enhanced support |
+| Business | All features + advanced reporting | Priority support |
+| Business Plus | All features + AI insights | Premium support |
+| Agent | All features + white labeling | Dedicated support |
+| Enterprise | Custom solutions | Custom support |
 
 ### Upgrading Your License
 
 To upgrade your license:
 
-1. Log in to your QA ZERO account at [https://qazero.com/account/](https://qazero.com/account/)
-2. Go to the **Licenses** section
-3. Click **Upgrade** next to your current license
-4. Select the new license tier
-5. Complete the checkout process
-6. Your license will be automatically upgraded
+1. Log in to your QA ZERO account at [https://mem.quarka.org/tsushin/](https://mem.quarka.org/tsushin/)
+2. Purchase the new license tier
+3. Activate the new license key on your site
+4. Your license will be automatically upgraded
 
 ### Downgrading Your License
 
@@ -150,18 +141,17 @@ By default, QA ZERO licenses are set to renew automatically:
 
 If you've disabled automatic renewal:
 
-1. Log in to your QA ZERO account at [https://qazero.com/account/](https://qazero.com/account/)
-2. Go to the **Licenses** section
-3. Click **Renew** next to the expiring license
-4. Complete the checkout process
+1. Log in to your QA ZERO account at [https://mem.quarka.org/tsushin/](https://mem.quarka.org/tsushin/)
+2. Purchase a renewal for your license
+3. Your license will be renewed
 
-### Renewal Discounts
+### Renewal Benefits
 
-QA ZERO offers renewal discounts:
+QA ZERO offers benefits for renewing your license:
 
-1. 15% discount for 1-year renewals
-2. 25% discount for 2-year renewals
-3. 35% discount for 3-year renewals
+1. Continued access to premium features
+2. Access to updates and new features
+3. Ongoing support for your installation
 
 ## Transferring Licenses
 
@@ -176,9 +166,9 @@ To transfer a license to a different site:
 
 If you continue to experience license issues:
 
-1. Check the [QA ZERO Knowledge Base](https://qazero.com/kb/) for license-related articles
-2. Contact QA ZERO support with:
+1. Contact QA ZERO support with:
    - Your license key (last 4 characters only for security)
    - Description of the issue
    - Screenshots of any error messages
    - Steps you've already taken to troubleshoot
+   - Your WordPress and PHP versions
