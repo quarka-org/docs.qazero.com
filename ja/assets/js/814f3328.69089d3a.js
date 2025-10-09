@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunktemp=self.webpackChunktemp||[]).push([[7472],{5513:e=>{e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Welcome to the QA ZERO Blog","permalink":"/ja/blog/welcome","unlisted":false,"date":"2025-11-01T00:00:00.000Z"}]}')}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunktemp=self.webpackChunktemp||[]).push([[8121],{8070:e=>{e.exports=JSON.parse('{"tags":[{"label":"Welcome","permalink":"/blog/tags/welcome","description":"Welcome and introduction posts","count":1},{"label":"Introduction","permalink":"/blog/tags/introduction","description":"Introduction to QA ZERO features","count":1}]}')}}]);
