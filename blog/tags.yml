@@ -1,3 +1,13 @@
+welcome:
+  label: Welcome
+  permalink: /welcome
+  description: Welcome and introduction posts
+
+introduction:
+  label: Introduction
+  permalink: /introduction
+  description: Introduction to QA ZERO features
+
 facebook:
   label: Facebook
   permalink: /facebook

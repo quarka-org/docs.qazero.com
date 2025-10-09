@@ -182,7 +182,7 @@ const config: Config = {
             },
             {
               label: 'Release Notes',
-              to: '/docs/release-notes/latest',
+              to: '/docs/release-notes/v3x',
             },
             {
               label: 'FAQ',
