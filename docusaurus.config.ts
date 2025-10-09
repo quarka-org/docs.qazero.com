@@ -160,7 +160,7 @@ const config: Config = {
         },
         // GitHub link
         {
-          href: 'https://github.com/quarka-org/qa-zero',
+          href: 'https://github.com/quarka-org/docs.qazero.com',
           label: 'GitHub',
           position: 'right',
         },
@@ -195,7 +195,7 @@ const config: Config = {
           items: [
             {
               label: 'GitHub Issues',
-              href: 'https://github.com/quarka-org/qa-zero/issues',
+              href: 'https://github.com/quarka-org/docs.qazero.com/issues',
             },
             {
               label: 'WordPress.org',
@@ -212,7 +212,7 @@ const config: Config = {
             },
             {
               label: 'GitHub',
-              href: 'https://github.com/quarka-org/qa-zero',
+              href: 'https://github.com/quarka-org/docs.qazero.com',
             },
           ],
         },

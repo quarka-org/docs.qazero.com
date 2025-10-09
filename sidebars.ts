@@ -79,9 +79,30 @@ const sidebars: SidebarsConfig = {
       items: [
         'developer-manual/introduction',
         'developer-manual/architecture',
-        'developer-manual/api',
-        'developer-manual/extending',
-        'developer-manual/contributing',
+        {
+          type: 'category',
+          label: 'API Reference',
+          link: {
+            type: 'doc',
+            id: 'developer-manual/api/api-overview',
+          },
+          items: [
+            'developer-manual/api/api-overview',
+            {
+              type: 'category',
+              label: 'Version 2025-10-20',
+              items: [
+                'developer-manual/api/2025-10-20/getting-started-2025-10-20',
+                'developer-manual/api/2025-10-20/endpoints-2025-10-20',
+                'developer-manual/api/2025-10-20/qal-2025-10-20',
+                'developer-manual/api/2025-10-20/materials-2025-10-20',
+              ],
+            },
+            'developer-manual/api/api-compatibility',
+            'developer-manual/api/VERSION_MANAGEMENT',
+            'developer-manual/api/RELEASE_UPDATE_GUIDE',
+          ],
+        },
       ],
     },
   ],
@@ -92,11 +113,11 @@ const sidebars: SidebarsConfig = {
       label: 'Release Notes',
       link: {
         type: 'doc',
-        id: 'release-notes/latest',
+        id: 'release-notes/v3x',
       },
       items: [
-        'release-notes/latest',
-        'release-notes/archive',
+        'release-notes/v3x',
+        'release-notes/v2x',
       ],
     },
   ],
@@ -111,9 +132,6 @@ const sidebars: SidebarsConfig = {
       },
       items: [
         'faq/general',
-        'faq/installation',
-        'faq/usage',
-        'faq/troubleshooting',
       ],
     },
   ],

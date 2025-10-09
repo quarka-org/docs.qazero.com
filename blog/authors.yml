@@ -1,23 +1,9 @@
-yangshun:
-  name: Yangshun Tay
-  title: Front End Engineer @ Facebook
-  url: https://github.com/yangshun
-  image_url: https://github.com/yangshun.png
+kojimaruyama:
+  name: Koji Maruyama
+  title: Product Manager
+  url: https://quarka.org/
+  image_url: https://secure.gravatar.com/avatar/3477727c3a1c4ba101baa1314b5c5a43573359950047fda17b18828df048264b?s=100&d=mm&r=g
   page: true
   socials:
-    x: yangshunz
-    github: yangshun
-
-slorber:
-  name: Sébastien Lorber
-  title: Docusaurus maintainer
-  url: https://sebastienlorber.com
-  image_url: https://github.com/slorber.png
-  page:
-    # customize the url of the author page at /blog/authors/<permalink>
-    permalink: '/all-sebastien-lorber-articles'
-  socials:
-    x: sebastienlorber
-    linkedin: sebastienlorber
-    github: slorber
-    newsletter: https://thisweekinreact.com
+    x: koji_maruyama
+    github: kojimaruyama75

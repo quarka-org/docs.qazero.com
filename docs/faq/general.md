@@ -11,10 +11,6 @@ Frequently asked questions about QA ZERO.
 
 QA ZERO is a WordPress plugin that provides analytics, heatmaps, and session recording functionality to help you understand how users interact with your website.
 
-## Is QA ZERO free?
-
-QA ZERO offers both free and premium versions. The free version includes basic analytics and heatmap features, while the premium version adds advanced features like session recording, goal tracking, and AI-powered insights.
-
 ## How does QA ZERO compare to Google Analytics?
 
 While Google Analytics provides comprehensive traffic data, QA ZERO focuses on user behavior and interaction. QA ZERO offers visual tools like heatmaps and session recordings that Google Analytics doesn't provide. Many users use both tools together for a complete picture of their website performance.
