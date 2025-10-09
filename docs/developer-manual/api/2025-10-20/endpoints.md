@@ -1,3 +1,4 @@
+---
 id: endpoints-2025-10-20
 title: API Endpoints
 sidebar_position: 2
