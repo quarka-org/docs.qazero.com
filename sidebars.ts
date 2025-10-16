@@ -95,6 +95,7 @@ const sidebars: SidebarsConfig = {
                 'developer-manual/api/2025-10-20/getting-started-2025-10-20',
                 'developer-manual/api/2025-10-20/endpoints-2025-10-20',
                 'developer-manual/api/2025-10-20/qal-2025-10-20',
+                'developer-manual/api/2025-10-20/qal-validation-2025-10-20',
                 'developer-manual/api/2025-10-20/materials-2025-10-20',
               ],
             },

@@ -312,7 +312,7 @@ Specify which view to return and how.
 {
   "result": {
     "use": "view_name",
-    "limit": 100,
+    "limit": 1000,
     "count_only": false
   }
 }
@@ -338,20 +338,21 @@ Maximum number of rows to return.
 
 ```json
 {
-  "limit": 100
+  "limit": 1000
 }
 ```
 
 **Rules:**
-- Default: `100`
-- Maximum: `5000`
-- Values above 5000 will be capped at 5000
+- Default: `1000`
+- Maximum: `50000`
+- Values above 50000 will be capped at 50000
 
 **Examples:**
 ```json
-{"limit": 10}     // Return up to 10 rows
-{"limit": 1000}   // Return up to 1000 rows
-{"limit": 5000}   // Maximum allowed
+{"limit": 10}      // Return up to 10 rows
+{"limit": 1000}    // Default value
+{"limit": 10000}   // Return up to 10000 rows
+{"limit": 50000}   // Maximum allowed
 ```
 
 ### count_only (optional)
@@ -375,7 +376,7 @@ Return only the count instead of data.
 // Get data
 {
   "use": "page_views",
-  "limit": 100,
+  "limit": 1000,
   "count_only": false
 }
 // Returns: {"data": [...], "meta": {...}}
@@ -450,7 +451,7 @@ Get device and browser information:
   },
   "result": {
     "use": "device_info",
-    "limit": 100
+    "limit": 1000
   }
 }
 ```
@@ -550,7 +551,7 @@ Get Google Search Console keywords:
   },
   "result": {
     "use": "keywords",
-    "limit": 100
+    "limit": 1000
   }
 }
 ```
