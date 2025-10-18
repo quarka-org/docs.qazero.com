@@ -3,6 +3,7 @@ id: qal-validation-2025-10-20
 title: QAL Validation Manifest
 sidebar_position: 4
 version: "2025-10-20"
+update: "2025-10-20"
 type: validation_manifest
 description: >
   Defines strict validation rules for QAL JSON execution requests.
@@ -127,7 +128,8 @@ The YAML frontmatter section is used by the PHP executor for validation. The bod
 ```yaml
 id: qal-validation-2025-10-20
 title: QAL Validation Manifest (for Executor and AI)
-version: "2025-10-20"
+api-version: "2025-10-20"
+api-update: "2025-10-20"
 type: validation_manifest
 description: >
   Defines strict validation rules for QAL JSON execution requests.
