@@ -329,33 +329,39 @@ Content-Type: application/json
 Authorization: Basic <credentials>
 ```
 
-**Body:** JSON QAL query
+**Body:** JSON object with `qal` key containing the QAL query
 
-### QAL Query Structure (2025-10-20)
+### Request Body Structure
+
+The request body must be a JSON object with a `qal` key that contains the QAL query:
 
 ```json
 {
-  "tracking_id": "abc123",
-  "materials": [
-    { "name": "allpv" }
-  ],
-  "time": {
-    "start": "2025-10-01T00:00:00",
-    "end": "2025-10-20T00:00:00",
-    "tz": "Asia/Tokyo"
-  },
-  "make": {
-    "view_name": {
-      "from": ["allpv"],
-      "keep": ["allpv.url", "allpv.title"]
+  "qal": {
+    "tracking_id": "abc123",
+    "materials": [
+      { "name": "allpv" }
+    ],
+    "time": {
+      "start": "2025-10-01T00:00:00",
+      "end": "2025-10-20T00:00:00",
+      "tz": "Asia/Tokyo"
+    },
+    "make": {
+      "view_name": {
+        "from": ["allpv"],
+        "keep": ["allpv.url", "allpv.title"]
+      }
+    },
+    "result": {
+      "use": "view_name",
+      "limit": 100
     }
-  },
-  "result": {
-    "use": "view_name",
-    "limit": 100
   }
 }
 ```
+
+### QAL Query Structure (2025-10-20)
 
 **Note:** API version is specified in the URL (`?version=2025-10-20`), not in the QAL query body.
 
@@ -435,22 +441,24 @@ curl -X POST \
   -u "username:password" \
   -H "Content-Type: application/json" \
   -d '{
-    "tracking_id": "abc123",
-  "materials": [{"name": "allpv"}],
-    "time": {
-      "start": "2025-10-01T00:00:00",
-      "end": "2025-10-20T00:00:00",
-      "tz": "Asia/Tokyo"
-    },
-    "make": {
-      "recent": {
-        "from": ["allpv"],
-        "keep": ["allpv.url", "allpv.title", "allpv.access_time"]
+    "qal": {
+      "tracking_id": "abc123",
+      "materials": [{"name": "allpv"}],
+      "time": {
+        "start": "2025-10-01T00:00:00",
+        "end": "2025-10-20T00:00:00",
+        "tz": "Asia/Tokyo"
+      },
+      "make": {
+        "recent": {
+          "from": ["allpv"],
+          "keep": ["allpv.url", "allpv.title", "allpv.access_time"]
+        }
+      },
+      "result": {
+        "use": "recent",
+        "limit": 10
       }
-    },
-    "result": {
-      "use": "recent",
-      "limit": 10
     }
   }' \
   "https://your-site.com/wp-json/qa-platform/query?version=2025-10-20"
@@ -463,27 +471,29 @@ curl -X POST \
   -u "username:password" \
   -H "Content-Type: application/json" \
   -d '{
-    "tracking_id": "abc123",
-  "materials": [{"name": "allpv"}],
-    "time": {
-      "start": "2025-10-01T00:00:00",
-      "end": "2025-10-20T00:00:00",
-      "tz": "Asia/Tokyo"
-    },
-    "make": {
-      "mobile_pvs": {
-        "from": ["allpv"],
-        "keep": [
-          "allpv.url",
-          "allpv.device_type",
-          "allpv.os",
-          "allpv.browser"
-        ]
+    "qal": {
+      "tracking_id": "abc123",
+      "materials": [{"name": "allpv"}],
+      "time": {
+        "start": "2025-10-01T00:00:00",
+        "end": "2025-10-20T00:00:00",
+        "tz": "Asia/Tokyo"
+      },
+      "make": {
+        "mobile_pvs": {
+          "from": ["allpv"],
+          "keep": [
+            "allpv.url",
+            "allpv.device_type",
+            "allpv.os",
+            "allpv.browser"
+          ]
+        }
+      },
+      "result": {
+        "use": "mobile_pvs",
+        "limit": 50
       }
-    },
-    "result": {
-      "use": "mobile_pvs",
-      "limit": 50
     }
   }' \
   "https://your-site.com/wp-json/qa-platform/query?version=2025-10-20"
@@ -496,22 +506,24 @@ curl -X POST \
   -u "username:password" \
   -H "Content-Type: application/json" \
   -d '{
-    "tracking_id": "abc123",
-  "materials": [{"name": "allpv"}],
-    "time": {
-      "start": "2025-10-01T00:00:00",
-      "end": "2025-10-20T00:00:00",
-      "tz": "Asia/Tokyo"
-    },
-    "make": {
-      "all": {
-        "from": ["allpv"],
-        "keep": ["allpv.pv_id"]
+    "qal": {
+      "tracking_id": "abc123",
+      "materials": [{"name": "allpv"}],
+      "time": {
+        "start": "2025-10-01T00:00:00",
+        "end": "2025-10-20T00:00:00",
+        "tz": "Asia/Tokyo"
+      },
+      "make": {
+        "all": {
+          "from": ["allpv"],
+          "keep": ["allpv.pv_id"]
+        }
+      },
+      "result": {
+        "use": "all",
+        "count_only": true
       }
-    },
-    "result": {
-      "use": "all",
-      "count_only": true
     }
   }' \
   "https://your-site.com/wp-json/qa-platform/query?version=2025-10-20"
@@ -524,28 +536,30 @@ curl -X POST \
   -u "username:password" \
   -H "Content-Type: application/json" \
   -d '{
-    "tracking_id": "abc123",
-  "materials": [{"name": "gsc"}],
-    "time": {
-      "start": "2025-10-01T00:00:00",
-      "end": "2025-10-20T00:00:00",
-      "tz": "Asia/Tokyo"
-    },
-    "make": {
-      "keywords": {
-        "from": ["gsc"],
-        "keep": [
-          "gsc.keyword",
-          "gsc.clicks_sum",
-          "gsc.impressions_sum",
-          "gsc.ctr",
-          "gsc.position_wavg"
-        ]
+    "qal": {
+      "tracking_id": "abc123",
+      "materials": [{"name": "gsc"}],
+      "time": {
+        "start": "2025-10-01T00:00:00",
+        "end": "2025-10-20T00:00:00",
+        "tz": "Asia/Tokyo"
+      },
+      "make": {
+        "keywords": {
+          "from": ["gsc"],
+          "keep": [
+            "gsc.keyword",
+            "gsc.clicks_sum",
+            "gsc.impressions_sum",
+            "gsc.ctr",
+            "gsc.position_wavg"
+          ]
+        }
+      },
+      "result": {
+        "use": "keywords",
+        "limit": 100
       }
-    },
-    "result": {
-      "use": "keywords",
-      "limit": 100
     }
   }' \
   "https://your-site.com/wp-json/qa-platform/query?version=2025-10-20"
@@ -557,21 +571,24 @@ curl -X POST \
 const auth = btoa('username:password');
 
 const query = {
-  materials: [{name: "allpv"}],
-  time: {
-    start: "2025-10-01T00:00:00",
-    end: "2025-10-20T00:00:00",
-    tz: "Asia/Tokyo"
-  },
-  make: {
-    pvs: {
-      from: ["allpv"],
-      keep: ["allpv.url", "allpv.title"]
+  qal: {
+    tracking_id: "abc123",
+    materials: [{name: "allpv"}],
+    time: {
+      start: "2025-10-01T00:00:00",
+      end: "2025-10-20T00:00:00",
+      tz: "Asia/Tokyo"
+    },
+    make: {
+      pvs: {
+        from: ["allpv"],
+        keep: ["allpv.url", "allpv.title"]
+      }
+    },
+    result: {
+      use: "pvs",
+      limit: 10
     }
-  },
-  result: {
-    use: "pvs",
-    limit: 10
   }
 };
 
@@ -594,22 +611,24 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 query = {
-    "tracking_id": "abc123",
-  "materials": [{"name": "allpv"}],
-    "time": {
-        "start": "2025-10-01T00:00:00",
-        "end": "2025-10-20T00:00:00",
-        "tz": "Asia/Tokyo"
-    },
-    "make": {
-        "pvs": {
-            "from": ["allpv"],
-            "keep": ["allpv.url", "allpv.title"]
+    "qal": {
+        "tracking_id": "abc123",
+        "materials": [{"name": "allpv"}],
+        "time": {
+            "start": "2025-10-01T00:00:00",
+            "end": "2025-10-20T00:00:00",
+            "tz": "Asia/Tokyo"
+        },
+        "make": {
+            "pvs": {
+                "from": ["allpv"],
+                "keep": ["allpv.url", "allpv.title"]
+            }
+        },
+        "result": {
+            "use": "pvs",
+            "limit": 10
         }
-    },
-    "result": {
-        "use": "pvs",
-        "limit": 10
     }
 }
 
