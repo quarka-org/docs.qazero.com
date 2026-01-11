@@ -5,6 +5,7 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
 import Heading from '@theme/Heading';
+import Translate, {translate} from '@docusaurus/Translate';
 
 import styles from './index.module.css';
 
@@ -16,12 +17,16 @@ function HomepageHeader() {
         <Heading as="h1" className="hero__title">
           {siteConfig.title}
         </Heading>
-        <p className="hero__subtitle">{siteConfig.tagline}</p>
+        <p className="hero__subtitle">
+          <Translate id="homepage.subtitle">
+            Everything you need to master QA ZERO – from setup to advanced analytics.
+          </Translate>
+        </p>
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
             to="/docs/user-manual/introduction">
-            Get Started
+            <Translate id="homepage.getStarted">Get Started</Translate>
           </Link>
         </div>
       </div>
@@ -34,7 +39,11 @@ export default function Home(): ReactNode {
   return (
     <Layout
       title={`${siteConfig.title}`}
-      description="Official documentation and support for QA ZERO - WordPress analytics, heatmaps, and session recording plugin">
+      description={translate({
+        id: 'homepage.description',
+        message:
+          'Official documentation and support for QA ZERO - WordPress analytics, heatmaps, and session recording plugin',
+      })}>
       <HomepageHeader />
       <main>
         <HomepageFeatures />

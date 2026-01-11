@@ -1,0 +1,50 @@
+{
+  "version.label": {
+    "message": "Latest",
+    "description": "The label for version current"
+  },
+  "sidebar.userManualSidebar.category.User Manual": {
+    "message": "User Manual",
+    "description": "The label for category User Manual in sidebar userManualSidebar"
+  },
+  "sidebar.userManualSidebar.category.🧭 Start Guide": {
+    "message": "🧭 Start Guide",
+    "description": "The label for category 🧭 Start Guide in sidebar userManualSidebar"
+  },
+  "sidebar.userManualSidebar.category.🔍 Screens and Operations": {
+    "message": "🔍 Screens and Operations",
+    "description": "The label for category 🔍 Screens and Operations in sidebar userManualSidebar"
+  },
+  "sidebar.userManualSidebar.category.⚙ Site Environment Adjustments": {
+    "message": "⚙ Site Environment Adjustments",
+    "description": "The label for category ⚙ Site Environment Adjustments in sidebar userManualSidebar"
+  },
+  "sidebar.userManualSidebar.category.🛠 Troubleshooting": {
+    "message": "🛠 Troubleshooting",
+    "description": "The label for category 🛠 Troubleshooting in sidebar userManualSidebar"
+  },
+  "sidebar.userManualSidebar.category.🔐 Premium Version and License": {
+    "message": "🔐 Premium Version and License",
+    "description": "The label for category 🔐 Premium Version and License in sidebar userManualSidebar"
+  },
+  "sidebar.developerManualSidebar.category.Developer Manual": {
+    "message": "Developer Manual",
+    "description": "The label for category Developer Manual in sidebar developerManualSidebar"
+  },
+  "sidebar.developerManualSidebar.category.API Reference": {
+    "message": "API Reference",
+    "description": "The label for category API Reference in sidebar developerManualSidebar"
+  },
+  "sidebar.developerManualSidebar.category.Version 2025-10-20": {
+    "message": "Version 2025-10-20",
+    "description": "The label for category Version 2025-10-20 in sidebar developerManualSidebar"
+  },
+  "sidebar.releaseNotesSidebar.category.Release Notes": {
+    "message": "Release Notes",
+    "description": "The label for category Release Notes in sidebar releaseNotesSidebar"
+  },
+  "sidebar.faqSidebar.category.FAQ": {
+    "message": "FAQ",
+    "description": "The label for category FAQ in sidebar faqSidebar"
+  }
+}
