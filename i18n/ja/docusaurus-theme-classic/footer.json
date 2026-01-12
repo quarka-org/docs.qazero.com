@@ -1,0 +1,50 @@
+{
+  "link.title.Documentation": {
+    "message": "Documentation",
+    "description": "The title of the footer links column with title=Documentation in the footer"
+  },
+  "link.title.Community": {
+    "message": "Community",
+    "description": "The title of the footer links column with title=Community in the footer"
+  },
+  "link.title.More": {
+    "message": "More",
+    "description": "The title of the footer links column with title=More in the footer"
+  },
+  "link.item.label.User Manual": {
+    "message": "User Manual",
+    "description": "The label of footer link with label=User Manual linking to /docs/user-manual/introduction"
+  },
+  "link.item.label.Developer Manual": {
+    "message": "Developer Manual",
+    "description": "The label of footer link with label=Developer Manual linking to /docs/developer-manual/introduction"
+  },
+  "link.item.label.Release Notes": {
+    "message": "Release Notes",
+    "description": "The label of footer link with label=Release Notes linking to /docs/release-notes/v3x"
+  },
+  "link.item.label.FAQ": {
+    "message": "FAQ",
+    "description": "The label of footer link with label=FAQ linking to /docs/faq/general"
+  },
+  "link.item.label.GitHub Issues": {
+    "message": "GitHub Issues",
+    "description": "The label of footer link with label=GitHub Issues linking to https://github.com/quarka-org/docs.qazero.com/issues"
+  },
+  "link.item.label.WordPress.org": {
+    "message": "WordPress.org",
+    "description": "The label of footer link with label=WordPress.org linking to https://wordpress.org/plugins/"
+  },
+  "link.item.label.Blog": {
+    "message": "Blog",
+    "description": "The label of footer link with label=Blog linking to /blog"
+  },
+  "link.item.label.GitHub": {
+    "message": "GitHub",
+    "description": "The label of footer link with label=GitHub linking to https://github.com/quarka-org/docs.qazero.com"
+  },
+  "copyright": {
+    "message": "Copyright © 2026 QA ZERO. Built with Docusaurus.",
+    "description": "The footer copyright"
+  }
+}
