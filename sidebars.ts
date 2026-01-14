@@ -27,6 +27,7 @@ const sidebars: SidebarsConfig = {
             'user-manual/start-guide/initial-setup',
             'user-manual/start-guide/faq',
             'user-manual/start-guide/tracking-tag-setup',
+            'user-manual/start-guide/cookie-consent-tool-setup',
           ],
         },
         {
