@@ -8,11 +8,11 @@
     "description": "The label for category User Manual in sidebar userManualSidebar"
   },
   "sidebar.userManualSidebar.category.🧭 Start Guide": {
-    "message": "🧭 Start Guide",
+    "message": "🧭 スタートガイド",
     "description": "The label for category 🧭 Start Guide in sidebar userManualSidebar"
   },
   "sidebar.userManualSidebar.category.🔍 Screens and Operations": {
-    "message": "🔍 Screens and Operations",
+    "message": "🔍 QA ZEROの使い方",
     "description": "The label for category 🔍 Screens and Operations in sidebar userManualSidebar"
   },
   "sidebar.userManualSidebar.category.⚙ Site Environment Adjustments": {
@@ -26,6 +26,10 @@
   "sidebar.userManualSidebar.category.🔐 Premium Version and License": {
     "message": "🔐 Premium Version and License",
     "description": "The label for category 🔐 Premium Version and License in sidebar userManualSidebar"
+  },
+  "sidebar.userManualSidebar.category.🚀 Deployment": {  
+    "message": "🚀 導入環境",  
+    "description": "The label for category 🚀 Deployment in sidebar userManualSidebar"  
   },
   "sidebar.developerManualSidebar.category.Developer Manual": {
     "message": "Developer Manual",

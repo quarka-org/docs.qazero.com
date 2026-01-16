@@ -32,7 +32,7 @@ const sidebars: SidebarsConfig = {
         },
         {
           type: 'category',
-          label: '🔍 Screens and Operations',
+          label: '🔍 Using QA ZERO',
           items: [
             'user-manual/screens-operations/overview',
             'user-manual/screens-operations/heatmap-usage',
