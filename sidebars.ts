@@ -35,8 +35,9 @@ const sidebars: SidebarsConfig = {
           label: '🔍 Using QA ZERO',
           items: [
             'user-manual/screens-operations/overview',
-            'user-manual/screens-operations/heatmap-usage',
+            'user-manual/screens-operations/ai-reports',
             'user-manual/screens-operations/article-data',
+            'user-manual/screens-operations/heatmap-usage',
           ],
         },
         {
