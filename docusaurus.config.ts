@@ -51,7 +51,6 @@ const config: Config = {
       {
         docs: {
           sidebarPath: './sidebars.ts',
-          editUrl: 'https://github.com/quarka-org/docs.qazero.com/edit/main/',
           routeBasePath: 'docs',
           path: 'docs',
           lastVersion: 'current',
@@ -67,7 +66,6 @@ const config: Config = {
             type: ['rss', 'atom'],
             xslt: true,
           },
-          editUrl: 'https://github.com/quarka-org/docs.qazero.com/edit/main/',
           // Blogging best practices
           onInlineTags: 'warn',
           onInlineAuthors: 'warn',
