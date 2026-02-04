@@ -1,6 +1,6 @@
 ---
-sidebar_position: 2
-title: AIレポート
+sidebar_position: 3
+title: AIレポート（スプレッドシート版）
 ---
 
 # AIレポート
