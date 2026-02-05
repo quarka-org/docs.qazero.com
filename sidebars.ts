@@ -39,6 +39,7 @@ const sidebars: SidebarsConfig = {
             'user-manual/screens-operations/ai-reports',
             'user-manual/screens-operations/article-data',
             'user-manual/screens-operations/heatmap-usage',
+            'user-manual/screens-operations/heatmap-versions',
           ],
         },
         {
