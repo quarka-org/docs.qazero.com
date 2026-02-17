@@ -24,7 +24,7 @@ QA ZERO では、サイト訪問者が Cookie の利用に同意しているか�
 
 そのため、Cookie 同意ツールを利用しているサイトでは、  
 同意／拒否のタイミングで QA ZERO に通知を送るための  
-JavaScript スクリプト（同意タグ）の設置が必要です。
+JavaScript スクリプト（同意連携スクリプト）の設置が必要です。
 
 
 ---
@@ -50,15 +50,15 @@ Cookie 同意ツールおよび ZERO のタグとの読み込み順を意識し�
 
 ZERO に関するタグは、次の順番で設置します。
 
-1. **トラッキングタグ（先）**
+1. **計測タグ（先）**
 2. **同意連携スクリプト（後）**
 
 
 同意連携スクリプトでは  
 `qahmz_pub.cookieConsent()` という JavaScript 関数を呼び出します。
 
-この関数はトラッキングタグ内で定義されるため、  
-トラッキングタグを先に読み込んでおく必要があります。
+この関数は計測タグ内で定義されるため、  
+計測タグを先に読み込んでおく必要があります。
 
 順序が逆になると、  
 関数が未定義の状態で実行され、エラーが発生する可能性があります。
@@ -69,7 +69,7 @@ ZERO に関するタグは、次の順番で設置します。
 
 同意連携スクリプトでは、  
 Cookie 同意ツールが示す同意状態に応じて  
-次の JavaScript を実行します。
+以下の JavaScript を呼び出すように実装します。
 
 - 同意したとき  
   `qahmz_pub.cookieConsent(true);`
@@ -79,18 +79,20 @@ Cookie 同意ツールが示す同意状態に応じて
 
 ---
 
-### 実装イメージ（雛形）
+## 実装イメージ（サンプル）
 
-以下は記述例です。
+以下は **実装例（サンプル）** です。  
+実際の実装では、**お使いの Cookie 同意ツールの仕様に合わせて**コードを記述してください。
 
-仮に、Cookie 同意ツールから次のような値が取得できるとします。
 
-- 同意のとき：`consentStatus === "accepted"`
-- 拒否のとき：`consentStatus === "rejected"`
+### 1) 同意状態を表す値を直接参照できる場合
+
+* 変数名（例：`consentStatus`）  
+* 同意／拒否を表す値（例：`"accepted"` / `"rejected"`）    
+は、お使いの Cookie 同意ツールの仕様に基づいて適切に実装してください。
 
 ```html
 <script>
-// ▼ 変数名と値は、お使いの Cookie 同意ツールに合わせて変更してください
 if (consentStatus === "accepted") {
   qahmz_pub.cookieConsent(true);
 } else if (consentStatus === "rejected") {
@@ -99,17 +101,44 @@ if (consentStatus === "accepted") {
 </script>
 ```
 
-※ 同意状態の取得方法（変数名・値・コールバック名など）は  
-**お使いの Cookie 同意ツールの仕様をご確認ください**。
+
+### 2) コールバック関数の引数として同意状態が渡される場合
+
+コールバック内で `qahmz_pub.cookieConsent()` を呼び出します。
+
+* コールバック関数名（例：`onCookieConsentChange`）  
+* 引数の形式（`true/false` なのか、文字列なのか）    
+は、お使いの Cookie 同意ツールの仕様に基づいて適切に実装してください。
+
+```html
+<script>
+window.onCookieConsentChange = function(consent) {
+  qahmz_pub.cookieConsent(consent);
+};
+</script>
+```
 
 
----
+### 3) イベントとして同意状態が通知される場合
+
+イベントリスナー内で `qahmz_pub.cookieConsent()` を呼び出します。
+
+* イベント名（例：`cookieConsent`）  
+* イベントオブジェクトの構造（例：`e.detail.agreed`）    
+は、お使いの Cookie 同意ツールの仕様に基づいて適切に実装してください。
+
+```html
+<script>
+window.addEventListener('cookieConsent', function(e) {
+  qahmz_pub.cookieConsent(e.detail.agreed);
+});
+</script>
+```
 
 
-## 設定作業の担当範囲について
+※ 同意状態の取得方法（変数名・値・コールバック名・イベント名など）は、  
+**必ずお使いの Cookie 同意ツールの仕様をご確認のうえ実装してください。**
 
-- 計測サイトページ側（HTML やタグ管理ツール）に JavaScript スクリプトを設置してください
-- スクリプト内で使用する「同意／拒否を表す値」は、お使いの Cookie 同意ツールの仕様をご確認ください
 
 
 ---
