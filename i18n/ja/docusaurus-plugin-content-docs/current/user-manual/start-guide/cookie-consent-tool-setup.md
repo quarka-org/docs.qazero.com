@@ -20,10 +20,10 @@ Cookie 同意ツールを利用していない場合は、
 ## なぜこの連携（スクリプト設置）が必要なのか
 
 QA ZERO では、サイト訪問者が Cookie の利用に同意しているかどうかに応じて、  
-計測の動作を切り替えています。
+計測方法（Cookieを使った計測か使わない計測か）を切り替えることができます。
 
 そのため、Cookie 同意ツールを利用しているサイトでは、  
-同意／拒否のタイミングで QA ZERO に通知を送るための  
+**サイト訪問者の Cookie 同意／拒否の結果を QA ZERO に通知するための**  
 JavaScript スクリプト（同意連携スクリプト）の設置が必要です。
 
 
@@ -67,7 +67,27 @@ ZERO に関するタグは、次の順番で設置します。
 
 ## 同意連携スクリプトで行うこと
 
-同意連携スクリプトでは、  
+QA ZERO と Cookie 同意ツールを連携する場合、  
+サイト側で実装する内容は次の 2 点です。
+
+1. `qahmz.cookieConsentObject` を定義する  
+2. Cookie 同意ツールの状態に応じて `qahmz_pub.cookieConsent()` を呼び出す  
+
+---
+
+### 1. 同意オブジェクトの定義
+
+計測タグの後に、次のコードを記述してください。
+
+```html
+<script>
+var qahmz = qahmz || {};
+qahmz.cookieConsentObject = true;
+</script>
+```
+
+### 2. 同意／拒否の通知
+
 Cookie 同意ツールが示す同意状態に応じて  
 以下の JavaScript を呼び出すように実装します。
 
@@ -92,6 +112,13 @@ Cookie 同意ツールが示す同意状態に応じて
 は、お使いの Cookie 同意ツールの仕様に基づいて適切に実装してください。
 
 ```html
+<!-- ① 同意オブジェクトの定義（必ず書く） -->
+<script>
+var qahmz = qahmz || {};
+qahmz.cookieConsentObject = true;
+</script>
+
+<!-- ② 同意／拒否の通知（Cookie同意ツールの仕様に合わせて書く） -->
 <script>
 if (consentStatus === "accepted") {
   qahmz_pub.cookieConsent(true);
@@ -111,6 +138,13 @@ if (consentStatus === "accepted") {
 は、お使いの Cookie 同意ツールの仕様に基づいて適切に実装してください。
 
 ```html
+<!-- ① 同意オブジェクトの定義（必ず書く） -->
+<script>
+var qahmz = qahmz || {};
+qahmz.cookieConsentObject = true;
+</script>
+
+<!-- ② 同意／拒否の通知（Cookie同意ツールの仕様に合わせて書く） -->
 <script>
 window.onCookieConsentChange = function(consent) {
   qahmz_pub.cookieConsent(consent);
@@ -128,6 +162,13 @@ window.onCookieConsentChange = function(consent) {
 は、お使いの Cookie 同意ツールの仕様に基づいて適切に実装してください。
 
 ```html
+<!-- ① 同意オブジェクトの定義（必ず書く） -->
+<script>
+var qahmz = qahmz || {};
+qahmz.cookieConsentObject = true;
+</script>
+
+<!-- ② 同意／拒否の通知（Cookie同意ツールの仕様に合わせて書く） -->
 <script>
 window.addEventListener('cookieConsent', function(e) {
   qahmz_pub.cookieConsent(e.detail.agreed);
