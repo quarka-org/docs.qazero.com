@@ -1,9 +1,9 @@
 ---
 sidebar_position: 1
-title: インストール
+title: QA ZERO プラグインのインストール
 ---
 
-# インストール
+# QA ZERO プラグインのインストール
 
 このガイドでは、WordPressをデプロイメントプラットフォームとして使用してQA ZERO分析サーバーをインストールする方法を説明します。
 

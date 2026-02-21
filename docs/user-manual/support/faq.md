@@ -28,7 +28,7 @@ Theme compatibility is irrelevant. QA ZERO does **not** render or affect your Wo
 No. QA ZERO is optimized for performance. The tracking script loads asynchronously and does not block rendering. All analytics data is processed server-side in a way that is completely detached from your website's core operation.
 
 ### Can I use QA ZERO with a caching plugin?
-Yes. Since QA ZERO doesn't modify your visible site pages, it is compatible with most caching plugins. However, make sure the tracking script is excluded from page caching if needed. Details are available in the [Plugin Compatibility](#) section.
+Yes. Since QA ZERO doesn't modify your visible site pages, it is compatible with most caching plugins. However, make sure the tracking script is excluded from page caching if needed. 
 
 ---
 
