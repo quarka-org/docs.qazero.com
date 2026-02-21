@@ -3,6 +3,10 @@ sidebar_position: 3
 title: AI Reports (Spreadsheet Version)
 ---
 
-# AI Reports
+This page has been moved as part of a documentation structure update.
 
-AI-powered analytics reports and insights.
+Please refer to the updated page below:
+
+👉 [AI Reports (Spreadsheet Version)](/docs/user-manual/using/ai-reports)
+
+If you have bookmarked this page, please update your bookmark.

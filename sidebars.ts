@@ -21,57 +21,7 @@ const sidebars: SidebarsConfig = {
         'user-manual/introduction',
         {
           type: 'category',
-          label: '🧭 Start Guide',
-          items: [
-            'user-manual/start-guide/installation',
-            'user-manual/start-guide/initial-setup',
-            'user-manual/start-guide/faq',
-            'user-manual/start-guide/tracking-tag-setup',
-            'user-manual/start-guide/cookie-consent-tool-setup',
-          ],
-        },
-        {
-          type: 'category',
-          label: '🔍 Using QA ZERO',
-          items: [
-            'user-manual/screens-operations/overview',
-            'user-manual/screens-operations/ai-reports-direct',
-            'user-manual/screens-operations/ai-reports',
-            'user-manual/screens-operations/article-data',
-            'user-manual/screens-operations/heatmap-usage',
-            'user-manual/screens-operations/heatmap-versions',
-          ],
-        },
-        {
-          type: 'category',
-          label: '⚙ Site Environment Adjustments',
-          items: [
-            'user-manual/site-environment/plugin-compatibility',
-            'user-manual/site-environment/theme-layout',
-            'user-manual/site-environment/site-performance',
-          ],
-        },
-        {
-          type: 'category',
-          label: '🛠 Troubleshooting',
-          items: [
-            'user-manual/troubleshooting/recording-issues',
-            'user-manual/troubleshooting/data-loss',
-            'user-manual/troubleshooting/license-errors',
-          ],
-        },
-        {
-          type: 'category',
-          label: '🔐 Premium Version and License',
-          items: [
-            'user-manual/premium-license/free-vs-premium',
-            'user-manual/premium-license/activation',
-            'user-manual/premium-license/subscription',
-          ],
-        },
-        {
-          type: 'category',
-          label: '🚀 Deployment',
+          label: 'Deployment',
           items: [
             'user-manual/deployment/server-overview',
             'user-manual/deployment/infrastructure-requirements',
@@ -84,6 +34,35 @@ const sidebars: SidebarsConfig = {
             'user-manual/deployment/operational-notes',
           ],
         },
+        {
+          type: 'category',
+          label: 'Tracking Setup',
+          items: [           
+            'user-manual/tracking-setup/tracking-tag-setup',
+            'user-manual/tracking-setup/cookie-consent-tool-setup',
+          ],
+        },
+        {
+          type: 'category',
+          label: '📊 Using QA ZERO',
+          items: [
+            'user-manual/using/ai-reports-direct',
+            'user-manual/using/ai-reports',
+            'user-manual/using/heatmap-usage',
+            'user-manual/using/heatmap-versions',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Support & FAQ',
+          items: [
+            'user-manual/support/faq',
+            'user-manual/support/faq-heatmap-data',
+            'user-manual/support/faq-tsv-report-fields',
+            'user-manual/support/troubleshooting',
+          ],
+        },
+
       ],
     },
   ],
