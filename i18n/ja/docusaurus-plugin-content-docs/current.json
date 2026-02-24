@@ -7,29 +7,21 @@
     "message": "User Manual",
     "description": "The label for category User Manual in sidebar userManualSidebar"
   },
-  "sidebar.userManualSidebar.category.🧭 Start Guide": {
-    "message": "🧭 スタートガイド",
-    "description": "The label for category 🧭 Start Guide in sidebar userManualSidebar"
+    "sidebar.userManualSidebar.category.Deployment": {  
+    "message": "導入準備",  
+    "description": "The label for category Deployment in sidebar userManualSidebar"  
   },
-  "sidebar.userManualSidebar.category.🔍 Screens and Operations": {
-    "message": "🔍 QA ZEROの使い方",
-    "description": "The label for category 🔍 Screens and Operations in sidebar userManualSidebar"
+  "sidebar.userManualSidebar.category.Tracking Setup": {
+    "message": "計測設定",
+    "description": "The label for category Tracking Setup in sidebar userManualSidebar"
   },
-  "sidebar.userManualSidebar.category.⚙ Site Environment Adjustments": {
-    "message": "⚙ Site Environment Adjustments",
-    "description": "The label for category ⚙ Site Environment Adjustments in sidebar userManualSidebar"
+  "sidebar.userManualSidebar.category.📊 Using QA ZERO": {
+    "message": "📊 QA ZEROの使い方",
+    "description": "The label for category 📊 Using QA ZERO in sidebar userManualSidebar"
   },
-  "sidebar.userManualSidebar.category.🛠 Troubleshooting": {
-    "message": "🛠 Troubleshooting",
-    "description": "The label for category 🛠 Troubleshooting in sidebar userManualSidebar"
-  },
-  "sidebar.userManualSidebar.category.🔐 Premium Version and License": {
-    "message": "🔐 Premium Version and License",
-    "description": "The label for category 🔐 Premium Version and License in sidebar userManualSidebar"
-  },
-  "sidebar.userManualSidebar.category.🚀 Deployment": {  
-    "message": "🚀 導入環境",  
-    "description": "The label for category 🚀 Deployment in sidebar userManualSidebar"  
+  "sidebar.userManualSidebar.category.Support & FAQ": {
+    "message": "サポート & FAQ",
+    "description": "The label for category Support & FAQ in sidebar userManualSidebar"
   },
   "sidebar.developerManualSidebar.category.Developer Manual": {
     "message": "Developer Manual",
