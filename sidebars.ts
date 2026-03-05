@@ -50,8 +50,8 @@ const sidebars: SidebarsConfig = {
             'user-manual/using/ai-reports',
             'user-manual/using/heatmap-usage',
             'user-manual/using/heatmap-versions',
-            'user-manual/using/goal-settings',
             'user-manual/using/convenient-features',
+            'user-manual/using/goal-settings',
           ],
         },
         {
