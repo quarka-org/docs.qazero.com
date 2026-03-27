@@ -51,6 +51,7 @@ const sidebars: SidebarsConfig = {
             'user-manual/using/assistants',
             'user-manual/using/heatmap-usage',
             'user-manual/using/heatmap-versions',
+            'user-manual/using/session-recording',
             'user-manual/using/convenient-features',
             'user-manual/using/goal-settings',
           ],
