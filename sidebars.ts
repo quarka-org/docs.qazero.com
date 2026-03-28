@@ -49,6 +49,8 @@ const sidebars: SidebarsConfig = {
             'user-manual/using/ai-reports-direct',
             'user-manual/using/ai-reports',
             'user-manual/using/assistants',
+            'user-manual/using/realtime',
+            'user-manual/using/audience',
             'user-manual/using/heatmap-usage',
             'user-manual/using/heatmap-versions',
             'user-manual/using/session-recording',
