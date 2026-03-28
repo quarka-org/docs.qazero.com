@@ -1,7 +1,7 @@
 ---
 id: heatmap-versions
 title: ヒートマップバージョンについて
-sidebar_position: 6
+sidebar_position: 51
 ---
 
 # ヒートマップバージョンについて

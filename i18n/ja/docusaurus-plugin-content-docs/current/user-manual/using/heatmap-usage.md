@@ -1,7 +1,7 @@
 ---  
 id: heatmap-usage  
 title: ヒートマップ
-sidebar_position: 5  
+sidebar_position: 50  
 ---
 
 # ヒートマップ
