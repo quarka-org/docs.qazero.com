@@ -1,7 +1,7 @@
 ---
 id: session-recording
 title: セッションレコーディング（動画再生）
-sidebar_position: 7
+sidebar_position: 60
 ---
 
 # セッションレコーディング（動画再生）
