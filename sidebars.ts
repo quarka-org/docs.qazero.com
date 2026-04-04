@@ -68,6 +68,16 @@ const sidebars: SidebarsConfig = {
             'user-manual/support/troubleshooting',
           ],
         },
+        {
+          type: 'category',
+          label: 'Terms & Usage',
+          items: [
+            'user-manual/terms/plans-contracts',
+            'user-manual/terms/terms-privacy',
+            'user-manual/terms/cancellation',
+            'user-manual/terms/support-update-policy',
+          ],
+        },
 
       ],
     },

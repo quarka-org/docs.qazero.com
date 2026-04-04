@@ -23,6 +23,10 @@
     "message": "サポート & FAQ",
     "description": "The label for category Support & FAQ in sidebar userManualSidebar"
   },
+  "sidebar.userManualSidebar.category.Terms & Usage": {
+    "message": "契約・利用について",
+    "description": "The label for category Terms & Usage in sidebar userManualSidebar"
+  },
   "sidebar.developerManualSidebar.category.Developer Manual": {
     "message": "Developer Manual",
     "description": "The label for category Developer Manual in sidebar developerManualSidebar"
