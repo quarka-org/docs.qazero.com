@@ -4,10 +4,60 @@
         <title>Welcome to the Official QA ZERO Documentation Blog</title>
         <link>https://docs.qazero.com/ja/blog</link>
         <description>Welcome to the Official QA ZERO Documentation Blog</description>
-        <lastBuildDate>Sat, 01 Nov 2025 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Fri, 10 Apr 2026 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>ja</language>
+        <item>
+            <title><![CDATA[qa-labo spring 2026: filter, join, calc, and a lot of new materials]]></title>
+            <link>https://docs.qazero.com/ja/blog/qa-labo-spring-2026-update</link>
+            <guid>https://docs.qazero.com/ja/blog/qa-labo-spring-2026-update</guid>
+            <pubDate>Fri, 10 Apr 2026 00:00:00 GMT</pubDate>
+            <description><![CDATA[Most of the heavy lifting in QA ZERO happens in a sibling repository called qa-labo — the experimental fork where new features incubate before they roll up into the production plugin. This post is the first in what I hope becomes a regular stream of notes from that work.]]></description>
+            <content:encoded><![CDATA[<p>Most of the heavy lifting in QA ZERO happens in a sibling repository called <strong>qa-labo</strong> — the experimental fork where new features incubate before they roll up into the production plugin. This post is the first in what I hope becomes a regular stream of notes from that work.</p>
+<p>Since the last time this blog updated, qa-labo has filled in almost everything the original QAL <code>2025-10-20</code> guide listed as "not yet available". The API version is <strong>unchanged</strong> — these are additive, so you can keep using <code>?version=2025-10-20</code> and just start using the new features.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="whats-new-in-qal">What's new in QAL<a href="https://docs.qazero.com/ja/blog/qa-labo-spring-2026-update#whats-new-in-qal" class="hash-link" aria-label="What's new in QAL への直接リンク" title="What's new in QAL への直接リンク">​</a></h2>
+<p>The original release shipped <code>from</code> + <code>keep</code> and little else. You can now write full queries:</p>
+<ul>
+<li><strong><code>filter</code></strong> — flat, AND-combined row filter with ten operators (<code>eq</code>, <code>neq</code>, <code>gt</code>/<code>gte</code>, <code>lt</code>/<code>lte</code>, <code>in</code>, <code>contains</code>, <code>prefix</code>, <code>between</code>). Keys are plain column names belonging to the source material, so <code>{ "device_type": ["SP"], "url": { "prefix": "/blog" } }</code> "just works".</li>
+<li><strong><code>join</code></strong> — single equi-join per view, id-columns only. N<!-- -->:M<!-- --> materials like <code>gsc</code> now require a filter on the joined side (enforced by the executor as <code>E_JOIN_FILTER_REQUIRED</code>) — we hit this in production when a stray join blew up a 100-PV page into 15,000 rows. The rule is strict by design.</li>
+<li><strong><code>calc</code></strong> — whitelisted aggregation (<code>COUNT</code>, <code>COUNTUNIQUE</code>, <code>SUM</code>, <code>AVERAGE</code>, <code>MIN</code>, <code>MAX</code>) with a strict single-column argument. <code>COUNT(*)</code> is still banned — always name the column, which keeps the optimizer honest.</li>
+<li><strong>View chaining</strong> — <code>from: ["&lt;earlier_view&gt;"]</code> inside the same <code>make</code> block. This is where QAL starts feeling like a real query language: filter once in a base view, then aggregate it two different ways in child views without re-scanning the column DB.</li>
+<li><strong><code>result.sort</code>, <code>result.sample</code>, <code>result.include_count</code></strong> — these keys are reserved in the spec but <strong>not yet implemented</strong>. <code>sort</code> is currently rejected as <code>E_RESULT_FORBIDDEN_KEY</code>, and <code>sample</code>/<code>include_count</code> pass validation but are no-ops. Sort and size-check client-side until the <code>features</code> map in <code>/guide</code> flips them on.</li>
+</ul>
+<p>The <a href="https://docs.qazero.com/ja/docs/developer-manual/api/2025-10-20/qal-2025-10-20">QAL Guide</a> has been completely rewritten to cover all of this, and the <a href="https://docs.qazero.com/ja/docs/developer-manual/api/2025-10-20/qal-validation-2025-10-20">Validation Manifest</a> now reflects the executor's real rules instead of the initial "everything is disabled" stub.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="new-materials">New materials<a href="https://docs.qazero.com/ja/blog/qa-labo-spring-2026-update#new-materials" class="hash-link" aria-label="New materials への直接リンク" title="New materials への直接リンク">​</a></h2>
+<p><code>allpv</code> and <code>gsc</code> are no longer alone. <code>/guide</code> now surfaces:</p>
+<ul>
+<li><strong><code>goal_1</code>..<code>goal_N</code></strong> — per-PV conversion logs, one material per configured goal. For "did this PV achieve goal 3?" there are also <strong>virtual</strong> columns <code>is_goal_1</code>..<code>is_goal_10</code> on <code>allpv</code> so you can filter without switching materials.</li>
+<li><strong><code>ga4_age_gender</code>, <code>ga4_country</code>, <code>ga4_region</code></strong> — GA4 attribute data landed via T48. These are aggregate materials (no <code>pv_id</code>), meant to complement <code>allpv</code> with demographics that first-party tracking doesn't see.</li>
+<li><strong><code>page_version</code></strong> — per-page content version tracker (T53). Joins to <code>allpv</code> on <code>version_id</code>, 1:1, so you can attach version metadata to PVs without worrying about row explosion.</li>
+<li><strong><code>click_event</code></strong> — click events with selector, element text, destination URL, and page-relative coordinates. Joinable via <code>pv_id</code>.</li>
+<li><strong><code>datalayer_event</code></strong> (+ dynamic <strong><code>events.{name}</code></strong>) — sites that ship dataLayer events now get both a uniform index of every event and a typed per-event material whose columns reflect that event's parameters. The <code>/guide</code> response lists every <code>events.*</code> material the site exposes.</li>
+</ul>
+<p>And <code>allpv</code> itself grew a lot of new columns: behavioral metrics (<code>depth_position</code>, <code>deep_read</code>, <code>stop_max_sec</code>, <code>stop_max_pos</code>, <code>exit_pos</code>, <code>is_submit</code>, <code>dead_click_image_count</code>, <code>irritation_click_count</code>, <code>scroll_back_count</code>, <code>content_skip_count</code>, <code>exploration_count</code>) and generated page-type booleans (<code>is_article</code>, <code>is_product</code>, <code>is_form</code>, <code>is_faq</code>, and so on). The <a href="https://docs.qazero.com/ja/docs/developer-manual/api/2025-10-20/materials-2025-10-20">Materials Reference</a> has the full list.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="why-docs-as-a-knowledge-base-for-ai">Why "docs as a knowledge base for AI"?<a href="https://docs.qazero.com/ja/blog/qa-labo-spring-2026-update#why-docs-as-a-knowledge-base-for-ai" class="hash-link" aria-label="Why &quot;docs as a knowledge base for AI&quot;? への直接リンク" title="Why &quot;docs as a knowledge base for AI&quot;? への直接リンク">​</a></h2>
+<p>This blog sits in a <strong>public</strong> repository on purpose. The API documentation for QA ZERO is optimized not just for human developers but for <strong>AI assistants that are about to write a QAL query</strong>. If an LLM is going to generate a valid query for you, it needs:</p>
+<ul>
+<li>Exact, machine-readable validation rules (hence the YAML frontmatter on the validation manifest being identical to the body).</li>
+<li>A clear list of allowed column names per material (hence every material page linking out of <code>/guide</code>).</li>
+<li>Explicit error codes with the cause, so the assistant can self-correct rather than hallucinate.</li>
+</ul>
+<p>The blog itself is a lower-ceremony channel: design notes, "why we did it this way" stories, and dev diaries. Expect it to update irregularly — when something interesting ships in qa-labo, not on a fixed cadence.</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="whats-next">What's next<a href="https://docs.qazero.com/ja/blog/qa-labo-spring-2026-update#whats-next" class="hash-link" aria-label="What's next への直接リンク" title="What's next への直接リンク">​</a></h2>
+<p>The shortlist on my desk right now:</p>
+<ul>
+<li><code>OR</code> across filter conditions (the top complaint since <code>filter</code> went live).</li>
+<li>HAVING-style filtering over aggregated results.</li>
+<li><code>return.mode = "FILE"</code> with CSV and Parquet output for the "I need 5 million rows" case.</li>
+<li>More attribute materials as additional sources land.</li>
+</ul>
+<p>If you're building against the QA ZERO API and something in the new surface is unclear, file an issue against <a href="https://github.com/quarka-org/docs.qazero.com" target="_blank" rel="noopener noreferrer">quarka-org/docs.qazero.com</a> — the repo is public precisely so problems in the docs are as easy to report as problems in the code.</p>
+<p>— Koji</p>]]></content:encoded>
+            <category>qa-labo</category>
+            <category>QAL</category>
+            <category>API</category>
+        </item>
         <item>
             <title><![CDATA[Welcome to the QA ZERO Blog]]></title>
             <link>https://docs.qazero.com/ja/blog/welcome</link>
