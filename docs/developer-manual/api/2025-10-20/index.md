@@ -2,7 +2,7 @@
 id: getting-started-2025-10-20
 title: Getting Started
 sidebar_position: 1
-last_updated: 2025-10-06
+last_updated: 2026-04-10
 ---
 
 # QA  ZERO API - Getting Started (2025-10-20)
@@ -11,8 +11,8 @@ last_updated: 2025-10-06
 **API Version:** 2025-10-20  
 **Plugin Version Required:** 3.0.0.0+  
 **Status:** Current Release  
-**Last Updated:** 2025-10-06  
-**Documentation Version:** 1.0.0
+**Last Updated:** 2026-04-10  
+**Documentation Version:** 1.1.0
 
 **Check Compatibility:** [Version Compatibility Guide](../compatibility.md)
 :::
@@ -20,6 +20,25 @@ last_updated: 2025-10-06
 ---
 
 ## Changelog
+
+### 2026-04-10 - Documentation v1.1.0
+**Added:**
+- ✅ QAL `filter` (flat form, `eq`/`neq`/`gt`/`gte`/`lt`/`lte`/`in`/`contains`/`prefix`/`between`)
+- ✅ QAL `join` (single equi-join per view, id-column only)
+- ✅ QAL `calc` aggregation with whitelisted functions (`COUNT`, `COUNTUNIQUE`, `SUM`, `AVERAGE`, `MIN`, `MAX`)
+- ✅ View chaining — `from` may reference previously defined views in the same `make` block
+- ✅ `result.sort`, `result.sample`, `result.include_count`
+- ✅ M:N join filter requirement (`E_JOIN_FILTER_REQUIRED`) documented
+- ✅ New materials: `goal_1`..`goal_N`, `ga4_age_gender`, `ga4_country`, `ga4_region`, `page_version`, `click_event`, `datalayer_event`, `events.{name}`
+- ✅ `allpv` behavioral columns (`depth_position`, `deep_read`, `stop_max_sec`, `stop_max_pos`, `exit_pos`, `is_submit`, `dead_click_image_count`, `irritation_click_count`, `scroll_back_count`, `content_skip_count`, `exploration_count`)
+- ✅ `allpv` page-type booleans (`is_article`, `is_product`, `is_form`, ...) and virtual goal columns (`is_goal_1`..`is_goal_10`)
+- ✅ `gsc` column-DB schema (`clicks`, `impressions`, `position_x100`) with virtual `ctr`, `position`, `position_weighted`
+
+**Changed:**
+- 🔄 QAL Validation Manifest aligned with current runtime rules (filter/join/calc features enabled)
+- 🔄 Materials Reference restructured to catalogue all materials from `/guide`
+
+These features reflect work merged into qa-labo through April 2026. See the [Developer Blog](/blog) for context on what was built and why.
 
 ### 2025-10-06 - Documentation v1.0.0
 **Added:**
@@ -61,22 +80,35 @@ This is the initial release of QA  ZERO API, providing simple and straightforwar
 ### What's Included in This Version
 
 ✅ **Materials:**
-- `allpv` - Page view data from view_pv
-- `gsc` - Google Search Console data
+- `allpv` — Page views with identity, device, traffic source, and behavioral metrics
+- `gsc` — Google Search Console (column-DB, N:M)
+- `goal_1`..`goal_N` — Per-goal conversion logs
+- `ga4_age_gender`, `ga4_country`, `ga4_region` — GA4 attribute aggregates
+- `page_version` — Page content versions
+- `click_event` — Element-level click events
+- `datalayer_event` + `events.{name}` — dataLayer event index and per-event typed materials
 
 ✅ **QAL Features:**
-- `from` - Specify data source
-- `keep` - Select columns to return
+- `from` — Material or previously-built view (view chaining)
+- `filter` — Flat-form row filter with 10 operators (`eq`/`neq`/`gt`/`gte`/`lt`/`lte`/`in`/`contains`/`prefix`/`between`)
+- `join` — Single equi-join per view, id-column only, M:N targets require a filter
+- `keep` — Column projection / group-by keys
+- `calc` — `COUNT` / `COUNTUNIQUE` / `SUM` / `AVERAGE` / `MIN` / `MAX`
+- Virtual columns — `allpv.is_goal_N`, `gsc.ctr`, `gsc.position`, `gsc.position_weighted`, ...
 
 ✅ **Result Options:**
-- `limit` - Limit number of rows
-- `count_only` - Return count instead of data
+- `limit` (default 1000, cap 50000)
+- `count_only`
+- `include_count`
+- `sort` — `[{ by, dir }]`
+- `sample` — `head` / `random` / `hashmod`
+- `return` — `INLINE` / `JSON` (FILE/CSV/PARQUET declared; not yet fully supported)
 
-❌ **Not Yet Available:**
-- `filter` - Row filtering
-- `join` - Combining materials
-- `calc` - Aggregations
-- CSV/Parquet output formats
+⚠️ **Not yet available:**
+- `OR` across filter conditions (use multiple queries or post-process)
+- HAVING-style filter on aggregated results
+- Multi-step joins within a single view (one join per view)
+- `return.mode = "FILE"` and non-JSON output formats
 
 ---
 
@@ -105,7 +137,7 @@ Authorization: Basic base64(username:application_password)
 **Example (curl):**
 ```bash
 curl -u "admin:xxxx xxxx xxxx xxxx xxxx xxxx" \
-  "https://your-site.com/wp-json/qa-platform/materials?version=2025-10-20"
+  "https://your-site.com/wp-json/qa-platform/guide?version=2025-10-20"
 ```
 
 **Example (JavaScript):**
@@ -114,7 +146,7 @@ const username = 'admin';
 const password = 'xxxx xxxx xxxx xxxx xxxx xxxx';
 const auth = btoa(`${username}:${password}`);
 
-fetch('https://your-site.com/wp-json/qa-platform/materials?version=2025-10-20', {
+fetch('https://your-site.com/wp-json/qa-platform/guide?version=2025-10-20', {
   headers: {
     'Authorization': `Basic ${auth}`
   }
@@ -137,9 +169,8 @@ https://your-site.com/wp-json/qa-platform/
 
 | Endpoint | Method | Purpose |
 |----------|--------|---------|
-| `/qa-platform/guide` | GET | Get API documentation |
-| `/qa-platform/materials` | GET | List available materials |
-| `/qa-platform/query` | POST | Execute QAL query |
+| `/qa-platform/guide` | GET | Get API documentation, available sites, materials, goals, limits |
+| `/qa-platform/query` | POST | Execute QAL query (request body must wrap the QAL object in a `qal` key) |
 
 ---
 
@@ -153,7 +184,7 @@ Always specify the API version in your requests:
 
 **Example:**
 ```
-GET /qa-platform/materials?version=2025-10-20
+GET /qa-platform/guide?version=2025-10-20
 POST /qa-platform/query?version=2025-10-20
 ```
 
@@ -163,35 +194,14 @@ POST /qa-platform/query?version=2025-10-20
 
 ## Your First Query
 
-### Step 1: Check Available Materials
+### Step 1: Discover sites, materials, and goals
 
 ```bash
 curl -u "username:password" \
-  "https://your-site.com/wp-json/qa-platform/materials?version=2025-10-20"
+  "https://your-site.com/wp-json/qa-platform/guide?version=2025-10-20"
 ```
 
-**Response:**
-```json
-{
-  "meta": {
-    "version": "2025-10-20"
-  },
-  "data": {
-    "materials": [
-      {
-        "name": "allpv",
-        "description": "Page view data",
-        "columns": [...]
-      },
-      {
-        "name": "gsc",
-        "description": "Google Search Console data",
-        "columns": [...]
-      }
-    ]
-  }
-}
-```
+The `/guide` response reports the available tracking sites, each site's materials (with row counts and data ranges), configured goals, dataLayer events, and system limits. It is the single source of truth for discovery. See [Endpoints Reference](./endpoints.md) for the full schema.
 
 ### Step 2: Run a Simple Query
 
@@ -202,26 +212,30 @@ curl -X POST \
   -u "username:password" \
   -H "Content-Type: application/json" \
   -d '{
-    "tracking_id": "abc123",
-  "materials": [{"name": "allpv"}],
-    "time": {
-      "start": "2025-10-01T00:00:00",
-      "end": "2025-10-20T00:00:00",
-      "tz": "Asia/Tokyo"
-    },
-    "make": {
-      "recent_pvs": {
-        "from": ["allpv"],
-        "keep": ["allpv.url", "allpv.title", "allpv.access_time"]
+    "qal": {
+      "tracking_id": "abc123",
+      "materials": [{"name": "allpv"}],
+      "time": {
+        "start": "2026-03-01T00:00:00",
+        "end":   "2026-04-01T00:00:00",
+        "tz":    "Asia/Tokyo"
+      },
+      "make": {
+        "recent_pvs": {
+          "from": ["allpv"],
+          "keep": ["allpv.url", "allpv.title", "allpv.access_time"]
+        }
+      },
+      "result": {
+        "use": "recent_pvs",
+        "limit": 10
       }
-    },
-    "result": {
-      "use": "recent_pvs",
-      "limit": 10
     }
   }' \
   "https://your-site.com/wp-json/qa-platform/query?version=2025-10-20"
 ```
+
+**Note:** The request body must wrap the QAL object in a top-level `"qal"` key — see [Endpoints Reference](./endpoints.md#request-body-structure).
 
 **Response:**
 ```json
@@ -253,22 +267,24 @@ curl -X POST \
   -u "username:password" \
   -H "Content-Type: application/json" \
   -d '{
-    "tracking_id": "abc123",
-  "materials": [{"name": "allpv"}],
-    "time": {
-      "start": "2025-10-01T00:00:00",
-      "end": "2025-10-20T00:00:00",
-      "tz": "Asia/Tokyo"
-    },
-    "make": {
-      "all_pvs": {
-        "from": ["allpv"],
-        "keep": ["allpv.pv_id"]
+    "qal": {
+      "tracking_id": "abc123",
+      "materials": [{"name": "allpv"}],
+      "time": {
+        "start": "2026-03-01T00:00:00",
+        "end":   "2026-04-01T00:00:00",
+        "tz":    "Asia/Tokyo"
+      },
+      "make": {
+        "all_pvs": {
+          "from": ["allpv"],
+          "keep": ["allpv.pv_id"]
+        }
+      },
+      "result": {
+        "use": "all_pvs",
+        "count_only": true
       }
-    },
-    "result": {
-      "use": "all_pvs",
-      "count_only": true
     }
   }' \
   "https://your-site.com/wp-json/qa-platform/query?version=2025-10-20"
@@ -464,23 +480,25 @@ const auth = btoa('username:password');
 const baseUrl = 'https://your-site.com/wp-json/qa-platform';
 
 async function getPageViews() {
-  const query = {
-    version: "1.5.2",
-    materials: [{name: "allpv"}],
-    time: {
-      start: "2025-10-01T00:00:00",
-      end: "2025-10-20T00:00:00",
-      tz: "Asia/Tokyo"
-    },
-    make: {
-      pvs: {
-        from: ["allpv"],
-        keep: ["allpv.url", "allpv.title"]
+  const body = {
+    qal: {
+      tracking_id: "abc123",
+      materials: [{name: "allpv"}],
+      time: {
+        start: "2026-03-01T00:00:00",
+        end:   "2026-04-01T00:00:00",
+        tz:    "Asia/Tokyo"
+      },
+      make: {
+        pvs: {
+          from: ["allpv"],
+          keep: ["allpv.url", "allpv.title"]
+        }
+      },
+      result: {
+        use: "pvs",
+        limit: 10
       }
-    },
-    result: {
-      use: "pvs",
-      limit: 10
     }
   };
 
@@ -490,7 +508,7 @@ async function getPageViews() {
       'Authorization': `Basic ${auth}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(query)
+    body: JSON.stringify(body)
   });
 
   const data = await response.json();
@@ -508,29 +526,31 @@ from requests.auth import HTTPBasicAuth
 
 base_url = 'https://your-site.com/wp-json/qa-platform'
 
-query = {
-    "tracking_id": "abc123",
-  "materials": [{"name": "allpv"}],
-    "time": {
-        "start": "2025-10-01T00:00:00",
-        "end": "2025-10-20T00:00:00",
-        "tz": "Asia/Tokyo"
-    },
-    "make": {
-        "pvs": {
-            "from": ["allpv"],
-            "keep": ["allpv.url", "allpv.title"]
+body = {
+    "qal": {
+        "tracking_id": "abc123",
+        "materials": [{"name": "allpv"}],
+        "time": {
+            "start": "2026-03-01T00:00:00",
+            "end":   "2026-04-01T00:00:00",
+            "tz":    "Asia/Tokyo"
+        },
+        "make": {
+            "pvs": {
+                "from": ["allpv"],
+                "keep": ["allpv.url", "allpv.title"]
+            }
+        },
+        "result": {
+            "use": "pvs",
+            "limit": 10
         }
-    },
-    "result": {
-        "use": "pvs",
-        "limit": 10
     }
 }
 
 response = requests.post(
     f'{base_url}/query?version=2025-10-20',
-    json=query,
+    json=body,
     auth=HTTPBasicAuth('username', 'password')
 )
 
@@ -548,11 +568,11 @@ print(data)
 
 ## Future Versions
 
-Future releases will add:
-- Filtering (`filter`)
-- Joins (`join`)
-- Aggregations (`calc`)
-- Additional materials
-- CSV/Parquet export
+Planned additions tracked in qa-labo:
+- `OR` logic across filter conditions
+- HAVING-style filters over aggregated results
+- Multi-step joins within a single view
+- `return.mode = "FILE"` with CSV / Parquet output
+- Additional attribute materials
 
-Stay tuned for updates!
+Read the [Developer Blog](/blog) for ongoing notes from the qa-labo experiments that feed this API.

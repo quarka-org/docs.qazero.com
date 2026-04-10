@@ -1,13 +1,14 @@
 ---
 id: qal-validation-2025-10-20
 title: QAL Validation Manifest
-sidebar_position: 4
+sidebar_position: 5
 version: "2025-10-20"
-update: "2025-10-20"
+update: "2026-04-10"
 type: validation_manifest
 description: >
   Defines strict validation rules for QAL JSON execution requests.
-  This frontmatter is parsed by QAL_Executor (PHP yaml_parse_file) for runtime validation.
+  This frontmatter is parsed by QAL_Executor (PHP) for runtime validation
+  and mirrored in the body for AI models and other HTTP consumers.
 structure:
   required: ["tracking_id", "materials", "time", "make", "result"]
 rules:
@@ -28,8 +29,8 @@ rules:
       properties:
         name:
           type: string
-          description: "Material name. Only 'allpv' (page view data) and 'gsc' (Google Search Console data) are allowed."
-          enum: ["allpv", "gsc"]
+          description: "Material name. Allowed values: 'allpv', 'gsc', 'ga4_age_gender', 'ga4_country', 'ga4_region', 'goal_N' (N>=1), 'click_event', 'datalayer_event', 'page_version', or 'events.{name}'."
+          pattern: "^(allpv|gsc|ga4_age_gender|ga4_country|ga4_region|goal_[1-9]\\d*|click_event|datalayer_event|page_version|events\\.[a-zA-Z0-9_]+)$"
       additionalProperties: false
     minItems: 1
     errors:
@@ -44,7 +45,7 @@ rules:
       end: { type: string, format: date-time }
       tz:
         type: string
-        description: "IANA timezone identifier (e.g., Asia/Tokyo, UTC, America/New_York). Any valid IANA timezone is accepted."
+        description: "IANA timezone identifier. Any valid IANA zone is accepted."
         examples: ["Asia/Tokyo", "UTC", "Europe/London", "America/New_York", "America/Los_Angeles", "Europe/Paris"]
     errors:
       - code: E_TIME_REQUIRED
@@ -52,26 +53,87 @@ rules:
 
   make:
     type: object
-    description: "Defines views (data transformations) to create from materials. Each key is a view name, and the value defines the view's structure."
+    description: "Defines views (data transformations) to create from materials. Each key is a view name."
     patternProperties:
       "^[a-zA-Z0-9_]+$":
         type: object
-        description: "View definition. Must specify 'from' (source material) and 'keep' (columns to select)."
+        description: >
+          View definition. Must specify 'from' (source material or previously defined view)
+          and 'keep' (columns to select). Optionally specify 'filter' for row filtering,
+          'join' for combining materials, and 'add'/'calc' for aggregation.
         required: ["from", "keep"]
         properties:
           from:
             type: array
-            description: "Specify which material to use. Must contain exactly one material name."
-            items: { type: string, enum: ["allpv", "gsc"] }
+            description: "Exactly one element: a material name or a view name previously defined in this make block."
+            items:
+              type: string
+              pattern: "^(allpv|gsc|ga4_age_gender|ga4_country|ga4_region|goal_[1-9]\\d*|click_event|datalayer_event|page_version|events\\.[a-zA-Z0-9_]+|[a-zA-Z0-9_]+)$"
             minItems: 1
             maxItems: 1
           keep:
             type: array
-            description: "List of columns to include in the result. Must use fully qualified names in the format 'material.column_name' (e.g., 'allpv.url', 'gsc.keyword')."
+            description: >
+              List of columns to include. Must use fully qualified names in the format
+              'material.column' or 'view.column'. Empty array is allowed when 'calc' is
+              present (global aggregation pattern).
             items:
               type: string
-              pattern: "^(allpv|gsc)\\.[a-zA-Z0-9_]+$"
-            minItems: 1
+              pattern: "^[a-zA-Z0-9_\\.]+\\.[a-zA-Z0-9_]+$"
+            minItems: 0
+          filter:
+            type: object
+            description: >
+              Filter conditions to apply to rows from the 'from' source. Keys are plain
+              (unqualified) column names. Values are either an array (implicit IN) or an
+              object keyed by an operator. Multiple keys combine with implicit AND.
+              Filtering a view that uses another view as 'from' is not allowed
+              (E_FILTER_ON_VIEW_CHAIN).
+            additionalProperties:
+              oneOf:
+                - type: array
+                  items: { type: ["string", "number", "boolean"] }
+                - type: object
+                  propertyNames:
+                    enum: [eq, neq, gt, gte, lt, lte, in, contains, prefix, between]
+          join:
+            type: object
+            description: >
+              One equi-join per view (arrays of joins are forbidden). 'with' is the right-side
+              material or view, 'on' is an array of {left, right} fully qualified column pairs.
+              Only integer id columns may be joined. M:N target materials (e.g. gsc) require
+              a filter on the target side (E_JOIN_FILTER_REQUIRED).
+            required: ["with", "on"]
+            properties:
+              with: { type: string }
+              on:
+                type: array
+                minItems: 1
+                items:
+                  type: object
+                  required: ["left", "right"]
+                  properties:
+                    left: { type: string, description: "Fully qualified column from the left (from) source." }
+                    right: { type: string, description: "Fully qualified column from the 'with' material/view." }
+              "if not match":
+                type: string
+                enum: ["keep-left", "drop"]
+                description: "Unmatched-row behavior. Default: keep-left (LEFT OUTER)."
+              fill:
+                description: "Default value for unmatched right-side columns when 'if not match' is 'keep-left'. Default: null."
+          add:
+            type: array
+            description: "Optional list of calc result column names. Must exactly match calc keys when specified; auto-derived from calc when omitted."
+            items: { type: string }
+          calc:
+            type: object
+            description: >
+              Aggregation expressions. Keys are result column names; values must match
+              ^(COUNT|COUNTUNIQUE|SUM|AVERAGE|MIN|MAX)\\([A-Za-z_][\\w]*\\.[A-Za-z_][\\w]*\\)$.
+              The column referenced need not appear in 'keep'.
+            additionalProperties:
+              type: string
+              pattern: "^(COUNT|COUNTUNIQUE|SUM|AVERAGE|MIN|MAX)\\([A-Za-z_][\\w]*\\.[A-Za-z_][\\w]*\\)$"
         additionalProperties: false
     errors:
       - code: E_UNKNOWN_COLUMN
@@ -84,27 +146,59 @@ rules:
     properties:
       use:
         type: string
-        description: "Name of the view (defined in 'make') to return as the result."
+        description: "Name of the view (defined in 'make') to return."
       limit:
         type: integer
-        description: "Maximum number of rows to return. Default: 1000, Maximum: 50000."
+        description: "Max rows returned. Default: 1000, hard cap: 50000."
         minimum: 1
         maximum: 50000
         default: 1000
       count_only:
         type: boolean
-        description: "If true, return only the count of rows instead of the actual data. Default: false."
+        description: "If true, return only { count: N } instead of rows."
         default: false
+      include_count:
+        type: boolean
+        description: "If true, meta.filtered_rows carries the pre-sample hit count."
+        default: false
+      sort:
+        type: array
+        description: "Sort specifications applied at the result stage."
+        items:
+          type: object
+          required: ["by", "dir"]
+          properties:
+            by:  { type: string }
+            dir: { type: string, enum: ["asc", "desc"] }
+      sample:
+        type: object
+        description: "Sampling when the view exceeds max_rows."
+        required: ["max_rows", "method"]
+        properties:
+          max_rows: { type: integer, minimum: 1 }
+          method:   { type: string, enum: ["head", "random", "hashmod"] }
+      return:
+        type: object
+        description: "Output shape. Only INLINE+JSON is fully supported in this version."
+        properties:
+          mode:   { type: string, enum: ["INLINE", "FILE"] }
+          format: { type: string, enum: ["JSON", "CSV", "PARQUET"] }
     additionalProperties: false
     errors:
       - code: E_UNKNOWN_VIEW
         message: "Result.use does not match any defined view in make."
+      - code: E_RESULT_FORBIDDEN_KEY
+        message: "Result contains a non-whitelisted key."
 
 features:
-  filter: false
-  join: false
-  calc: false
-  sort: false
+  filter: true
+  join: true
+  calc: true
+  sort: true
+  sample: true
+  view_chaining: true
+  return_file_csv: false
+  return_file_parquet: false
 ---
 
 # QAL Validation Manifest — AI Accessible Version
@@ -121,694 +215,112 @@ The YAML frontmatter section is used by the PHP executor for validation. The bod
 **Type:** validation_manifest
 **Audience:** QAL Executor (PHP), AI Models (ChatGPT, Claude, MCP), Human Documentation
 
----
-
-## Validation Manifest (AI-Readable Copy)
-
-```yaml
-id: qal-validation-2025-10-20
-title: QAL Validation Manifest (for Executor and AI)
-version: "2025-10-20"
-update: "2025-10-20"
-type: validation_manifest
-description: >
-  Defines strict validation rules for QAL JSON execution requests.
-  Used for validating QAL structures before execution.
-
-structure:
-  required: ["tracking_id", "materials", "time", "make", "result"]
-
-rules:
-  tracking_id:
-    type: string
-    description: "Unique identifier for the tracking site to query. Must match a tracking_id from the /guide endpoint response."
-    pattern: "^[a-zA-Z0-9_-]+$"
-    errors:
-      - code: E_UNKNOWN_TRACKING_ID
-        message: "Invalid tracking_id provided."
-
-  materials:
-    type: array
-    description: "List of data sources (materials) to use in the query. Each material must have a 'name' property."
-    items:
-      type: object
-      required: ["name"]
-      properties:
-        name:
-          type: string
-          description: "Material name. Only 'allpv' (page view data) and 'gsc' (Google Search Console data) are allowed."
-          enum: ["allpv", "gsc"]
-      additionalProperties: false
-    minItems: 1
-    errors:
-      - code: E_UNKNOWN_MATERIAL
-        message: "Material name not found in manifest."
-
-  time:
-    type: object
-    required: ["start", "end", "tz"]
-    properties:
-      start: { type: string, format: date-time }
-      end: { type: string, format: date-time }
-      tz:
-        type: string
-        description: "IANA timezone identifier (e.g., Asia/Tokyo, UTC, America/New_York). Any valid IANA timezone is accepted."
-        examples: ["Asia/Tokyo", "UTC", "Europe/London", "America/New_York", "America/Los_Angeles", "Europe/Paris"]
-    errors:
-      - code: E_TIME_REQUIRED
-        message: "Missing time.start, time.end, or time.tz."
-
-  make:
-    type: object
-    description: "Defines views (data transformations) to create from materials. Each key is a view name, and the value defines the view's structure."
-    patternProperties:
-      "^[a-zA-Z0-9_]+$":
-        type: object
-        description: "View definition. Must specify 'from' (source material) and 'keep' (columns to select)."
-        required: ["from", "keep"]
-        properties:
-          from:
-            type: array
-            description: "Specify which material to use. Must contain exactly one material name."
-            items: { type: string, enum: ["allpv", "gsc"] }
-            minItems: 1
-            maxItems: 1
-          keep:
-            type: array
-            description: "List of columns to include in the result. Must use fully qualified names in the format 'material.column_name' (e.g., 'allpv.url', 'gsc.keyword')."
-            items:
-              type: string
-              pattern: "^(allpv|gsc)\\.[a-zA-Z0-9_]+$"
-            minItems: 1
-        additionalProperties: false
-    errors:
-      - code: E_UNKNOWN_COLUMN
-        message: "Invalid column name in keep list."
-
-  result:
-    type: object
-    description: "Specifies which view to return and how to format the result."
-    required: ["use"]
-    properties:
-      use:
-        type: string
-        description: "Name of the view (defined in 'make') to return as the result."
-      limit:
-        type: integer
-        description: "Maximum number of rows to return. Default: 1000, Maximum: 50000."
-        minimum: 1
-        maximum: 50000
-        default: 1000
-      count_only:
-        type: boolean
-        description: "If true, return only the count of rows instead of the actual data. Default: false."
-        default: false
-    additionalProperties: false
-    errors:
-      - code: E_UNKNOWN_VIEW
-        message: "Result.use does not match any defined view in make."
-
-features:
-  filter: false
-  join: false
-  calc: false
-  sort: false
-```
+The authoritative copy lives in the repository at `src/core/yaml/qal-validation-2025-10-20.yaml` and is mirrored here whenever the plugin ships a documentation update.
 
 ---
 
-## How to Use
-
-### For AI Models (ChatGPT, Claude, MCP)
+## For AI Models (ChatGPT, Claude, MCP)
 
 **You are a QAL Generator.**
 
-Your task is to produce valid QAL JSON objects that conform to this schema:
+Your job is to produce valid QAL JSON that conforms to the schema above. Follow these rules:
 
-1. **Always include these required sections:**
-   - `tracking_id` - string matching `^[a-zA-Z0-9_-]+$`
-   - `materials` - array with at least one material (`allpv` or `gsc`)
-   - `time` - object with `start`, `end`, and `tz`
-   - `make` - object with at least one view definition
-   - `result` - object with `use` (required), optional `limit` and `count_only`
+1. **Always include all required top-level keys:** `tracking_id`, `materials`, `time`, `make`, `result`.
+2. **Materials:** Use only names allowed by the `materials[].name` pattern (`allpv`, `gsc`, `ga4_age_gender`, `ga4_country`, `ga4_region`, `goal_N`, `click_event`, `datalayer_event`, `page_version`, `events.{name}`).
+3. **Time:** `start` / `end` / `tz` are all required. `tz` must be a full IANA identifier such as `Asia/Tokyo` — never abbreviations like `JST`.
+4. **make views:**
+   - `from` is an array of **exactly one** element. That element may be a material name or another view defined earlier in the same `make` block (view chaining).
+   - `keep` uses fully qualified names (`material.column` or `view.column`). When `calc` is present, `keep` may be empty (global aggregation).
+   - `filter` keys are **plain column names** (unqualified). Values are either an array (IN) or `{ <op>: <value> }`. Multiple keys combine with AND; there is no OR form yet. **Do not use filter when `from` references another view** — filter in the upstream view.
+   - `join` is a single object (arrays forbidden). `on[]` uses fully qualified names on both sides. Only integer id columns may be joined. If the join target is an M:N material (e.g. `gsc`), the view must carry a filter on a target column.
+   - `calc` values must match the strict regex `^(COUNT|COUNTUNIQUE|SUM|AVERAGE|MIN|MAX)\(<qualified>\)$`. `COUNT(*)` is forbidden.
+5. **result:** Only the whitelisted keys (`use`, `limit`, `count_only`, `include_count`, `sort`, `sample`, `return`) are allowed. Unknown keys raise `E_RESULT_FORBIDDEN_KEY`.
+6. **No aliasing.** Never add `as` fields to `materials[]` or `make.<view>` — it raises `E_ALIAS_FORBIDDEN`.
 
-2. **Follow these rules:**
-   - Only use materials: `allpv`, `gsc` (strictly limited)
-   - Use any valid IANA timezone (examples: `Asia/Tokyo`, `UTC`, `Europe/London`, `America/New_York`, `America/Los_Angeles`, `Europe/Paris`)
-   - Column names must be fully qualified: `material.column`
-   - Each view in `make` must have exactly ONE item in `from` array
-   - `result.use` must reference a view name defined in `make`
-   - `result.limit` must be 1-50000 (default: 1000)
+### Features enabled in this version
 
-3. **Do NOT use these features (disabled in this version):**
-   - `filter` - Not supported
-   - `join` - Not supported
-   - `calc` - Not supported
-   - `sort` - Not supported
-
----
-
-### For QAL Executor (PHP)
-
-**Runtime Validation:**
-
-```php
-<?php
-// Load validation manifest
-$manifest = yaml_parse_file('/path/to/qal-validation.md');
-
-// Validate QAL JSON
-$result = QAL_Executor::qal_validate_by_manifest($qal_json, $manifest);
-
-if (!$result['valid']) {
-    // Return validation errors
-    return [
-        'success' => false,
-        'errors' => $result['errors']
-    ];
-}
-
-// Proceed with execution
-```
-
-**Validation Steps:**
-
-1. **Structure validation** - Check all required top-level keys exist
-2. **tracking_id validation** - Verify format and existence
-3. **materials validation** - Check material names are valid
-4. **time validation** - Validate datetime format and timezone
-5. **make validation** - Verify view structure, from, and keep rules
-6. **result validation** - Check use references valid view, limit is in range
-7. **Feature check** - Reject any disabled features (filter, join, calc, sort)
-
----
-
-### For Human Documentation (Docusaurus)
-
-This page is rendered as part of the API documentation. The YAML frontmatter is parsed by Docusaurus, and this markdown body provides human-readable guidance.
-
-**Navigation:**
-- [QAL Guide](./qal.md) - Learn how to write QAL queries
-- [Materials Reference](./materials.md) - See available columns
-- [Endpoints](./endpoints.md) - API endpoint details
-
----
-
-## Validation Rules Details
-
-### 1. tracking_id
-
-**Type:** `string`
-**Pattern:** `^[a-zA-Z0-9_-]+$`
-**Error Code:** `E_UNKNOWN_TRACKING_ID`
-
-**Valid Examples:**
-```json
-{"tracking_id": "abc123"}
-{"tracking_id": "site-001"}
-{"tracking_id": "my_tracking_id"}
-```
-
-**Invalid Examples:**
-```json
-{"tracking_id": ""}          // Empty
-{"tracking_id": "abc 123"}   // Contains space
-{"tracking_id": "abc@123"}   // Contains special char
-```
-
----
-
-### 2. materials
-
-**Type:** `array` of objects
-**Min Items:** 1
-**Allowed Values:** `allpv`, `gsc`
-**Error Code:** `E_UNKNOWN_MATERIAL`
-
-**Valid Examples:**
-```json
-{
-  "materials": [
-    {"name": "allpv"}
-  ]
-}
-```
-
-```json
-{
-  "materials": [
-    {"name": "allpv"},
-    {"name": "gsc"}
-  ]
-}
-```
-
-**Invalid Examples:**
-```json
-{
-  "materials": []  // Empty array
-}
-```
-
-```json
-{
-  "materials": [
-    {"name": "unknown"}  // Invalid material name
-  ]
-}
-```
-
-```json
-{
-  "materials": [
-    {"name": "allpv", "as": "pv"}  // additionalProperties not allowed
-  ]
-}
-```
-
----
-
-### 3. time
-
-**Type:** `object`
-**Required Fields:** `start`, `end`, `tz`
-**Error Code:** `E_TIME_REQUIRED`
-
-**Valid Example:**
-```json
-{
-  "time": {
-    "start": "2025-10-01T00:00:00",
-    "end": "2025-10-20T00:00:00",
-    "tz": "Asia/Tokyo"
-  }
-}
-```
-
-**Timezone (`tz`):**
-- **Type:** String
-- **Format:** IANA timezone identifier
-- **Any valid IANA timezone is accepted** (see [IANA Time Zone Database](https://www.iana.org/time-zones))
-- **Common examples:**
-  - `Asia/Tokyo` - Japan Standard Time
-  - `UTC` - Coordinated Universal Time
-  - `Europe/London` - UK
-  - `America/New_York` - US Eastern
-  - `America/Los_Angeles` - US Pacific
-  - `Europe/Paris` - Central European Time
-  - `Australia/Sydney` - Australian Eastern Time
-
-**Invalid Examples:**
-```json
-{
-  "time": {
-    "start": "2025-10-01",  // Missing time component
-    "end": "2025-10-20T00:00:00",
-    "tz": "Asia/Tokyo"
-  }
-}
-```
-
-```json
-{
-  "time": {
-    "start": "2025-10-01T00:00:00",
-    "end": "2025-10-20T00:00:00",
-    "tz": "JST"  // Use IANA format like "Asia/Tokyo", not abbreviations
-  }
-}
-```
-
-```json
-{
-  "time": {
-    "start": "2025-10-01T00:00:00",
-    "end": "2025-10-20T00:00:00",
-    "tz": "Tokyo"  // Must use full IANA identifier "Asia/Tokyo"
-  }
-}
-```
-
----
-
-### 4. make
-
-**Type:** `object`
-**Pattern:** View names must match `^[a-zA-Z0-9_]+$`
-**Error Code:** `E_UNKNOWN_COLUMN`
-
-**Structure:**
-- Each view must have `from` (array with exactly 1 material)
-- Each view must have `keep` (array with at least 1 column)
-- Column names must match `^(allpv|gsc)\.[a-zA-Z0-9_]+$`
-
-**Valid Example:**
-```json
-{
-  "make": {
-    "page_views": {
-      "from": ["allpv"],
-      "keep": [
-        "allpv.url",
-        "allpv.title",
-        "allpv.access_time"
-      ]
-    }
-  }
-}
-```
-
-**Invalid Examples:**
-```json
-{
-  "make": {
-    "page_views": {
-      "from": ["allpv", "gsc"],  // More than 1 item
-      "keep": ["allpv.url"]
-    }
-  }
-}
-```
-
-```json
-{
-  "make": {
-    "page_views": {
-      "from": ["allpv"],
-      "keep": ["url"]  // Not fully qualified
-    }
-  }
-}
-```
-
-```json
-{
-  "make": {
-    "page_views": {
-      "from": ["allpv"],
-      "keep": []  // Empty keep array
-    }
-  }
-}
-```
-
----
-
-### 5. result
-
-**Type:** `object`
-**Required:** `use`
-**Optional:** `limit` (1-50000, default: 1000), `count_only` (boolean, default: false)
-**Error Code:** `E_UNKNOWN_VIEW`
-
-**Valid Examples:**
-```json
-{
-  "result": {
-    "use": "page_views"
-  }
-}
-```
-
-```json
-{
-  "result": {
-    "use": "page_views",
-    "limit": 100,
-    "count_only": false
-  }
-}
-```
-
-```json
-{
-  "result": {
-    "use": "page_views",
-    "count_only": true
-  }
-}
-```
-
-**Invalid Examples:**
-```json
-{
-  "result": {
-    "use": "nonexistent_view"  // View not defined in make
-  }
-}
-```
-
-```json
-{
-  "result": {
-    "use": "page_views",
-    "limit": 100000  // Exceeds maximum of 50000
-  }
-}
-```
-
-```json
-{
-  "result": {
-    "use": "page_views",
-    "limit": 0  // Below minimum
-  }
-}
-```
+- ✅ `filter` (flat form, AND-only)
+- ✅ `join` (single equi-join, id-column only)
+- ✅ `calc` (whitelisted single-column aggregates)
+- ✅ view chaining (`from: ["<previous_view>"]`)
+- ✅ `result.sort`, `result.sample`, `result.include_count`
+- ⚠️ `return.mode = "FILE"` and non-JSON formats are declared in the schema but not fully supported yet — use `INLINE` / `JSON`.
 
 ---
 
 ## Error Codes Reference
 
-| Error Code | Field | Cause | Solution |
-|------------|-------|-------|----------|
-| `E_UNKNOWN_TRACKING_ID` | `tracking_id` | Invalid or missing tracking_id | Use tracking_id from `/guide` endpoint |
-| `E_UNKNOWN_MATERIAL` | `materials` | Invalid material name | Use only `allpv` or `gsc` |
-| `E_TIME_REQUIRED` | `time` | Missing start, end, or tz | Include all three fields |
-| `E_UNKNOWN_COLUMN` | `make.*.keep` | Invalid column name | Use fully qualified names (material.column) |
-| `E_UNKNOWN_VIEW` | `result.use` | View name doesn't exist in make | Reference a view defined in make |
-| `E_FEATURE_NOT_SUPPORTED` | Various | Used disabled feature | Remove filter, join, calc, or sort |
+| Code | Field | Cause |
+|------|-------|-------|
+| `E_UNKNOWN_TRACKING_ID` | `tracking_id` | Not a known site |
+| `E_UNKNOWN_MATERIAL` | `materials[]` / `from[]` | Name not in manifest |
+| `E_UNKNOWN_VIEW` | `from[]` / `result.use` | View not defined |
+| `E_UNKNOWN_COLUMN` | `keep` / `filter` / `calc` / `join.on` | Column not in material schema |
+| `E_ALIAS_FORBIDDEN` | `materials` / `make` | `as` used |
+| `E_TIME_REQUIRED` | `time` | Missing `start`/`end`/`tz` |
+| `E_FILTER_INVALID` | `filter` | Malformed or over-nested |
+| `E_FILTER_ON_VIEW_CHAIN` | `filter` | `filter` used when `from` is a view |
+| `E_INVALID_JOIN` | `join` | Missing `with`/`on`, non-qualified, non-equi |
+| `E_JOIN_MULTIPLE_FORBIDDEN` | `join` | Array or multiple joins |
+| `E_JOIN_FILTER_REQUIRED` | `join` | M:N target has no filter |
+| `E_RESULT_UNKNOWN_VIEW` | `result.use` | View not in `make` |
+| `E_RESULT_FORBIDDEN_KEY` | `result` | Non-whitelisted key |
+| `E_KEEP_EXPR_FORBIDDEN` | `keep` | Non-column expression |
+| `E_ADD_NOT_SUBSET_OF_CALC` | `add` | Explicit `add` lists an unknown metric |
+| `E_CALC_NOT_SUBSET_OF_ADD` | `calc` | Explicit `add` is missing calc keys |
 
 ---
 
-## Design Principles
-
-### 1. Single Source of Truth
-
-Both the PHP executor and AI models read the same schema definition. This ensures consistency between validation and generation.
-
-### 2. Frictionless Versioning
-
-Each version gets its own manifest file:
-- `/docs/developer-manual/api/2025-10-20/qal-validation.md`
-- `/docs/developer-manual/api/2025-11-01/qal-validation.md`
-- etc.
-
-### 3. Double YAML Format
-
-**Frontmatter YAML:** Parsed by PHP `yaml_parse_file()` or Symfony YAML component
-**Body YAML:** Readable by AI models via HTTP fetch or markdown context
-
-Both sections are identical and serve different consumers.
-
-### 4. AI-Friendly Structure
-
-- Flat, explicit rules
-- No cross-references
-- Clear error codes
-- Enum values explicitly listed
-- Pattern validation with regex
-
----
-
-## PHP Integration Example
-
-### Method 1: Parse Frontmatter Only
-
-```php
-<?php
-// Using symfony/yaml
-use Symfony\Component\Yaml\Yaml;
-
-$content = file_get_contents('/path/to/qal-validation.md');
-preg_match('/^---\n(.*?)\n---/s', $content, $matches);
-$manifest = Yaml::parse($matches[1]);
-```
-
-### Method 2: Parse Body YAML Block
-
-```php
-<?php
-$content = file_get_contents('/path/to/qal-validation.md');
-preg_match('/```yaml\n(.*?)\n```/s', $content, $matches);
-$manifest = Yaml::parse($matches[1]);
-```
-
-### Validation Function
-
-```php
-<?php
-class QAL_Executor {
-    public static function qal_validate_by_manifest($qal_json, $manifest) {
-        $errors = [];
-
-        // 1. Check required structure
-        foreach ($manifest['structure']['required'] as $field) {
-            if (!isset($qal_json[$field])) {
-                $errors[] = "Missing required field: $field";
-            }
-        }
-
-        // 2. Validate tracking_id
-        if (isset($qal_json['tracking_id'])) {
-            $pattern = $manifest['rules']['tracking_id']['pattern'];
-            if (!preg_match("/$pattern/", $qal_json['tracking_id'])) {
-                $errors[] = $manifest['rules']['tracking_id']['errors'][0]['message'];
-            }
-        }
-
-        // 3. Validate materials
-        if (isset($qal_json['materials'])) {
-            $allowed = $manifest['rules']['materials']['items']['properties']['name']['enum'];
-            foreach ($qal_json['materials'] as $material) {
-                if (!in_array($material['name'], $allowed)) {
-                    $errors[] = $manifest['rules']['materials']['errors'][0]['message'];
-                }
-            }
-        }
-
-        // ... more validation steps
-
-        return [
-            'valid' => empty($errors),
-            'errors' => $errors
-        ];
-    }
-}
-```
-
----
-
-## Complete Validation Example
-
-### Valid QAL JSON
+## Complete Valid Example
 
 ```json
 {
   "tracking_id": "abc123",
   "materials": [
-    {"name": "allpv"}
+    { "name": "allpv" },
+    { "name": "gsc" }
   ],
   "time": {
-    "start": "2025-10-01T00:00:00",
-    "end": "2025-10-20T00:00:00",
-    "tz": "Asia/Tokyo"
+    "start": "2026-03-01T00:00:00",
+    "end":   "2026-04-01T00:00:00",
+    "tz":    "Asia/Tokyo"
   },
   "make": {
-    "page_views": {
-      "from": ["allpv"],
-      "keep": [
-        "allpv.url",
-        "allpv.title",
-        "allpv.access_time"
-      ]
+    "blog_pvs": {
+      "from":   ["allpv"],
+      "filter": { "url": { "prefix": "/blog" }, "device_type": ["SP"] },
+      "keep":   ["allpv.url", "allpv.reader_id", "allpv.pv_id", "allpv.browse_sec"]
+    },
+    "blog_by_url": {
+      "from": ["blog_pvs"],
+      "keep": ["blog_pvs.url"],
+      "calc": {
+        "pv":        "COUNT(blog_pvs.pv_id)",
+        "uniq_user": "COUNTUNIQUE(blog_pvs.reader_id)",
+        "avg_dwell": "AVERAGE(blog_pvs.browse_sec)"
+      }
     }
   },
   "result": {
-    "use": "page_views",
-    "limit": 100
+    "use": "blog_by_url",
+    "sort": [{ "by": "pv", "dir": "desc" }],
+    "limit": 100,
+    "include_count": true
   }
 }
 ```
-
-**Validation Result:**
-```php
-[
-  'valid' => true,
-  'errors' => []
-]
-```
-
-### Invalid QAL JSON
-
-```json
-{
-  "tracking_id": "abc123",
-  "materials": [
-    {"name": "unknown_material"}
-  ],
-  "time": {
-    "start": "2025-10-01T00:00:00",
-    "end": "2025-10-20T00:00:00",
-    "tz": "Invalid/Timezone"
-  },
-  "make": {
-    "page_views": {
-      "from": ["allpv"],
-      "keep": ["url"]
-    }
-  },
-  "result": {
-    "use": "nonexistent_view",
-    "limit": 10000
-  }
-}
-```
-
-**Validation Result:**
-```php
-[
-  'valid' => false,
-  'errors' => [
-    'Material name not found in manifest.',
-    'Invalid timezone: Invalid/Timezone',
-    'Invalid column name in keep list.',
-    'Result.use does not match any defined view in make.',
-    'Limit exceeds maximum of 50000.'
-  ]
-]
-```
-
----
-
-## Future Extensions
-
-As QAL evolves, this manifest will be updated to support:
-
-- `filter` rules and validation
-- `join` structure validation
-- `calc` aggregation rules
-- `sort` specification validation
-- Additional materials
-- New timezones
-- Custom column patterns
-
-Each new version will get its own dated manifest file.
 
 ---
 
 ## Related Documentation
 
-- **[QAL Guide](./qal.md)** - Learn how to write QAL queries
-- **[Materials Reference](./materials.md)** - Available columns and data types
-- **[Endpoints](./endpoints.md)** - API endpoint specifications
-- **[API Overview](./index.md)** - Return to API documentation home
+- **[QAL Guide](./qal.md)** — Syntax walkthrough with examples
+- **[Materials Reference](./materials.md)** — Column catalogue
+- **[Endpoints](./endpoints.md)** — HTTP surface
+- **[Getting Started](./index.md)** — Overview
 
 ---
 
-## Why This Format?
-
-| Target | Reads Which Part | How |
-|--------|------------------|-----|
-| **PHP Executor** | Frontmatter YAML | `yaml_parse_file()` or `Symfony\Yaml::parseFile()` |
-| **AI Models** | Body YAML block | Via HTTP fetch or markdown context |
-| **Humans** | Entire markdown | Rendered by Docusaurus |
-| **Docusaurus** | Frontmatter | For metadata and navigation |
-
-This format serves all consumers with a single file, ensuring consistency and reducing maintenance burden.
-
----
-
-**Last Updated:** 2025-10-20
-**Version:** 2025-10-20
+**Last Updated:** 2026-04-10
+**API Version:** 2025-10-20
 **Manifest ID:** qal-validation-2025-10-20
