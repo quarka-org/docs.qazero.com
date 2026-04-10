@@ -21,6 +21,8 @@ last_updated: 2026-04-10
 
 ### What's supported
 
+Check the server's `/guide` response `features` map for the authoritative list — it reports exactly which features the running plugin implements.
+
 | Feature | Status | Notes |
 |---------|--------|-------|
 | `materials` | ✅ | Declare data sources (no aliasing) |
@@ -33,13 +35,16 @@ last_updated: 2026-04-10
 | `make.add` | ✅ | Optional explicit calc key list |
 | View chaining (`from: ["other_view"]`) | ✅ | Compose views with in-memory keep/calc/join |
 | `result.use` / `limit` / `count_only` | ✅ | |
-| `result.sort` | ✅ | Sort applied at result stage |
-| `result.sample` | ✅ | `head` / `random` / `hashmod` sampling |
-| `result.include_count` | ✅ | Report pre-sample filtered rows in meta |
-| `result.return` | Partial | `INLINE` JSON; `FILE`/`CSV`/`PARQUET` planned |
 | Virtual columns (`position_weighted`, `is_goal_N`, …) | ✅ | Computed at material/executor layer |
+| `result.sort` | 🚧 Planned | Not yet implemented — rejected by the result-key whitelist |
+| `result.sample` | 🚧 Planned | Accepted by validator but not yet processed |
+| `result.include_count` | 🚧 Planned | Accepted by validator but not yet processed |
+| `result.return` | 🚧 Planned | Only `INLINE` / `JSON` works; `FILE` / `CSV` / `PARQUET` planned |
 
-**Not yet supported:**
+**Not yet supported (explicit list):**
+- `result.sort` — sorting is rejected as `E_RESULT_FORBIDDEN_KEY`; do the sort client-side for now
+- `result.sample` / `result.include_count` — the validator accepts these keys but the executor does not process them yet; treat them as no-ops
+- `result.return.mode = "FILE"` and non-JSON formats
 - `OR` logic across filter conditions (flat filters are implicit `AND`)
 - HAVING-style filters on aggregated results
 - Aliasing (`as`) — intentionally forbidden
@@ -350,28 +355,35 @@ Selects the final view and controls output shape.
 ```json
 {
   "result": {
-    "use":           "pv_stats",
-    "limit":         1000,
-    "include_count": true,
-    "count_only":    false,
-    "sort":          [ { "by": "sessions", "dir": "desc" } ],
-    "sample":        { "max_rows": 10000, "method": "random" },
-    "return":        { "mode": "INLINE", "format": "JSON" }
+    "use":        "pv_stats",
+    "limit":      1000,
+    "count_only": false
   }
 }
 ```
+
+### Currently implemented keys
 
 | Key | Type | Description |
 |-----|------|-------------|
 | `use` | string | Name of the view (in `make`) to return. Exactly one. |
 | `limit` | int | Max rows returned. Default `1000`, hard cap `50000`. |
-| `include_count` | bool | When `true`, `meta.filtered_rows` carries the pre-sample hit count. |
 | `count_only` | bool | When `true`, returns `{ "count": N }` only — no data. |
-| `sort` | array | `[ { "by": "<col>", "dir": "asc\|desc" }, ... ]`. Applied after view build. |
-| `sample` | object | `{ "max_rows": N, "method": "head\|random\|hashmod" }`. When the view exceeds `max_rows`, a sample is returned and `meta.sampled = true`. |
-| `return` | object | `{ "mode": "INLINE\|FILE", "format": "JSON\|CSV\|PARQUET" }`. `INLINE` + `JSON` is currently the only supported combination. |
 
-Only the whitelisted keys above are allowed — any other key triggers `E_RESULT_FORBIDDEN_KEY`.
+Only the whitelisted keys above are allowed in practice — any other key triggers `E_RESULT_FORBIDDEN_KEY` or is silently ignored (see below).
+
+### Planned keys (not yet implemented)
+
+The following keys appear in the design spec and some of them pass validation, but **they are not yet processed by the executor**. Relying on them will not produce the documented behavior. They are listed here so client authors know what is coming.
+
+| Key | Status | Planned shape |
+|-----|--------|---------------|
+| `sort` | 🚧 **Rejected** (`E_RESULT_FORBIDDEN_KEY`) — sort client-side for now | `[ { "by": "<col>", "dir": "asc\|desc" }, ... ]` |
+| `sample` | 🚧 Accepted by validator, **no runtime effect yet** | `{ "max_rows": N, "method": "head\|random\|hashmod" }` |
+| `include_count` | 🚧 Accepted by validator, **no runtime effect yet** | `bool` → will populate `meta.filtered_rows` |
+| `return` | 🚧 Only `mode:"INLINE"` / `format:"JSON"` returns data; other combinations are no-ops | `{ "mode": "INLINE\|FILE", "format": "JSON\|CSV\|PARQUET" }` |
+
+Check the `/guide` response `features` map for the authoritative runtime state before using any of these.
 
 ---
 
@@ -439,11 +451,12 @@ Only the whitelisted keys above are allowed — any other key triggers `E_RESULT
   },
   "result": {
     "use": "by_url",
-    "sort": [{ "by": "sessions", "dir": "desc" }],
     "limit": 100
   }
 }
 ```
+
+> The executor does not sort results yet (`result.sort` is rejected). Sort client-side by `sessions` desc after receiving the data.
 
 ### 7.3 Global aggregate (one row)
 
@@ -483,7 +496,6 @@ Only the whitelisted keys above are allowed — any other key triggers `E_RESULT
   },
   "result": {
     "use": "goal1_cvrs",
-    "sort": [{ "by": "conversions", "dir": "desc" }],
     "limit": 50
   }
 }
@@ -510,13 +522,12 @@ Only the whitelisted keys above are allowed — any other key triggers `E_RESULT
   },
   "result": {
     "use": "kw_perf",
-    "sort": [{ "by": "clicks", "dir": "desc" }],
     "limit": 100
   }
 }
 ```
 
-Compute a weighted average position client-side as `position_weighted / impressions`.
+Compute a weighted average position client-side as `position_weighted / impressions`. Sort by `clicks` desc client-side as well, since `result.sort` is not yet implemented.
 
 ### 7.6 View chaining
 
@@ -543,9 +554,7 @@ Compute a weighted average position client-side as `position_weighted / impressi
   },
   "result": {
     "use": "mobile_by_url",
-    "sort": [{ "by": "pv", "dir": "desc" }],
-    "limit": 50,
-    "include_count": true
+    "limit": 50
   }
 }
 ```

@@ -159,27 +159,18 @@ rules:
         default: false
       include_count:
         type: boolean
-        description: "If true, meta.filtered_rows carries the pre-sample hit count."
+        description: "Planned: meta.filtered_rows will carry the pre-sample hit count. Currently accepted by the validator but the executor does not process it yet."
         default: false
-      sort:
-        type: array
-        description: "Sort specifications applied at the result stage."
-        items:
-          type: object
-          required: ["by", "dir"]
-          properties:
-            by:  { type: string }
-            dir: { type: string, enum: ["asc", "desc"] }
       sample:
         type: object
-        description: "Sampling when the view exceeds max_rows."
+        description: "Planned: sampling when the view exceeds max_rows. Currently accepted by the validator but the executor does not process it yet."
         required: ["max_rows", "method"]
         properties:
           max_rows: { type: integer, minimum: 1 }
           method:   { type: string, enum: ["head", "random", "hashmod"] }
       return:
         type: object
-        description: "Output shape. Only INLINE+JSON is fully supported in this version."
+        description: "Planned: output shape. Only INLINE+JSON works today; other combinations are no-ops."
         properties:
           mode:   { type: string, enum: ["INLINE", "FILE"] }
           format: { type: string, enum: ["JSON", "CSV", "PARQUET"] }
@@ -188,17 +179,23 @@ rules:
       - code: E_UNKNOWN_VIEW
         message: "Result.use does not match any defined view in make."
       - code: E_RESULT_FORBIDDEN_KEY
-        message: "Result contains a non-whitelisted key."
+        message: "Result contains a non-whitelisted key (e.g. 'sort' is not yet implemented)."
 
 features:
-  filter: true
-  join: true
-  calc: true
-  sort: true
-  sample: true
+  # Implemented and fully processed
+  filter:        true
+  join:          true
+  calc:          true
   view_chaining: true
-  return_file_csv: false
-  return_file_parquet: false
+  # Not yet implemented. 'sort' is rejected outright as E_RESULT_FORBIDDEN_KEY.
+  # 'sample' / 'include_count' pass validation but the executor does not
+  # process them yet; treat them as no-ops until flipped to true.
+  sort:          false
+  sample:        false
+  include_count: false
+  return_file:   false
+  return_csv:    false
+  return_parquet: false
 ---
 
 # QAL Validation Manifest — AI Accessible Version
@@ -234,17 +231,25 @@ Your job is to produce valid QAL JSON that conforms to the schema above. Follow 
    - `filter` keys are **plain column names** (unqualified). Values are either an array (IN) or `{ <op>: <value> }`. Multiple keys combine with AND; there is no OR form yet. **Do not use filter when `from` references another view** — filter in the upstream view.
    - `join` is a single object (arrays forbidden). `on[]` uses fully qualified names on both sides. Only integer id columns may be joined. If the join target is an M:N material (e.g. `gsc`), the view must carry a filter on a target column.
    - `calc` values must match the strict regex `^(COUNT|COUNTUNIQUE|SUM|AVERAGE|MIN|MAX)\(<qualified>\)$`. `COUNT(*)` is forbidden.
-5. **result:** Only the whitelisted keys (`use`, `limit`, `count_only`, `include_count`, `sort`, `sample`, `return`) are allowed. Unknown keys raise `E_RESULT_FORBIDDEN_KEY`.
+5. **result:** The executor's runtime whitelist is `use`, `limit`, `count_only`, `include_count`, `sample`, `return` (plus `x-*` annotations). **`sort` is NOT in the whitelist** and will raise `E_RESULT_FORBIDDEN_KEY`. Of the accepted keys, `include_count` / `sample` / `return` are currently no-ops — see §Features below.
 6. **No aliasing.** Never add `as` fields to `materials[]` or `make.<view>` — it raises `E_ALIAS_FORBIDDEN`.
 
 ### Features enabled in this version
 
+Always consult the `/guide` response `features` map on the live server — it reports the authoritative runtime state. The current baseline:
+
+**Implemented and processed:**
 - ✅ `filter` (flat form, AND-only)
-- ✅ `join` (single equi-join, id-column only)
+- ✅ `join` (single equi-join, id-column only, M:N target must be filtered)
 - ✅ `calc` (whitelisted single-column aggregates)
 - ✅ view chaining (`from: ["<previous_view>"]`)
-- ✅ `result.sort`, `result.sample`, `result.include_count`
-- ⚠️ `return.mode = "FILE"` and non-JSON formats are declared in the schema but not fully supported yet — use `INLINE` / `JSON`.
+
+**Not yet implemented (do not rely on them yet):**
+- 🚧 `result.sort` — actively rejected as `E_RESULT_FORBIDDEN_KEY`. Sort client-side.
+- 🚧 `result.sample` — accepted by validator, no runtime effect
+- 🚧 `result.include_count` — accepted by validator, no runtime effect
+- 🚧 `return.mode = "FILE"` and non-JSON formats — use `INLINE` / `JSON` for now
+- 🚧 `OR` logic across filter conditions
 
 ---
 
@@ -303,12 +308,12 @@ Your job is to produce valid QAL JSON that conforms to the schema above. Follow 
   },
   "result": {
     "use": "blog_by_url",
-    "sort": [{ "by": "pv", "dir": "desc" }],
-    "limit": 100,
-    "include_count": true
+    "limit": 100
   }
 }
 ```
+
+> Sort (`result.sort`) is not yet implemented — sort the returned rows client-side by `pv` desc. `include_count` would be handy here but is currently a no-op; omit it until `features.include_count` flips to `true` in `/guide`.
 
 ---
 

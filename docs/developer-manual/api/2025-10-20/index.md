@@ -2,7 +2,7 @@
 id: getting-started-2025-10-20
 title: Getting Started
 sidebar_position: 1
-last_updated: 2026-04-10
+last_updated: 2026-04-11
 ---
 
 # QA  ZERO API - Getting Started (2025-10-20)
@@ -11,8 +11,8 @@ last_updated: 2026-04-10
 **API Version:** 2025-10-20  
 **Plugin Version Required:** 3.0.0.0+  
 **Status:** Current Release  
-**Last Updated:** 2026-04-10  
-**Documentation Version:** 1.1.0
+**Last Updated:** 2026-04-11  
+**Documentation Version:** 1.1.1
 
 **Check Compatibility:** [Version Compatibility Guide](../compatibility.md)
 :::
@@ -21,13 +21,16 @@ last_updated: 2026-04-10
 
 ## Changelog
 
+### 2026-04-11 - Documentation v1.1.1
+**Corrected:**
+- 🔧 Removed inaccurate claims that `result.sort`, `result.sample`, `result.include_count` were implemented. They are not yet — `sort` is rejected as `E_RESULT_FORBIDDEN_KEY`, and `sample`/`include_count` pass validation but are no-ops. The examples, feature table, and validation manifest were updated accordingly. The `features` map reported by `/guide` is now the authoritative runtime state.
+
 ### 2026-04-10 - Documentation v1.1.0
 **Added:**
 - ✅ QAL `filter` (flat form, `eq`/`neq`/`gt`/`gte`/`lt`/`lte`/`in`/`contains`/`prefix`/`between`)
 - ✅ QAL `join` (single equi-join per view, id-column only)
 - ✅ QAL `calc` aggregation with whitelisted functions (`COUNT`, `COUNTUNIQUE`, `SUM`, `AVERAGE`, `MIN`, `MAX`)
 - ✅ View chaining — `from` may reference previously defined views in the same `make` block
-- ✅ `result.sort`, `result.sample`, `result.include_count`
 - ✅ M:N join filter requirement (`E_JOIN_FILTER_REQUIRED`) documented
 - ✅ New materials: `goal_1`..`goal_N`, `ga4_age_gender`, `ga4_country`, `ga4_region`, `page_version`, `click_event`, `datalayer_event`, `events.{name}`
 - ✅ `allpv` behavioral columns (`depth_position`, `deep_read`, `stop_max_sec`, `stop_max_pos`, `exit_pos`, `is_submit`, `dead_click_image_count`, `irritation_click_count`, `scroll_back_count`, `content_skip_count`, `exploration_count`)
@@ -96,19 +99,17 @@ This is the initial release of QA  ZERO API, providing simple and straightforwar
 - `calc` — `COUNT` / `COUNTUNIQUE` / `SUM` / `AVERAGE` / `MIN` / `MAX`
 - Virtual columns — `allpv.is_goal_N`, `gsc.ctr`, `gsc.position`, `gsc.position_weighted`, ...
 
-✅ **Result Options:**
+✅ **Result Options (implemented):**
 - `limit` (default 1000, cap 50000)
 - `count_only`
-- `include_count`
-- `sort` — `[{ by, dir }]`
-- `sample` — `head` / `random` / `hashmod`
-- `return` — `INLINE` / `JSON` (FILE/CSV/PARQUET declared; not yet fully supported)
 
-⚠️ **Not yet available:**
+⚠️ **Not yet available** (check `/guide` `features` map for the runtime truth):
+- `result.sort` — rejected as `E_RESULT_FORBIDDEN_KEY`. Sort client-side for now.
+- `result.sample` / `result.include_count` — accepted by the validator but not processed by the executor yet (no-op)
+- `result.return.mode = "FILE"` and non-JSON output formats — `INLINE` + `JSON` only
 - `OR` across filter conditions (use multiple queries or post-process)
 - HAVING-style filter on aggregated results
 - Multi-step joins within a single view (one join per view)
-- `return.mode = "FILE"` and non-JSON output formats
 
 ---
 
