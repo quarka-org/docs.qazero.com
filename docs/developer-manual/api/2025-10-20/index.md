@@ -3,29 +3,39 @@ id: getting-started-2025-10-20
 title: Getting Started
 sidebar_position: 1
 last_updated: 2026-04-11
+api_update: 2026-04-11
 ---
 
 # QA  ZERO API - Getting Started (2025-10-20)
 
 :::info Version Information
 **API Version:** 2025-10-20  
+**API Update:** 2026-04-11  
 **Plugin Version Required:** 3.0.0.0+  
 **Status:** Current Release  
 **Last Updated:** 2026-04-11  
-**Documentation Version:** 1.1.1
+**Documentation Version:** 1.1.2
+
+The combined value `2025-10-20 / 2026-04-11` is the canonical identifier of this API revision. Keep `?version=2025-10-20` in your URL (it only changes on breaking revisions) and read `api_update` and `features` from `/guide` at runtime to decide which features are usable against a given server.
 
 **Check Compatibility:** [Version Compatibility Guide](../compatibility.md)
 :::
 
 ---
 
-## Changelog
+## Changelog (Update Ledger)
 
-### 2026-04-11 - Documentation v1.1.1
-**Corrected:**
-- 🔧 Removed inaccurate claims that `result.sort`, `result.sample`, `result.include_count` were implemented. They are not yet — `sort` is rejected as `E_RESULT_FORBIDDEN_KEY`, and `sample`/`include_count` pass validation but are no-ops. The examples, feature table, and validation manifest were updated accordingly. The `features` map reported by `/guide` is now the authoritative runtime state.
+This is the **Update Ledger** for API version `2025-10-20`: one living document per version, new entries on top. Each entry is tagged with the `api_update` date that the plugin will report in its `/guide` response. Read this table top-to-bottom to see how the API has grown since the initial release, and match the most recent entry against your server's `api_update` to know which features are actually available to you.
 
-### 2026-04-10 - Documentation v1.1.0
+### 2026-04-11 — `api_update: 2026-04-11` — Documentation v1.1.2
+**Runtime:**
+- ✅ `/guide` now returns an `api_update` field and a `features` map keyed by `filter`, `join`, `calc`, `view_chaining`, `sort`, `sample`, `include_count`, `return_file`, `return_csv`, `return_parquet`. This is the authoritative runtime state — clients (including AI agents) should consult `features` rather than hard-coding feature availability.
+- ✅ Plugin constants `QAHM_API_VERSION` and `QAHM_API_UPDATE` are introduced and used to populate the guide response.
+
+**Corrected (documentation only, carried forward from v1.1.1):**
+- 🔧 `result.sort` is rejected as `E_RESULT_FORBIDDEN_KEY`, and `result.sample` / `result.include_count` pass validation but are no-ops. Examples, feature table, and validation manifest were updated accordingly in the previous revision and remain authoritative.
+
+### 2026-04-10 — `api_update: 2026-04-10` — Documentation v1.1.0
 **Added:**
 - ✅ QAL `filter` (flat form, `eq`/`neq`/`gt`/`gte`/`lt`/`lte`/`in`/`contains`/`prefix`/`between`)
 - ✅ QAL `join` (single equi-join per view, id-column only)

@@ -2,7 +2,8 @@
 id: materials-2025-10-20
 title: Materials Reference
 sidebar_position: 4
-last_updated: 2026-04-10
+last_updated: 2026-04-11
+api_update: 2026-04-11
 ---
 
 # Materials Reference (2025-10-20)

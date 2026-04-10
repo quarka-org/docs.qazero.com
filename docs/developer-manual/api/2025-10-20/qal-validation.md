@@ -3,7 +3,9 @@ id: qal-validation-2025-10-20
 title: QAL Validation Manifest
 sidebar_position: 5
 version: "2025-10-20"
-update: "2026-04-10"
+update: "2026-04-11"
+api_update: "2026-04-11"
+last_updated: "2026-04-11"
 type: validation_manifest
 description: >
   Defines strict validation rules for QAL JSON execution requests.

@@ -1,34 +1,68 @@
 # Documentation Update Guide for Version Releases
 
-**Quick reference for maintaining API documentation when releasing new versions**
+**Quick reference for maintaining API documentation when shipping new features or new versions**
+
+First: understand the [two-layer versioning scheme](./VERSION_MANAGEMENT.md#two-layer-versioning-version--update). Almost every release you do will be an **update**, not a new **version**. New versions are rare (breaking changes only); updates happen continuously.
 
 ---
 
-## 📋 Update Checklist
+## 🟢 Scenario A (most common): Non-breaking Update
 
-When releasing a new API version or plugin version, follow this checklist:
+**Examples:** a new filter operator ships, a new material is added, `allpv` gains a behavioral column, the `features` map changes, a new calc function is whitelisted.
 
-### ☑️ Plugin Version Update (e.g., 3.0.0.0 → 3.1.0.0)
+→ **Stay inside the existing `YYYY-MM-DD/` directory.** Do not copy it. Do not create a new one. The directory is a living document.
 
-**If only adding backward-compatible features:**
+### 3-step workflow
 
-1. **compatibility.md** - Update matrix
-2. **materials.md** - Add new features section (if applicable)
-3. **Changelog** - Document what's new
+1. **In qa-labo (plugin source), bump the update date**
+   - Edit the implementation (executor / validator / material loader).
+   - Update `src/core/yaml/qal-validation-{version}.yaml` — either flip a `features:` flag to `true`, add to an enum list, or add a new rule.
+   - **Bump `QAHM_API_UPDATE` in `src/core/qahm-const.php` to today's date.** This is the single most important step — if you forget it, clients (including AI agents) will never discover the new feature via `/guide`.
+   - Make sure the edited files are listed in `qa-labo-override-files.txt` so the nightly sync from qa-platform does not clobber them.
 
-**If breaking changes exist:**
+2. **In docs.qazero.com (this repo), reflect the new feature**
+   - Edit the relevant `.md` file(s) inside `docs/developer-manual/api/{version}/` (`qal.md`, `materials.md`, `endpoints.md`, `qal-validation.md`).
+   - Add a `**Since:** YYYY-MM-DD` badge next to the new feature's heading or row.
+   - Bump `last_updated` **and** `api_update` in the frontmatter of every file you touched.
+   - Add a new entry at the **top** of the Update Ledger (Changelog) in `{version}/index.md`:
+     ```markdown
+     ### YYYY-MM-DD — `api_update: YYYY-MM-DD` — Documentation vX.Y.Z
+     **Added:**
+     - ✅ Short description of the new feature
+     ```
+   - If the `features` map or response shape in `endpoints.md` is visible in the `/guide` response example, update the example too.
 
-→ Create new API version directory (see "New API Version" below)
+3. **Commit and push**
+   - Single commit to this repo, pushed to `main`. GitHub Actions deploys to `gh-pages` automatically.
+   - Commit message convention: `docs(api/{version}): update YYYY-MM-DD — <one-line summary>`
+   - Verify on https://docs.qazero.com after a few minutes.
+
+### What you do **not** do in Scenario A
+
+- ❌ Do not `cp -r 2025-10-20 2025-10-20-update-YYYY`
+- ❌ Do not create a new `api/YYYY-MM-DD/` directory
+- ❌ Do not touch `compatibility.md` for non-breaking updates (it tracks **versions**, not updates)
+- ❌ Do not hand-edit the `features` map in docs to disagree with the YAML — the YAML is the source of truth
 
 ---
 
-### ☑️ New API Version (e.g., 2025-10-20 → 2026-03-01)
+## 🔴 Scenario B (rare): New API Version (breaking change)
 
-**Create new version:**
+**Examples:** response envelope shape changes, a required field is removed, a column is renamed, semantics of an operator changes.
+
+Breaking changes are rare. Before going down this path, ask: "can I add a new field and keep the old one working?" If yes, it's Scenario A.
+
+---
+
+### ☑️ New API Version (e.g., 2025-10-20 → 2026-03-01) — BREAKING ONLY
+
+**Create new version (Scenario B only):**
 
 1. **Copy directory**: `cp -r 2025-10-20/ 2026-03-01/`
 2. **Update 5 files** in new directory (details below)
 3. **Update 2 top-level files** (compatibility.md, index.md)
+4. **Reset** `api_update` to the new version's release date (the two layers are scoped per-version)
+5. **Keep the old version directory for 24 months** as part of the support policy
 
 ---
 
@@ -251,29 +285,21 @@ last_updated: 2026-03-01              # ← Update date
 ### Scenario 1: Minor Plugin Update (3.0.0.0 → 3.0.1.0)
 **No API changes, just bug fixes**
 
-→ **No documentation update needed**
+→ **No documentation update needed.** `api_update` stays put.
 
 ---
 
 ### Scenario 2: Plugin Feature Addition (3.0.0.0 → 3.1.0.0)
-**New fields added to existing material**
+**New fields added to existing material, new operator, new material — all backward-compatible**
 
-**Update:**
-1. compatibility.md - Add 3.1.0.0 entry
-2. materials.md - Add "New in 3.1.0.0" section
-3. Changelog in index.md
-
-**DON'T create new API version**
+This is Scenario A from the top of this document. **Do not create a new API version directory.** Bump `api_update`, add `**Since:**` badges, update the Update Ledger, and push. Update `compatibility.md` only if plugin version requirements changed — not for every `api_update` bump.
 
 ---
 
 ### Scenario 3: Breaking Change (3.0.0.0 → 4.0.0.0)
 **Field removed or behavior changed**
 
-**Must create new API version:**
-1. Create 2026-03-01/ directory
-2. Update all 6 files above
-3. Mark old version as "Previous" in main index.md
+This is Scenario B. Must create a new API version directory, reset `api_update` to the new release date, keep the old version directory for 24 months.
 
 ---
 

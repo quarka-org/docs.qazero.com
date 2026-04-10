@@ -2,7 +2,8 @@
 id: endpoints-2025-10-20
 title: API Endpoints
 sidebar_position: 2
-last_updated: 2025-10-06
+last_updated: 2026-04-11
+api_update: 2026-04-11
 ---
 
 # API Endpoints Reference (2025-10-20)
@@ -52,9 +53,23 @@ Returns comprehensive server information including:
 ```json
 {
   "version": "2025-10-20",
-  "timestamp": "2025-10-06T12:34:56Z",
+  "api_update": "2026-04-11",
+  "timestamp": "2026-04-11T12:34:56Z",
   "plugin_version": "3.0.0.0",
-  
+
+  "features": {
+    "filter":         true,
+    "join":           true,
+    "calc":           true,
+    "view_chaining":  true,
+    "sort":           false,
+    "sample":         false,
+    "include_count":  false,
+    "return_file":    false,
+    "return_csv":     false,
+    "return_parquet": false
+  },
+
   "sites": [
     {
       "tracking_id": "abc123",
@@ -176,9 +191,11 @@ Returns comprehensive server information including:
 ### Response Fields
 
 **Root Level:**
-- `version` - API version used
+- `version` - API version used (breaking-change identifier, changes rarely — kept in the URL)
+- `api_update` - Update date within the same `version` (non-breaking additions; bumps whenever a new feature ships). Clients should read this together with `features` to know what the server actually supports.
 - `timestamp` - Current server time (ISO 8601)
 - `plugin_version` - QA Platform plugin version (e.g., "3.0.0.0")
+- `features` - Runtime feature map for this `version` + `api_update` combo. Each key is a QAL/result feature and the value is a boolean indicating whether the executor actually processes it. This is the authoritative runtime truth — do not hard-code feature availability on the client side, read it from `/guide` at startup.
 
 **sites[] - Site Configurations:**
 - `tracking_id` - Unique identifier for the tracking site

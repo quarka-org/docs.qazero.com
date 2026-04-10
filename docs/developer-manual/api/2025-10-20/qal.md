@@ -2,7 +2,8 @@
 id: qal-2025-10-20
 title: QAL Guide
 sidebar_position: 3
-last_updated: 2026-04-10
+last_updated: 2026-04-11
+api_update: 2026-04-11
 ---
 
 # QAL Guide (2025-10-20)
