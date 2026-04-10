@@ -299,7 +299,7 @@ Available only on sites that ship dataLayer events (`raw_g`). Every event lands 
 
 Use `datalayer_event` for cross-event search ("which sessions fired any `add_to_cart`?"). For typed parameter columns, switch to `events.{name}` materials.
 
-### events.{name} — Per-event typed materials
+### `events.{name}` — Per-event typed materials
 
 For each distinct event name a site emits, a dynamic material is exposed whose columns are the typed parameters declared in the event's manifest. Fixed columns across all events: `pv_id`, `session_id`. Discover the list via the `/guide` response field `sites[].datalayer_events[]`, which reports each event's `material`, `event_count`, and typed column schema.
 
