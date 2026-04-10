@@ -8,50 +8,50 @@
     <subtitle>Welcome to the Official QA ZERO Documentation Blog</subtitle>
     <icon>https://docs.qazero.com/ja/img/favicon.ico</icon>
     <entry>
-        <title type="html"><![CDATA[qa-labo spring 2026: filter, join, calc, and a lot of new materials]]></title>
+        <title type="html"><![CDATA[qa-labo 2026年春: filter、join、calc、そして大量の新マテリアル]]></title>
         <id>https://docs.qazero.com/ja/blog/qa-labo-spring-2026-update</id>
         <link href="https://docs.qazero.com/ja/blog/qa-labo-spring-2026-update"/>
         <updated>2026-04-10T00:00:00.000Z</updated>
-        <summary type="html"><![CDATA[Most of the heavy lifting in QA ZERO happens in a sibling repository called qa-labo — the experimental fork where new features incubate before they roll up into the production plugin. This post is the first in what I hope becomes a regular stream of notes from that work.]]></summary>
-        <content type="html"><![CDATA[<p>Most of the heavy lifting in QA ZERO happens in a sibling repository called <strong>qa-labo</strong> — the experimental fork where new features incubate before they roll up into the production plugin. This post is the first in what I hope becomes a regular stream of notes from that work.</p>
-<p>Since the last time this blog updated, qa-labo has filled in almost everything the original QAL <code>2025-10-20</code> guide listed as "not yet available". The API version is <strong>unchanged</strong> — these are additive, so you can keep using <code>?version=2025-10-20</code> and just start using the new features.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="whats-new-in-qal">What's new in QAL<a href="https://docs.qazero.com/ja/blog/qa-labo-spring-2026-update#whats-new-in-qal" class="hash-link" aria-label="What's new in QAL への直接リンク" title="What's new in QAL への直接リンク">​</a></h2>
-<p>The original release shipped <code>from</code> + <code>keep</code> and little else. You can now write full queries:</p>
+        <summary type="html"><![CDATA[QA ZERO の重たい開発作業のほとんどは、qa-labo という兄弟リポジトリで行われています。新機能はまずここで実験的にインキュベートされ、その後プロダクションプラグインへと取り込まれていきます。この記事は、その作業から定期的に発信していきたいと考えているノートの第 1 弾です。]]></summary>
+        <content type="html"><![CDATA[<p>QA ZERO の重たい開発作業のほとんどは、<strong>qa-labo</strong> という兄弟リポジトリで行われています。新機能はまずここで実験的にインキュベートされ、その後プロダクションプラグインへと取り込まれていきます。この記事は、その作業から定期的に発信していきたいと考えているノートの第 1 弾です。</p>
+<p>このブログが前回更新されて以降、qa-labo は元の QAL <code>2025-10-20</code> ガイドが「まだ利用できない」としていた機能のほとんどを埋めてきました。API バージョンは <strong>変更されていません</strong> — これらはすべて後方互換な追加なので、<code>?version=2025-10-20</code> を使い続けたまま新機能を使い始めることができます。</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="qal-の新機能">QAL の新機能<a href="https://docs.qazero.com/ja/blog/qa-labo-spring-2026-update#qal-%E3%81%AE%E6%96%B0%E6%A9%9F%E8%83%BD" class="hash-link" aria-label="QAL の新機能 への直接リンク" title="QAL の新機能 への直接リンク">​</a></h2>
+<p>最初のリリースでは <code>from</code> + <code>keep</code> 程度しか提供されていませんでした。今では本格的なクエリを書くことができます。</p>
 <ul>
-<li><strong><code>filter</code></strong> — flat, AND-combined row filter with ten operators (<code>eq</code>, <code>neq</code>, <code>gt</code>/<code>gte</code>, <code>lt</code>/<code>lte</code>, <code>in</code>, <code>contains</code>, <code>prefix</code>, <code>between</code>). Keys are plain column names belonging to the source material, so <code>{ "device_type": ["SP"], "url": { "prefix": "/blog" } }</code> "just works".</li>
-<li><strong><code>join</code></strong> — single equi-join per view, id-columns only. N<!-- -->:M<!-- --> materials like <code>gsc</code> now require a filter on the joined side (enforced by the executor as <code>E_JOIN_FILTER_REQUIRED</code>) — we hit this in production when a stray join blew up a 100-PV page into 15,000 rows. The rule is strict by design.</li>
-<li><strong><code>calc</code></strong> — whitelisted aggregation (<code>COUNT</code>, <code>COUNTUNIQUE</code>, <code>SUM</code>, <code>AVERAGE</code>, <code>MIN</code>, <code>MAX</code>) with a strict single-column argument. <code>COUNT(*)</code> is still banned — always name the column, which keeps the optimizer honest.</li>
-<li><strong>View chaining</strong> — <code>from: ["&lt;earlier_view&gt;"]</code> inside the same <code>make</code> block. This is where QAL starts feeling like a real query language: filter once in a base view, then aggregate it two different ways in child views without re-scanning the column DB.</li>
-<li><strong><code>result.sort</code>, <code>result.sample</code>, <code>result.include_count</code></strong> — these keys are reserved in the spec but <strong>not yet implemented</strong>. <code>sort</code> is currently rejected as <code>E_RESULT_FORBIDDEN_KEY</code>, and <code>sample</code>/<code>include_count</code> pass validation but are no-ops. Sort and size-check client-side until the <code>features</code> map in <code>/guide</code> flips them on.</li>
+<li><strong><code>filter</code></strong> — フラット形式で AND 結合される行フィルターで、10 種類の演算子（<code>eq</code>、<code>neq</code>、<code>gt</code>/<code>gte</code>、<code>lt</code>/<code>lte</code>、<code>in</code>、<code>contains</code>、<code>prefix</code>、<code>between</code>）が使えます。キーはソースマテリアルに属する素のカラム名なので、<code>{ "device_type": ["SP"], "url": { "prefix": "/blog" } }</code> のように書くだけで動きます。</li>
+<li><strong><code>join</code></strong> — 1 つのビューにつき 1 回の等結合（equi-join）のみ、id カラム限定です。<code>gsc</code> のような N<!-- -->:M<!-- --> マテリアルでは、結合先に対するフィルターが必須になりました（エグゼキューターが <code>E_JOIN_FILTER_REQUIRED</code> として強制します）— これは、迷い込んだ join が 100 PV のページを 15,000 行に膨張させた本番事故を受けての仕様です。このルールは意図的に厳格になっています。</li>
+<li><strong><code>calc</code></strong> — ホワイトリスト方式の集計（<code>COUNT</code>、<code>COUNTUNIQUE</code>、<code>SUM</code>、<code>AVERAGE</code>、<code>MIN</code>、<code>MAX</code>）で、引数は単一カラム限定です。<code>COUNT(*)</code> は引き続き禁止 — 必ずカラム名を指定する形で、オプティマイザに正直な情報を与える設計になっています。</li>
+<li><strong>ビューチェイニング</strong> — 同じ <code>make</code> ブロック内での <code>from: ["&lt;earlier_view&gt;"]</code> 記法です。ここから QAL は本物のクエリ言語らしくなってきます。ベースビューで一度フィルターし、その結果を子ビューで 2 通りに集計する、といったことがカラム DB を再スキャンせずに書けます。</li>
+<li><strong><code>result.sort</code>、<code>result.sample</code>、<code>result.include_count</code></strong> — これらのキーは仕様として予約されていますが <strong>まだ実装されていません</strong>。<code>sort</code> は現在 <code>E_RESULT_FORBIDDEN_KEY</code> として拒否され、<code>sample</code> / <code>include_count</code> はバリデーションは通過しますが no-op です。<code>/guide</code> の <code>features</code> マップでオンになるまでは、ソートとサイズチェックはクライアント側で行ってください。</li>
 </ul>
-<p>The <a href="https://docs.qazero.com/ja/docs/developer-manual/api/2025-10-20/qal-2025-10-20">QAL Guide</a> has been completely rewritten to cover all of this, and the <a href="https://docs.qazero.com/ja/docs/developer-manual/api/2025-10-20/qal-validation-2025-10-20">Validation Manifest</a> now reflects the executor's real rules instead of the initial "everything is disabled" stub.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="new-materials">New materials<a href="https://docs.qazero.com/ja/blog/qa-labo-spring-2026-update#new-materials" class="hash-link" aria-label="New materials への直接リンク" title="New materials への直接リンク">​</a></h2>
-<p><code>allpv</code> and <code>gsc</code> are no longer alone. <code>/guide</code> now surfaces:</p>
+<p><a href="https://docs.qazero.com/ja/docs/developer-manual/api/2025-10-20/qal-2025-10-20">QAL ガイド</a> はこれらすべてをカバーするために全面的に書き直され、<a href="https://docs.qazero.com/ja/docs/developer-manual/api/2025-10-20/qal-validation-2025-10-20">バリデーションマニフェスト</a> も当初の「すべて無効」というスタブから、エグゼキューターの実際のルールを反映したものに更新されました。</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="新しいマテリアル">新しいマテリアル<a href="https://docs.qazero.com/ja/blog/qa-labo-spring-2026-update#%E6%96%B0%E3%81%97%E3%81%84%E3%83%9E%E3%83%86%E3%83%AA%E3%82%A2%E3%83%AB" class="hash-link" aria-label="新しいマテリアル への直接リンク" title="新しいマテリアル への直接リンク">​</a></h2>
+<p><code>allpv</code> と <code>gsc</code> だけではなくなりました。<code>/guide</code> では現在、以下が公開されています。</p>
 <ul>
-<li><strong><code>goal_1</code>..<code>goal_N</code></strong> — per-PV conversion logs, one material per configured goal. For "did this PV achieve goal 3?" there are also <strong>virtual</strong> columns <code>is_goal_1</code>..<code>is_goal_10</code> on <code>allpv</code> so you can filter without switching materials.</li>
-<li><strong><code>ga4_age_gender</code>, <code>ga4_country</code>, <code>ga4_region</code></strong> — GA4 attribute data landed via T48. These are aggregate materials (no <code>pv_id</code>), meant to complement <code>allpv</code> with demographics that first-party tracking doesn't see.</li>
-<li><strong><code>page_version</code></strong> — per-page content version tracker (T53). Joins to <code>allpv</code> on <code>version_id</code>, 1:1, so you can attach version metadata to PVs without worrying about row explosion.</li>
-<li><strong><code>click_event</code></strong> — click events with selector, element text, destination URL, and page-relative coordinates. Joinable via <code>pv_id</code>.</li>
-<li><strong><code>datalayer_event</code></strong> (+ dynamic <strong><code>events.{name}</code></strong>) — sites that ship dataLayer events now get both a uniform index of every event and a typed per-event material whose columns reflect that event's parameters. The <code>/guide</code> response lists every <code>events.*</code> material the site exposes.</li>
+<li><strong><code>goal_1</code>..<code>goal_N</code></strong> — PV ごとのコンバージョンログで、設定されたゴールごとに 1 つのマテリアルが用意されます。「この PV はゴール 3 を達成したか？」を知りたい場合には、<code>allpv</code> 上に <strong>仮想</strong> カラム <code>is_goal_1</code>..<code>is_goal_10</code> もあるので、マテリアルを切り替えずにフィルターできます。</li>
+<li><strong><code>ga4_age_gender</code>、<code>ga4_country</code>、<code>ga4_region</code></strong> — T48 で GA4 の属性データが着地しました。これらは集計マテリアル（<code>pv_id</code> を持たない）で、ファーストパーティトラッキングでは見えないデモグラ情報を <code>allpv</code> に補完することを意図しています。</li>
+<li><strong><code>page_version</code></strong> — ページごとのコンテンツバージョンを追跡するマテリアル（T53）です。<code>version_id</code> で <code>allpv</code> に 1:1 で結合されるため、行の爆発を気にせず PV にバージョンメタデータを付与できます。</li>
+<li><strong><code>click_event</code></strong> — セレクター、要素テキスト、遷移先 URL、ページ相対座標を含むクリックイベントです。<code>pv_id</code> で結合できます。</li>
+<li><strong><code>datalayer_event</code></strong>（+ 動的な <strong><code>events.{name}</code></strong>） — dataLayer イベントを送出しているサイトでは、全イベントの統一インデックスに加え、そのイベントのパラメーターを反映した型付きのイベント別マテリアルの両方が利用できるようになりました。<code>/guide</code> のレスポンスには、そのサイトが公開しているすべての <code>events.*</code> マテリアルが列挙されます。</li>
 </ul>
-<p>And <code>allpv</code> itself grew a lot of new columns: behavioral metrics (<code>depth_position</code>, <code>deep_read</code>, <code>stop_max_sec</code>, <code>stop_max_pos</code>, <code>exit_pos</code>, <code>is_submit</code>, <code>dead_click_image_count</code>, <code>irritation_click_count</code>, <code>scroll_back_count</code>, <code>content_skip_count</code>, <code>exploration_count</code>) and generated page-type booleans (<code>is_article</code>, <code>is_product</code>, <code>is_form</code>, <code>is_faq</code>, and so on). The <a href="https://docs.qazero.com/ja/docs/developer-manual/api/2025-10-20/materials-2025-10-20">Materials Reference</a> has the full list.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="why-docs-as-a-knowledge-base-for-ai">Why "docs as a knowledge base for AI"?<a href="https://docs.qazero.com/ja/blog/qa-labo-spring-2026-update#why-docs-as-a-knowledge-base-for-ai" class="hash-link" aria-label="Why &quot;docs as a knowledge base for AI&quot;? への直接リンク" title="Why &quot;docs as a knowledge base for AI&quot;? への直接リンク">​</a></h2>
-<p>This blog sits in a <strong>public</strong> repository on purpose. The API documentation for QA ZERO is optimized not just for human developers but for <strong>AI assistants that are about to write a QAL query</strong>. If an LLM is going to generate a valid query for you, it needs:</p>
+<p>そして <code>allpv</code> 自身にも多数の新カラムが追加されました。行動メトリクス（<code>depth_position</code>、<code>deep_read</code>、<code>stop_max_sec</code>、<code>stop_max_pos</code>、<code>exit_pos</code>、<code>is_submit</code>、<code>dead_click_image_count</code>、<code>irritation_click_count</code>、<code>scroll_back_count</code>、<code>content_skip_count</code>、<code>exploration_count</code>）と、生成されるページタイプ判定フラグ（<code>is_article</code>、<code>is_product</code>、<code>is_form</code>、<code>is_faq</code> など）です。完全なリストは <a href="https://docs.qazero.com/ja/docs/developer-manual/api/2025-10-20/materials-2025-10-20">マテリアルリファレンス</a> を参照してください。</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="なぜai-のためのナレッジベースとしてのドキュメントなのか">なぜ「AI のためのナレッジベースとしてのドキュメント」なのか？<a href="https://docs.qazero.com/ja/blog/qa-labo-spring-2026-update#%E3%81%AA%E3%81%9Cai-%E3%81%AE%E3%81%9F%E3%82%81%E3%81%AE%E3%83%8A%E3%83%AC%E3%83%83%E3%82%B8%E3%83%99%E3%83%BC%E3%82%B9%E3%81%A8%E3%81%97%E3%81%A6%E3%81%AE%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88%E3%81%AA%E3%81%AE%E3%81%8B" class="hash-link" aria-label="なぜ「AI のためのナレッジベースとしてのドキュメント」なのか？ への直接リンク" title="なぜ「AI のためのナレッジベースとしてのドキュメント」なのか？ への直接リンク">​</a></h2>
+<p>このブログは意図的に <strong>パブリック</strong> リポジトリに置かれています。QA ZERO の API ドキュメントは、人間の開発者だけでなく、<strong>これから QAL クエリを書こうとしている AI アシスタント</strong> のためにも最適化されています。LLM があなたのために有効なクエリを生成するには、次のものが必要です。</p>
 <ul>
-<li>Exact, machine-readable validation rules (hence the YAML frontmatter on the validation manifest being identical to the body).</li>
-<li>A clear list of allowed column names per material (hence every material page linking out of <code>/guide</code>).</li>
-<li>Explicit error codes with the cause, so the assistant can self-correct rather than hallucinate.</li>
+<li>正確で機械可読なバリデーションルール（だからこそバリデーションマニフェストの YAML frontmatter は本文と一致しています）。</li>
+<li>マテリアルごとに許可されているカラム名の明確なリスト（だからこそすべてのマテリアルページは <code>/guide</code> からリンクされています）。</li>
+<li>原因まで含めた明示的なエラーコード（これによりアシスタントはハルシネーションではなく自己修正できます）。</li>
 </ul>
-<p>The blog itself is a lower-ceremony channel: design notes, "why we did it this way" stories, and dev diaries. Expect it to update irregularly — when something interesting ships in qa-labo, not on a fixed cadence.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="whats-next">What's next<a href="https://docs.qazero.com/ja/blog/qa-labo-spring-2026-update#whats-next" class="hash-link" aria-label="What's next への直接リンク" title="What's next への直接リンク">​</a></h2>
-<p>The shortlist on my desk right now:</p>
+<p>ブログ自体はもっと気軽なチャンネルです。設計ノート、「なぜこう作ったか」というストーリー、開発日記など。更新は不定期になる予定です — 固定のペースではなく、qa-labo で面白いものが出たときに書きます。</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="次に来るもの">次に来るもの<a href="https://docs.qazero.com/ja/blog/qa-labo-spring-2026-update#%E6%AC%A1%E3%81%AB%E6%9D%A5%E3%82%8B%E3%82%82%E3%81%AE" class="hash-link" aria-label="次に来るもの への直接リンク" title="次に来るもの への直接リンク">​</a></h2>
+<p>今デスクの上にあるショートリストはこんな感じです。</p>
 <ul>
-<li><code>OR</code> across filter conditions (the top complaint since <code>filter</code> went live).</li>
-<li>HAVING-style filtering over aggregated results.</li>
-<li><code>return.mode = "FILE"</code> with CSV and Parquet output for the "I need 5 million rows" case.</li>
-<li>More attribute materials as additional sources land.</li>
+<li>フィルター条件をまたぐ <code>OR</code>（<code>filter</code> が出てから一番多い要望です）。</li>
+<li>集計結果に対する HAVING 形式のフィルタリング。</li>
+<li>「500 万行ほしい」ケースのための、CSV と Parquet 出力に対応した <code>return.mode = "FILE"</code>。</li>
+<li>追加のソースが着地するのにあわせて、さらに属性マテリアルを増やしていく。</li>
 </ul>
-<p>If you're building against the QA ZERO API and something in the new surface is unclear, file an issue against <a href="https://github.com/quarka-org/docs.qazero.com" target="_blank" rel="noopener noreferrer">quarka-org/docs.qazero.com</a> — the repo is public precisely so problems in the docs are as easy to report as problems in the code.</p>
+<p>QA ZERO API を使って開発していて、新しい範囲の何かが不明瞭であれば、<a href="https://github.com/quarka-org/docs.qazero.com" target="_blank" rel="noopener noreferrer">quarka-org/docs.qazero.com</a> に issue を立ててください — このリポジトリがパブリックなのは、まさにドキュメントの問題をコードの問題と同じくらい気軽に報告できるようにするためです。</p>
 <p>— Koji</p>]]></content>
         <author>
             <name>Koji Maruyama</name>
