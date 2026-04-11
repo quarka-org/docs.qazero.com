@@ -378,34 +378,16 @@ The request body must be a JSON object with a `qal` key that contains the QAL qu
 }
 ```
 
-### QAL Query Structure (2025-10-20)
+### QAL Query Structure
 
-**Note:** API version is specified in the URL (`?version=2025-10-20`), not in the QAL query body.
+A QAL query defines one or more **views** over **materials**, scoped by `tracking_id` and `time`, and returns a single named view as the result. The JSON body above under [Request Body Structure](#request-body-structure) is the minimal shape:
 
-### Supported QAL Features (2025-10-20)
+- `materials` — the materials you intend to read from
+- `time` — the time window (required)
+- `make` — view definitions (`from`, `filter`, `join`, `keep`, `calc`)
+- `result` — which view to return, plus options like `limit` and `count_only`
 
-**Required Fields:**
-- `tracking_id` - Tracking site identifier (from /guide response)
-- `materials` - Array of materials to use
-- `time` - Time range (start, end, tz)
-- `make` - View definitions
-- `result` - Result specification
-
-**make (View Definition):**
-- ✅ `from` - Source material (array with one element)
-- ✅ `keep` - Columns to keep (fully qualified names)
-- ❌ `join` - Not supported in this version
-- ❌ `filter` - Not supported in this version
-- ❌ `calc` - Not supported in this version
-
-**result (Output Options):**
-- ✅ `use` - View name to return (required)
-- ✅ `limit` - Maximum rows (default: 100, max: 5000)
-- ✅ `count_only` - Return count instead of data (boolean)
-- ❌ `sort` - Not supported in this version
-- ❌ `sample` - Not supported in this version
-- ❌ `return.mode` - Not supported (INLINE only)
-- ❌ `return.format` - Not supported (JSON only)
+The API version is specified in the URL (`?version=2025-10-20`), not in the body. For the full QAL syntax — all operators, join rules, calc functions, view chaining, result options, and error codes — see the **[QAL Guide](./qal.md)**. The runtime truth for which features are enabled on a given server is the `features` map returned by `/guide`.
 
 ### Response Format
 

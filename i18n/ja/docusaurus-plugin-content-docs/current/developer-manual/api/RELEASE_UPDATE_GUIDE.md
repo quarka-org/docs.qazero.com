@@ -24,7 +24,7 @@
    - `docs/developer-manual/api/{version}/` 内の該当する `.md` ファイル（`qal.md`, `materials.md`, `endpoints.md`, `qal-validation.md`）を編集します。
    - 新機能の見出しや行の横に `**Since:** YYYY-MM-DD` バッジを追加します。
    - 編集した各ファイルの frontmatter で `last_updated` **と** `api_update` を bump します。
-   - `{version}/index.md` のアップデート台帳（Changelog）の**先頭**に新しいエントリーを追加します。
+   - `{version}/changelog.md` のアップデート履歴の**先頭**に新しいエントリーを追加します。
      ```markdown
      ### YYYY-MM-DD — `api_update: YYYY-MM-DD` — Documentation vX.Y.Z
      **追加:**
@@ -292,7 +292,7 @@ last_updated: 2026-03-01              # ← 日付を更新
 ### シナリオ 2: プラグインの機能追加（3.0.0.0 → 3.1.0.0）
 **既存マテリアルへの新フィールド追加、新演算子、新マテリアル — すべて後方互換**
 
-これは本ドキュメント冒頭のシナリオ A です。**新しい API バージョンのディレクトリを作らないでください。** `api_update` を bump し、`**Since:**` バッジを追加し、アップデート台帳を更新してプッシュします。`compatibility.md` の更新は、プラグインバージョン要件が変わったときだけ行います — `api_update` を bump するたびに更新するものではありません。
+これは本ドキュメント冒頭のシナリオ A です。**新しい API バージョンのディレクトリを作らないでください。** `api_update` を bump し、`**Since:**` バッジを追加し、アップデート履歴を更新してプッシュします。`compatibility.md` の更新は、プラグインバージョン要件が変わったときだけ行います — `api_update` を bump するたびに更新するものではありません。
 
 ---
 

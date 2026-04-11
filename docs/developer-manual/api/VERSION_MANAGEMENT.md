@@ -22,7 +22,7 @@ QA ZERO API uses a **two-layer versioning scheme**. Understanding this is the mo
 **Do not** duplicate the `2025-10-20/` directory every time you bump `api_update`. The directory is a **single living document** for the entire lifetime of version `2025-10-20`. When you add a feature:
 
 1. Add a `**Since:** YYYY-MM-DD` badge to the feature's section in `qal.md` / `materials.md` / `endpoints.md`
-2. Add a new entry at the **top** of the Update Ledger (Changelog) in `index.md`
+2. Add a new entry at the **top** of the Update History in `changelog.md`
 3. Bump `api_update` and `last_updated` in the frontmatter of every edited file
 4. Bump `QAHM_API_UPDATE` in the qa-labo plugin source so `/guide` reports the new date
 

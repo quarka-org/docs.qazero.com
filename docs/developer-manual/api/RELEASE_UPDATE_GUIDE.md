@@ -24,7 +24,7 @@ First: understand the [two-layer versioning scheme](./VERSION_MANAGEMENT.md#two-
    - Edit the relevant `.md` file(s) inside `docs/developer-manual/api/{version}/` (`qal.md`, `materials.md`, `endpoints.md`, `qal-validation.md`).
    - Add a `**Since:** YYYY-MM-DD` badge next to the new feature's heading or row.
    - Bump `last_updated` **and** `api_update` in the frontmatter of every file you touched.
-   - Add a new entry at the **top** of the Update Ledger (Changelog) in `{version}/index.md`:
+   - Add a new entry at the **top** of the Update History in `{version}/changelog.md`:
      ```markdown
      ### YYYY-MM-DD — `api_update: YYYY-MM-DD` — Documentation vX.Y.Z
      **Added:**
@@ -292,7 +292,7 @@ last_updated: 2026-03-01              # ← Update date
 ### Scenario 2: Plugin Feature Addition (3.0.0.0 → 3.1.0.0)
 **New fields added to existing material, new operator, new material — all backward-compatible**
 
-This is Scenario A from the top of this document. **Do not create a new API version directory.** Bump `api_update`, add `**Since:**` badges, update the Update Ledger, and push. Update `compatibility.md` only if plugin version requirements changed — not for every `api_update` bump.
+This is Scenario A from the top of this document. **Do not create a new API version directory.** Bump `api_update`, add `**Since:**` badges, update the Update History, and push. Update `compatibility.md` only if plugin version requirements changed — not for every `api_update` bump.
 
 ---
 
