@@ -2,8 +2,8 @@
 id: qal-2025-10-20
 title: QAL ガイド
 sidebar_position: 3
-last_updated: 2026-04-11
-api_update: 2026-04-11
+last_updated: 2026-04-13
+api_update: 2026-04-13
 ---
 
 # QAL ガイド (2025-10-20)
@@ -34,18 +34,13 @@ api_update: 2026-04-11
 | `make.keep` | ✅ | カラムの射影 / グループキー |
 | `make.calc` | ✅ | 集計（ホワイトリスト関数） |
 | `make.add` | ✅ | オプションの明示的な calc キーリスト |
+| `make.sort` | ✅ **Since:** 2026-04-13 | 行のソートとトップ N 抽出 |
 | ビューチェイニング (`from: ["other_view"]`) | ✅ | インメモリの keep/calc/join でビューを合成 |
 | `result.use` / `limit` / `count_only` | ✅ | |
 | 仮想カラム (`position_weighted`, `is_goal_N`, …) | ✅ | マテリアル/Executor 層で計算 |
-| `result.sort` | 🚧 予定 | 未実装 — result キーのホワイトリストにより拒否されます |
-| `result.sample` | 🚧 予定 | バリデーターは受理しますが、まだ処理されません |
-| `result.include_count` | 🚧 予定 | バリデーターは受理しますが、まだ処理されません |
-| `result.return` | 🚧 予定 | `INLINE` / `JSON` のみ動作します。`FILE` / `CSV` / `PARQUET` は予定 |
 
 **未サポート（明示的なリスト）:**
-- `result.sort` — ソートは `E_RESULT_FORBIDDEN_KEY` として拒否されます。当面はクライアント側でソートしてください
-- `result.sample` / `result.include_count` — バリデーターはこれらのキーを受理しますが、Executor はまだ処理しません。no-op として扱ってください
-- `result.return.mode = "FILE"` および非 JSON フォーマット
+- `result.sample` / `result.include_count` / `result.return` — 現在の `result` ホワイトリストに含まれません。代わりに `make.sort` と `limit` / `count_only` を使用してください
 - フィルター条件をまたぐ `OR` ロジック（フラット形式フィルターは暗黙の `AND` です）
 - 集計結果に対する HAVING 形式のフィルター
 - エイリアス (`as`) — 意図的に禁止
@@ -153,6 +148,7 @@ QAL クエリには 5 つの必須トップレベルキーがあります。
       "keep":   ["material.column", "..."],
       "calc":   { /* §4.3 */ },
       "add":    ["metric_a", "metric_b"],
+      "sort":   { /* §4.7 */ },
       "x-label": "optional annotation"
     }
   }
@@ -347,6 +343,55 @@ QAL クエリには 5 つの必須トップレベルキーがあります。
 
 チェインされたビューでは、`keep`, `calc`, `join` は上流のビューが生成したインメモリの行に対して動作します。チェインされた `from` に対する `filter` は **使用できません** — 代わりに上流でフィルターをかけてください。
 
+### 4.7 sort (オプション)
+
+**Since:** 2026-04-13
+
+ビューの出力行をソートし、オプションでトップ N 行だけを残します。`sort` は `filter` / `join` / `keep` / `calc` の **後** に適用されるため、ソートキーはビューの出力に実在するカラム（`keep` のいずれか、または `calc` / `add` のメトリクス）でなければなりません。
+
+```json
+{
+  "sort": {
+    "by":    "pageviews",
+    "order": "desc",
+    "top":   10
+  }
+}
+```
+
+| フィールド | 型 | 必須 | 説明 |
+|-------|------|----------|-------------|
+| `by` | string | Yes | ソート対象のカラム名。修飾あり（`allpv.url`、`click_event.click_count`）でも修飾なし（`pageviews`）でも指定できます。このビューの `keep` または `calc` / `add` のいずれかに実在する必要があります。 |
+| `order` | string | Yes | `"asc"`（昇順）または `"desc"`（降順） |
+| `top` | int | No | ソート後の先頭 N 行のみを返します。省略するとすべての行を返します。 |
+
+**ルールと注意点:**
+
+- `sort` はビュー単位です — `make` 内の各ビューはそれぞれ独自の `sort` を持てます。最終的な `result.limit` は `top` の後にも適用されるため、「意味的にトップ N が欲しい」場合は `top` を使い、`limit` は行数のセーフティキャップとしてだけ使ってください。
+- `by` の解決は修飾名を先に試し、次に修飾なし名を試します。修飾なしで曖昧な場合はバリデーションエラーになります — 結合のあるビューでは修飾名を優先してください。
+- `null` 値は `desc` では最後に、`asc` では最初にソートされます（実行ごとに安定）。
+- ビューチェイニングで参照されるビューをソートすることは可能ですが、下流のビューが集計（`calc`）する場合、下流の出力順序は独立であり、下流側にも独自の `sort` が必要です。
+- 本バージョンでは「複数カラムによるソート」の形式はありません。副次キーが必要な場合は、副次キーを `calc` / `add` の複合スコアとして生成し、それでソートしてください（クライアント側または上流ビューで）。
+
+**例 — pageviews の多い URL トップ 10:**
+
+```json
+{
+  "make": {
+    "by_url": {
+      "from": ["allpv"],
+      "keep": ["allpv.url"],
+      "calc": {
+        "pageviews": "COUNT(allpv.pv_id)",
+        "sessions":  "COUNTUNIQUE(allpv.reader_id)"
+      },
+      "sort": { "by": "pageviews", "order": "desc", "top": 10 }
+    }
+  },
+  "result": { "use": "by_url" }
+}
+```
+
 ---
 
 ## 5. result (必須)
@@ -371,20 +416,21 @@ QAL クエリには 5 つの必須トップレベルキーがあります。
 | `limit` | int | 返却する最大行数。デフォルト `1000`、上限 `50000`。 |
 | `count_only` | bool | `true` の場合、`{ "count": N }` のみを返します — データは返しません。 |
 
-実運用で許可されているのは上記のホワイトリストに含まれるキーのみです — その他のキーは `E_RESULT_FORBIDDEN_KEY` を発生させるか、暗黙に無視されます（下記参照）。
+実運用で許可されているのは上記のホワイトリストに含まれるキーのみです — その他のキーは `E_RESULT_FORBIDDEN_KEY` を発生させます。
+
+### ソート — `result.sort` ではなく `make.sort` を使用
+
+本 API ではソートは **ビュー単位** の関心事です。順序付けられた結果が必要な場合は、`result.use` が指す先のビュー内に `sort` ブロックを置いてください（§4.7 参照）。`result.sort` キーは意図的に存在しません — 1 つの QAL クエリはビューチェイニングで複数のビューを要求できる場合があり、それぞれのビューが自分の順序を所有します。
 
 ### 計画中のキー（未実装）
 
-以下のキーは設計仕様書に記載されており、その一部はバリデーションを通過しますが、**Executor ではまだ処理されていません**。これらに依存してもドキュメント通りの動作は得られません。クライアント作成者が今後何が来るかを把握できるよう、ここに列挙しています。
+以下のキーは設計仕様書に記載されていますが、**現在の `result` ホワイトリストでは受理されません**。将来の `api_update` で有効化される予定です。使用する前に必ず `/guide` の `features` マップを確認してください。
 
 | キー | ステータス | 予定されている形式 |
 |-----|--------|---------------|
-| `sort` | 🚧 **拒否** (`E_RESULT_FORBIDDEN_KEY`) — 当面はクライアント側でソート | `[ { "by": "<col>", "dir": "asc\|desc" }, ... ]` |
-| `sample` | 🚧 バリデーターは受理しますが、**実行時には効果なし** | `{ "max_rows": N, "method": "head\|random\|hashmod" }` |
-| `include_count` | 🚧 バリデーターは受理しますが、**実行時には効果なし** | `bool` → `meta.filtered_rows` を埋める予定 |
-| `return` | 🚧 データを返すのは `mode:"INLINE"` / `format:"JSON"` のみ。その他の組み合わせは no-op | `{ "mode": "INLINE\|FILE", "format": "JSON\|CSV\|PARQUET" }` |
-
-これらのいずれかを使用する前に、必ず `/guide` レスポンスの `features` マップで正本の実行時状態を確認してください。
+| `sample` | 🚧 まだ受理されません | `{ "max_rows": N, "method": "head\|random\|hashmod" }` |
+| `include_count` | 🚧 まだ受理されません | `bool` → `meta.filtered_rows` を埋める予定 |
+| `return` | 🚧 まだ受理されません — 本日時点のレスポンスは常に `INLINE` / `JSON` です | `{ "mode": "INLINE\|FILE", "format": "JSON\|CSV\|PARQUET" }` |
 
 ---
 
@@ -457,7 +503,7 @@ QAL クエリには 5 つの必須トップレベルキーがあります。
 }
 ```
 
-> Executor はまだ結果をソートしません（`result.sort` は拒否されます）。データ受信後にクライアント側で `sessions` の降順にソートしてください。
+> `sessions` の降順でトップ 10 URL を取得したい場合は、`by_url` ビューに `"sort": { "by": "sessions", "order": "desc", "top": 10 }` を追加してください（§4.7 参照）。
 
 ### 7.3 グローバル集計（1 行）
 
@@ -528,7 +574,7 @@ QAL クエリには 5 つの必須トップレベルキーがあります。
 }
 ```
 
-クライアント側で加重平均順位を `position_weighted / impressions` として計算してください。`result.sort` がまだ実装されていないため、`clicks` の降順ソートもクライアント側で行ってください。
+クライアント側で加重平均順位を `position_weighted / impressions` として計算してください。`clicks` の降順でトップ 100 キーワードを取得したい場合は、`kw_perf` ビューに `"sort": { "by": "clicks", "order": "desc", "top": 100 }` を追加してください。
 
 ### 7.6 ビューチェイニング
 

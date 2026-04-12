@@ -2,21 +2,21 @@
 id: getting-started-2025-10-20
 title: はじめに
 sidebar_position: 1
-last_updated: 2026-04-11
-api_update: 2026-04-11
+last_updated: 2026-04-13
+api_update: 2026-04-13
 ---
 
 # QA  ZERO API - はじめに (2025-10-20)
 
 :::info バージョン情報
 **API バージョン:** 2025-10-20  
-**API アップデート:** 2026-04-11  
+**API アップデート:** 2026-04-13  
 **必要なプラグインバージョン:** 3.0.0.0+  
 **ステータス:** Current Release  
-**最終更新日:** 2026-04-11  
-**ドキュメントバージョン:** 1.1.2
+**最終更新日:** 2026-04-13  
+**ドキュメントバージョン:** 1.2.0
 
-`2025-10-20 / 2026-04-11` という組み合わせが、この API リビジョンの正式な識別子です。URL には `?version=2025-10-20` を指定し続け（破壊的変更があった場合にのみ変わります）、実行時には `/guide` から `api_update` と `features` を読み取り、対象サーバーでどの機能が利用可能かを判断してください。
+`2025-10-20 / 2026-04-13` という組み合わせが、この API リビジョンの正式な識別子です。URL には `?version=2025-10-20` を指定し続け（破壊的変更があった場合にのみ変わります）、実行時には `/guide` から `api_update` と `features` を読み取り、対象サーバーでどの機能が利用可能かを判断してください。
 
 **互換性の確認:** [バージョン互換性ガイド](../compatibility.md)
 :::
@@ -54,6 +54,7 @@ api_update: 2026-04-11
 - `join` — ビューごとに 1 つの等結合（equi-join）、id カラムのみ、M:N ターゲットにはフィルターが必須
 - `keep` — カラムの射影 / group-by キー
 - `calc` — `COUNT` / `COUNTUNIQUE` / `SUM` / `AVERAGE` / `MIN` / `MAX`
+- `sort` / `top` — ビュー単位の行ソートとトップ N 抽出（QAL ガイド §4.7 参照） — **Since:** 2026-04-13
 - 仮想カラム — `allpv.is_goal_N`、`gsc.ctr`、`gsc.position`、`gsc.position_weighted`、...
 
 ✅ **Result オプション（実装済み）:**
@@ -61,9 +62,8 @@ api_update: 2026-04-11
 - `count_only`
 
 ⚠️ **未対応**（実行時の正は `/guide` の `features` マップを確認してください）:
-- `result.sort` — `E_RESULT_FORBIDDEN_KEY` として拒否されます。現状ではクライアント側でソートしてください。
-- `result.sample` / `result.include_count` — バリデーターは受け付けますが、実行時にはまだ処理されません（no-op）
-- `result.return.mode = "FILE"` および JSON 以外の出力フォーマット — 現時点では `INLINE` + `JSON` のみ
+- `result.sample` / `result.include_count` / `result.return` — 現在の `result` ホワイトリストには含まれません
+- JSON 以外の出力フォーマット — 現時点では `INLINE` + `JSON` のみ
 - フィルター条件をまたぐ `OR`（複数回クエリを投げるか、後処理してください）
 - 集計結果に対する HAVING 相当のフィルター
 - 1 つのビュー内での多段 join（ビューあたり 1 回の join のみ）
