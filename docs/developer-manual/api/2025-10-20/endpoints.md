@@ -2,8 +2,8 @@
 id: endpoints-2025-10-20
 title: API Endpoints
 sidebar_position: 2
-last_updated: 2026-04-11
-api_update: 2026-04-11
+last_updated: 2026-04-13
+api_update: 2026-04-13
 ---
 
 # API Endpoints Reference (2025-10-20)
@@ -53,8 +53,8 @@ Returns comprehensive server information including:
 ```json
 {
   "version": "2025-10-20",
-  "api_update": "2026-04-11",
-  "timestamp": "2026-04-11T12:34:56Z",
+  "api_update": "2026-04-13",
+  "timestamp": "2026-04-13T12:34:56Z",
   "plugin_version": "3.0.0.0",
 
   "features": {
@@ -62,7 +62,7 @@ Returns comprehensive server information including:
     "join":           true,
     "calc":           true,
     "view_chaining":  true,
-    "sort":           false,
+    "sort":           true,
     "sample":         false,
     "include_count":  false,
     "return_file":    false,

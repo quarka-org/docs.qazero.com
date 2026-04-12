@@ -2,8 +2,8 @@
 id: qal-2025-10-20
 title: QAL Guide
 sidebar_position: 3
-last_updated: 2026-04-11
-api_update: 2026-04-11
+last_updated: 2026-04-13
+api_update: 2026-04-13
 ---
 
 # QAL Guide (2025-10-20)
@@ -34,18 +34,13 @@ Check the server's `/guide` response `features` map for the authoritative list �
 | `make.keep` | ✅ | Column projection / group keys |
 | `make.calc` | ✅ | Aggregation (whitelisted functions) |
 | `make.add` | ✅ | Optional explicit calc key list |
+| `make.sort` | ✅ **Since:** 2026-04-13 | Sort rows and optionally keep only the top N |
 | View chaining (`from: ["other_view"]`) | ✅ | Compose views with in-memory keep/calc/join |
 | `result.use` / `limit` / `count_only` | ✅ | |
 | Virtual columns (`position_weighted`, `is_goal_N`, …) | ✅ | Computed at material/executor layer |
-| `result.sort` | 🚧 Planned | Not yet implemented — rejected by the result-key whitelist |
-| `result.sample` | 🚧 Planned | Accepted by validator but not yet processed |
-| `result.include_count` | 🚧 Planned | Accepted by validator but not yet processed |
-| `result.return` | 🚧 Planned | Only `INLINE` / `JSON` works; `FILE` / `CSV` / `PARQUET` planned |
 
 **Not yet supported (explicit list):**
-- `result.sort` — sorting is rejected as `E_RESULT_FORBIDDEN_KEY`; do the sort client-side for now
-- `result.sample` / `result.include_count` — the validator accepts these keys but the executor does not process them yet; treat them as no-ops
-- `result.return.mode = "FILE"` and non-JSON formats
+- `result.sample` / `result.include_count` / `result.return` — not accepted by the current `result` whitelist. Use `make.sort` + `limit` / `count_only` instead
 - `OR` logic across filter conditions (flat filters are implicit `AND`)
 - HAVING-style filters on aggregated results
 - Aliasing (`as`) — intentionally forbidden
@@ -153,6 +148,7 @@ Time range is interpreted as `[start, end)`. Each material maps this range to it
       "keep":   ["material.column", "..."],
       "calc":   { /* §4.3 */ },
       "add":    ["metric_a", "metric_b"],
+      "sort":   { /* §4.7 */ },
       "x-label": "optional annotation"
     }
   }
@@ -347,6 +343,55 @@ Virtual columns are used just like physical ones in `keep`, `filter`, and `calc`
 
 In chained views, `keep`, `calc`, and `join` operate on the in-memory rows produced by the upstream view. `filter` is **not** allowed on a chained `from` — filter upstream instead.
 
+### 4.7 sort (optional)
+
+**Since:** 2026-04-13
+
+Sort the view's rows and, optionally, keep only the top N. `sort` is applied **after** `filter` / `join` / `keep` / `calc`, so the sort key must be a column that actually exists in the view's output (one of `keep` or a `calc`/`add` metric).
+
+```json
+{
+  "sort": {
+    "by":    "pageviews",
+    "order": "desc",
+    "top":   10
+  }
+}
+```
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `by` | string | Yes | Column to sort by. Either qualified (`allpv.url`, `click_event.click_count`) or unqualified (`pageviews`). Must exist in `keep` or a `calc`/`add` metric of this view. |
+| `order` | string | Yes | `"asc"` or `"desc"` |
+| `top` | int | No | Return only the first N rows after sorting. Omit to return every row. |
+
+**Rules and notes:**
+
+- Sort is per-view — each view in `make` can have its own `sort`. The final `result.limit` still applies after `top`, so use `top` when you want a semantic "top N" and `limit` only as a row-count safety cap.
+- `by` resolution tries qualified names first, then unqualified. Ambiguous unqualified names raise a validation error — prefer qualified names when you have joins.
+- `null` values sort last in `desc` and first in `asc` (stable across runs).
+- Sorting a view that is referenced by another view via chaining is allowed — the downstream view sees the sorted rows in order, but if it aggregates (`calc`) the sort order of its *own* output is independent and needs its own `sort`.
+- There is no "sort by multiple columns" form in this version. If you need a secondary key, produce the secondary key as a `calc`/`add` column and sort by a composite score (client-side or via an upstream view).
+
+**Example — top 10 URLs by pageviews:**
+
+```json
+{
+  "make": {
+    "by_url": {
+      "from": ["allpv"],
+      "keep": ["allpv.url"],
+      "calc": {
+        "pageviews": "COUNT(allpv.pv_id)",
+        "sessions":  "COUNTUNIQUE(allpv.reader_id)"
+      },
+      "sort": { "by": "pageviews", "order": "desc", "top": 10 }
+    }
+  },
+  "result": { "use": "by_url" }
+}
+```
+
 ---
 
 ## 5. result (required)
@@ -371,20 +416,21 @@ Selects the final view and controls output shape.
 | `limit` | int | Max rows returned. Default `1000`, hard cap `50000`. |
 | `count_only` | bool | When `true`, returns `{ "count": N }` only — no data. |
 
-Only the whitelisted keys above are allowed in practice — any other key triggers `E_RESULT_FORBIDDEN_KEY` or is silently ignored (see below).
+Only the whitelisted keys above are allowed — any other key triggers `E_RESULT_FORBIDDEN_KEY`.
+
+### Sorting — use `make.sort`, not `result.sort`
+
+Sorting is a **view-level** concern in this API. To get ordered results, put a `sort` block inside the view that `result.use` points to (see §4.7). There is intentionally no `result.sort` key — a single QAL query may ask for several views via chaining, and each view owns its own ordering.
 
 ### Planned keys (not yet implemented)
 
-The following keys appear in the design spec and some of them pass validation, but **they are not yet processed by the executor**. Relying on them will not produce the documented behavior. They are listed here so client authors know what is coming.
+The following keys appear in the design spec but are **not accepted by the current `result` whitelist**. They will light up in a future `api_update`; check the `/guide` `features` map before using any of them.
 
 | Key | Status | Planned shape |
 |-----|--------|---------------|
-| `sort` | 🚧 **Rejected** (`E_RESULT_FORBIDDEN_KEY`) — sort client-side for now | `[ { "by": "<col>", "dir": "asc\|desc" }, ... ]` |
-| `sample` | 🚧 Accepted by validator, **no runtime effect yet** | `{ "max_rows": N, "method": "head\|random\|hashmod" }` |
-| `include_count` | 🚧 Accepted by validator, **no runtime effect yet** | `bool` → will populate `meta.filtered_rows` |
-| `return` | 🚧 Only `mode:"INLINE"` / `format:"JSON"` returns data; other combinations are no-ops | `{ "mode": "INLINE\|FILE", "format": "JSON\|CSV\|PARQUET" }` |
-
-Check the `/guide` response `features` map for the authoritative runtime state before using any of these.
+| `sample` | 🚧 Not yet accepted | `{ "max_rows": N, "method": "head\|random\|hashmod" }` |
+| `include_count` | 🚧 Not yet accepted | `bool` → will populate `meta.filtered_rows` |
+| `return` | 🚧 Not yet accepted — responses are always `INLINE` / `JSON` today | `{ "mode": "INLINE\|FILE", "format": "JSON\|CSV\|PARQUET" }` |
 
 ---
 
@@ -457,7 +503,7 @@ Check the `/guide` response `features` map for the authoritative runtime state b
 }
 ```
 
-> The executor does not sort results yet (`result.sort` is rejected). Sort client-side by `sessions` desc after receiving the data.
+> To return, say, the top 10 URLs by `sessions`, add `"sort": { "by": "sessions", "order": "desc", "top": 10 }` to the `by_url` view (see §4.7).
 
 ### 7.3 Global aggregate (one row)
 
@@ -528,7 +574,7 @@ Check the `/guide` response `features` map for the authoritative runtime state b
 }
 ```
 
-Compute a weighted average position client-side as `position_weighted / impressions`. Sort by `clicks` desc client-side as well, since `result.sort` is not yet implemented.
+Compute a weighted average position client-side as `position_weighted / impressions`. To return the top 100 keywords by clicks, add `"sort": { "by": "clicks", "order": "desc", "top": 100 }` to the `kw_perf` view.
 
 ### 7.6 View chaining
 

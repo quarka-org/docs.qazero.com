@@ -2,13 +2,22 @@
 id: changelog-2025-10-20
 title: Update History
 sidebar_position: 6
-last_updated: 2026-04-11
-api_update: 2026-04-11
+last_updated: 2026-04-13
+api_update: 2026-04-13
 ---
 
 # Update History (2025-10-20)
 
 This is the **Update History** for API version `2025-10-20`: one living document per version, new entries on top. Each entry is tagged with the `api_update` date that the plugin will report in its `/guide` response. Read this top-to-bottom to see how the API has grown since the initial release, and match the most recent entry against your server's `api_update` to know which features are actually available to you.
+
+### 2026-04-13 — `api_update: 2026-04-13` — Documentation v1.2.0
+**Added:**
+- ✅ **QAL `make.sort`** — view-level row ordering and top-N. Place `sort: { by, order, top }` inside a view in `make` to sort the view's output after `filter` / `join` / `keep` / `calc`. `by` accepts both qualified (`allpv.url`) and unqualified (`pageviews`) names, `order` is `asc` / `desc`, `top` is an optional row cap. See [QAL Guide §4.7](./qal.md#47-sort-optional).
+- ✅ `/guide` `features.sort` now reports `true` on servers running this update — clients should use it to detect availability instead of hard-coding.
+
+**Clarified:**
+- 🔧 Sorting is intentionally **view-level, not result-level**. There is no `result.sort`. A single QAL query may ask for multiple chained views, and each view owns its own ordering.
+- 🔧 `result` whitelist today is exactly `use` / `limit` / `count_only`. `result.sample` / `result.include_count` / `result.return` are **not** currently accepted (previously documented as "validator-accepted no-ops"; that description is now obsolete).
 
 ### 2026-04-11 — `api_update: 2026-04-11` — Documentation v1.1.2
 **Runtime:**

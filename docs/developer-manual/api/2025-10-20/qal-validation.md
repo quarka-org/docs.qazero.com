@@ -3,9 +3,9 @@ id: qal-validation-2025-10-20
 title: QAL Validation Manifest
 sidebar_position: 5
 version: "2025-10-20"
-update: "2026-04-11"
-api_update: "2026-04-11"
-last_updated: "2026-04-11"
+update: "2026-04-13"
+api_update: "2026-04-13"
+last_updated: "2026-04-13"
 type: validation_manifest
 description: >
   Defines strict validation rules for QAL JSON execution requests.
@@ -123,6 +123,19 @@ rules:
                 description: "Unmatched-row behavior. Default: keep-left (LEFT OUTER)."
               fill:
                 description: "Default value for unmatched right-side columns when 'if not match' is 'keep-left'. Default: null."
+          sort:
+            type: object
+            description: >
+              View-level sort. Applied after filter/join/keep/calc. 'by' must exist in
+              keep or in a calc/add metric of this view. Accepts both qualified
+              ('material.column') and unqualified ('column') names. 'top' optionally
+              limits to the first N rows.
+            required: ["by", "order"]
+            properties:
+              by:    { type: string, description: "Column to sort by (qualified or unqualified)." }
+              order: { type: string, enum: ["asc", "desc"] }
+              top:   { type: integer, minimum: 1, description: "Return only the first N rows after sorting. Omit for all rows." }
+            additionalProperties: false
           add:
             type: array
             description: "Optional list of calc result column names. Must exactly match calc keys when specified; auto-derived from calc when omitted."
@@ -159,29 +172,12 @@ rules:
         type: boolean
         description: "If true, return only { count: N } instead of rows."
         default: false
-      include_count:
-        type: boolean
-        description: "Planned: meta.filtered_rows will carry the pre-sample hit count. Currently accepted by the validator but the executor does not process it yet."
-        default: false
-      sample:
-        type: object
-        description: "Planned: sampling when the view exceeds max_rows. Currently accepted by the validator but the executor does not process it yet."
-        required: ["max_rows", "method"]
-        properties:
-          max_rows: { type: integer, minimum: 1 }
-          method:   { type: string, enum: ["head", "random", "hashmod"] }
-      return:
-        type: object
-        description: "Planned: output shape. Only INLINE+JSON works today; other combinations are no-ops."
-        properties:
-          mode:   { type: string, enum: ["INLINE", "FILE"] }
-          format: { type: string, enum: ["JSON", "CSV", "PARQUET"] }
     additionalProperties: false
     errors:
       - code: E_UNKNOWN_VIEW
         message: "Result.use does not match any defined view in make."
       - code: E_RESULT_FORBIDDEN_KEY
-        message: "Result contains a non-whitelisted key (e.g. 'sort' is not yet implemented)."
+        message: "Result contains a non-whitelisted key. The current whitelist is {use, limit, count_only}. Sorting is done with make.<view>.sort, not result.sort."
 
 features:
   # Implemented and fully processed
@@ -189,10 +185,9 @@ features:
   join:          true
   calc:          true
   view_chaining: true
-  # Not yet implemented. 'sort' is rejected outright as E_RESULT_FORBIDDEN_KEY.
-  # 'sample' / 'include_count' pass validation but the executor does not
-  # process them yet; treat them as no-ops until flipped to true.
-  sort:          false
+  sort:          true
+  # Not yet implemented. sample / include_count / return are not accepted
+  # by the current result whitelist; they will be enabled in a future update.
   sample:        false
   include_count: false
   return_file:   false
@@ -233,7 +228,8 @@ Your job is to produce valid QAL JSON that conforms to the schema above. Follow 
    - `filter` keys are **plain column names** (unqualified). Values are either an array (IN) or `{ <op>: <value> }`. Multiple keys combine with AND; there is no OR form yet. **Do not use filter when `from` references another view** — filter in the upstream view.
    - `join` is a single object (arrays forbidden). `on[]` uses fully qualified names on both sides. Only integer id columns may be joined. If the join target is an M:N material (e.g. `gsc`), the view must carry a filter on a target column.
    - `calc` values must match the strict regex `^(COUNT|COUNTUNIQUE|SUM|AVERAGE|MIN|MAX)\(<qualified>\)$`. `COUNT(*)` is forbidden.
-5. **result:** The executor's runtime whitelist is `use`, `limit`, `count_only`, `include_count`, `sample`, `return` (plus `x-*` annotations). **`sort` is NOT in the whitelist** and will raise `E_RESULT_FORBIDDEN_KEY`. Of the accepted keys, `include_count` / `sample` / `return` are currently no-ops — see §Features below.
+   - `sort` (**Since: 2026-04-13**) is a view-level block: `{ "by": "<col>", "order": "asc"|"desc", "top": N? }`. Applied after `filter` / `join` / `keep` / `calc`. Use it instead of client-side sorting.
+5. **result:** The executor's runtime whitelist is exactly `use`, `limit`, `count_only` (plus `x-*` annotations). **`sort` is NOT a `result` key** — sort inside the view via `make.<view>.sort`. Any other key raises `E_RESULT_FORBIDDEN_KEY`.
 6. **No aliasing.** Never add `as` fields to `materials[]` or `make.<view>` — it raises `E_ALIAS_FORBIDDEN`.
 
 ### Features enabled in this version
@@ -245,12 +241,11 @@ Always consult the `/guide` response `features` map on the live server — it re
 - ✅ `join` (single equi-join, id-column only, M:N target must be filtered)
 - ✅ `calc` (whitelisted single-column aggregates)
 - ✅ view chaining (`from: ["<previous_view>"]`)
+- ✅ `sort` (view-level, with optional `top` — **Since: 2026-04-13**)
 
 **Not yet implemented (do not rely on them yet):**
-- 🚧 `result.sort` — actively rejected as `E_RESULT_FORBIDDEN_KEY`. Sort client-side.
-- 🚧 `result.sample` — accepted by validator, no runtime effect
-- 🚧 `result.include_count` — accepted by validator, no runtime effect
-- 🚧 `return.mode = "FILE"` and non-JSON formats — use `INLINE` / `JSON` for now
+- 🚧 `result.sample` / `result.include_count` / `result.return` — not accepted by the `result` whitelist
+- 🚧 Non-JSON response formats — the API always returns `INLINE` / `JSON` today
 - 🚧 `OR` logic across filter conditions
 
 ---
@@ -315,7 +310,7 @@ Always consult the `/guide` response `features` map on the live server — it re
 }
 ```
 
-> Sort (`result.sort`) is not yet implemented — sort the returned rows client-side by `pv` desc. `include_count` would be handy here but is currently a no-op; omit it until `features.include_count` flips to `true` in `/guide`.
+> To return, say, the top 10 URLs by `pv`, add `"sort": { "by": "pv", "order": "desc", "top": 10 }` to the `blog_by_url` view — sorting is a view-level concern, never a `result` key.
 
 ---
 
@@ -328,6 +323,6 @@ Always consult the `/guide` response `features` map on the live server — it re
 
 ---
 
-**Last Updated:** 2026-04-10
+**Last Updated:** 2026-04-13
 **API Version:** 2025-10-20
 **Manifest ID:** qal-validation-2025-10-20

@@ -2,21 +2,21 @@
 id: getting-started-2025-10-20
 title: Getting Started
 sidebar_position: 1
-last_updated: 2026-04-11
-api_update: 2026-04-11
+last_updated: 2026-04-13
+api_update: 2026-04-13
 ---
 
 # QA  ZERO API - Getting Started (2025-10-20)
 
 :::info Version Information
 **API Version:** 2025-10-20  
-**API Update:** 2026-04-11  
+**API Update:** 2026-04-13  
 **Plugin Version Required:** 3.0.0.0+  
 **Status:** Current Release  
-**Last Updated:** 2026-04-11  
-**Documentation Version:** 1.1.2
+**Last Updated:** 2026-04-13  
+**Documentation Version:** 1.2.0
 
-The combined value `2025-10-20 / 2026-04-11` is the canonical identifier of this API revision. Keep `?version=2025-10-20` in your URL (it only changes on breaking revisions) and read `api_update` and `features` from `/guide` at runtime to decide which features are usable against a given server.
+The combined value `2025-10-20 / 2026-04-13` is the canonical identifier of this API revision. Keep `?version=2025-10-20` in your URL (it only changes on breaking revisions) and read `api_update` and `features` from `/guide` at runtime to decide which features are usable against a given server.
 
 **Check Compatibility:** [Version Compatibility Guide](../compatibility.md)
 :::
@@ -54,6 +54,7 @@ This is the initial release of QA  ZERO API, providing simple and straightforwar
 - `join` — Single equi-join per view, id-column only, M:N targets require a filter
 - `keep` — Column projection / group-by keys
 - `calc` — `COUNT` / `COUNTUNIQUE` / `SUM` / `AVERAGE` / `MIN` / `MAX`
+- `sort` / `top` — view-level row ordering and top-N (see QAL Guide §4.7) — **Since:** 2026-04-13
 - Virtual columns — `allpv.is_goal_N`, `gsc.ctr`, `gsc.position`, `gsc.position_weighted`, ...
 
 ✅ **Result Options (implemented):**
@@ -61,9 +62,8 @@ This is the initial release of QA  ZERO API, providing simple and straightforwar
 - `count_only`
 
 ⚠️ **Not yet available** (check `/guide` `features` map for the runtime truth):
-- `result.sort` — rejected as `E_RESULT_FORBIDDEN_KEY`. Sort client-side for now.
-- `result.sample` / `result.include_count` — accepted by the validator but not processed by the executor yet (no-op)
-- `result.return.mode = "FILE"` and non-JSON output formats — `INLINE` + `JSON` only
+- `result.sample` / `result.include_count` / `result.return` — not accepted by the current `result` whitelist
+- Non-JSON output formats — `INLINE` + `JSON` only
 - `OR` across filter conditions (use multiple queries or post-process)
 - HAVING-style filter on aggregated results
 - Multi-step joins within a single view (one join per view)
