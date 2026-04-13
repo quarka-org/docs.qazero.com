@@ -74,8 +74,8 @@ const sidebars: SidebarsConfig = {
           items: [
             'user-manual/terms/plans-contracts',
             'user-manual/terms/terms-privacy',
-            'user-manual/terms/cancellation',
             'user-manual/terms/support-update-policy',
+            'user-manual/terms/cancellation',
           ],
         },
 
