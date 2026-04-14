@@ -68,6 +68,57 @@ A valid QAL query always contains these top-level keys:
 
 Any other top-level key is a mistake. The validator will reject it.
 
+### 4.1 Minimal working example
+
+Copy this shape first, then adapt. The entire QAL query must be wrapped
+in a top-level `qal` key when POSTed to `/query`:
+
+```json
+{
+  "qal": {
+    "tracking_id": "<id from /guide>",
+    "materials": [{"name": "allpv"}],
+    "time": {
+      "start": "2026-04-01T00:00:00",
+      "end":   "2026-04-14T00:00:00",
+      "tz":    "Asia/Tokyo"
+    },
+    "make": {
+      "top": {
+        "from":  ["allpv"],
+        "keep":  ["allpv.url"],
+        "calc":  {"views": "COUNT(*)"},
+        "sort":  [{"column": "views", "direction": "desc"}]
+      }
+    },
+    "result": {"use": "top", "limit": 5}
+  }
+}
+```
+
+This returns the top 5 URLs by page view count for the given time range.
+Every other query shape is a variation on this skeleton — change the
+material, the columns in `keep`, or the functions in `calc`.
+
+### 4.2 Common pitfalls
+
+These four mistakes account for almost all first-try failures. If your
+query is rejected, check these before anything else:
+
+1. **`from` must be an array, not a string.** Write `"from": ["allpv"]`,
+   not `"from": "allpv"`. Even a single source is wrapped in `[...]`.
+2. **`keep` entries must be qualified as `<material>.<column>`.** Write
+   `"keep": ["allpv.url"]`, not `"keep": ["url"]`. Bare column names are
+   rejected with `E_UNKNOWN_COLUMN`.
+3. **`calc` values are string expressions, not nested objects.** Write
+   `"calc": {"views": "COUNT(*)"}`, not `"calc": {"views": {"count": "*"}}`.
+   The value is a whitelisted function call like `COUNT(*)`, `SUM(col)`,
+   `AVERAGE(col)`.
+4. **The POST body must wrap the query in `{"qal": ...}`.** The
+   `/query` endpoint reads the query from the top-level `qal` field. A
+   bare QAL body at the root is treated as if `from` etc. were top-level
+   keys and fails validation.
+
 ## 5. Rules you must follow
 
 1. **Always call `/guide` before your first `/query`.** Do not guess the
