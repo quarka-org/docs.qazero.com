@@ -1,536 +1,74 @@
 ---
 id: getting-started-2025-10-20
-title: はじめに
+title: AI と使いはじめる
 sidebar_position: 1
-last_updated: 2026-04-13
-api_update: 2026-04-13
+last_updated: 2026-04-14
+api_update: 2026-04-14
 ---
 
-# QA  ZERO API - はじめに (2025-10-20)
+# AI と使いはじめる — QA ZERO API (2025-10-20)
 
 :::info バージョン情報
 **API バージョン:** 2025-10-20  
-**API アップデート:** 2026-04-13  
+**API アップデート:** 2026-04-14  
 **必要なプラグインバージョン:** 3.0.0.0+  
-**ステータス:** Current Release  
-**最終更新日:** 2026-04-13  
-**ドキュメントバージョン:** 1.2.0
+**ステータス:** 現行リリース
 
-`2025-10-20 / 2026-04-13` という組み合わせが、この API リビジョンの正式な識別子です。URL には `?version=2025-10-20` を指定し続け（破壊的変更があった場合にのみ変わります）、実行時には `/guide` から `api_update` と `features` を読み取り、対象サーバーでどの機能が利用可能かを判断してください。
+`2025-10-20` は URL に現れるバージョンで、破壊的変更があった時だけ変わります。`api_update` は同じバージョン内で非破壊の追加があるたびに bump されるので、実行時に `/guide` から読んで、いま話している相手のサーバーで使える機能を判定してください。
 
-**互換性の確認:** [バージョン互換性ガイド](../compatibility.md)
+**互換性:** [バージョン互換性ガイド](../compatibility.md)
 :::
 
 ---
 
-## Changelog
+> **AI で仕事の形は変わる。だからこそ、人がもっと面白いことに時間を使える土台を作りたい。**
 
-本 API バージョンの変更履歴は **[アップデート履歴](./changelog.md)** にまとめています。各エントリーには `api_update` の日付がタグ付けされており、お使いのサーバーの `/guide` レスポンスと突き合わせれば、実際に利用可能な機能が把握できます。
+## この API の目的
 
----
+QA ZERO API は **AI 時代の利用** を前提に設計されています。人間が直接読んで試すこともできますが、主な目的は **AI アシスタント** — Claude、MCP クライアント、独自エージェント — が、**QAL** という小さなクエリ言語を通じて、構造化された分析データを安全かつ一貫して取得できるようにすることです。
 
-## 概要
+もしあなたが *「データベース認証情報を渡さずに、AI に自分のサイトを分析してもらいたい」* と考えているなら、この API はあなたのためのものです。
 
-これは QA  ZERO API の初回リリースで、ページビューと Search Console のデータに対してシンプルで分かりやすいアクセスを提供します。
+## 通常の分析 API との違い
 
-**バージョン:** 2025-10-20  
-**ステータス:** Current Release  
+多くの分析 API は、SQL を読める人間とクラウドデータウェアハウスの両方を前提にしています。QA ZERO はその両方を外します。
 
+- **クラウドウェアハウス不要。** QAL は安価なレンタルサーバー上で動きます。契約しているホスティングプランが、そのまま計算予算になります。
+- **SQL ではない。** QAL は意図的に小さい宣言型言語です。AI が一発で正しいクエリを書けて、かつ、壊れたクエリでも裏のデータストアは傷つきません。
+- **機械可読仕様がファーストクラス。** `/guide` エンドポイントは、AI 向けの簡潔な指示 README と並んで、現在有効な仕様を YAML として配信します。ドキュメントサイトをスクレイピングする必要はありません。
 
-### このバージョンに含まれるもの
+一文でまとめると:
 
-✅ **マテリアル:**
-- `allpv` — ページビュー（識別情報、デバイス、トラフィックソース、行動メトリクスを含む）
-- `gsc` — Google Search Console（カラム DB、N:M）
-- `goal_1`..`goal_N` — ゴールごとのコンバージョンログ
-- `ga4_age_gender`、`ga4_country`、`ga4_region` — GA4 属性の集計
-- `page_version` — ページコンテンツのバージョン
-- `click_event` — 要素単位のクリックイベント
-- `datalayer_event` + `events.{name}` — dataLayer イベントのインデックスおよびイベントごとの型付きマテリアル
+> **これは、どんなサーバーでも、ウェブサイトを持つすべての人に向けて、AI が責任をもって操作できる観測基盤です。**
 
-✅ **QAL 機能:**
-- `from` — マテリアル、または先に構築したビュー（ビューチェイニング）
-- `filter` — 10 種類の演算子（`eq`/`neq`/`gt`/`gte`/`lt`/`lte`/`in`/`contains`/`prefix`/`between`）を持つフラット形式の行フィルター
-- `join` — ビューごとに 1 つの等結合（equi-join）、id カラムのみ、M:N ターゲットにはフィルターが必須
-- `keep` — カラムの射影 / group-by キー
-- `calc` — `COUNT` / `COUNTUNIQUE` / `SUM` / `AVERAGE` / `MIN` / `MAX`
-- `sort` / `top` — ビュー単位の行ソートとトップ N 抽出（QAL ガイド §4.7 参照） — **Since:** 2026-04-13
-- 仮想カラム — `allpv.is_goal_N`、`gsc.ctr`、`gsc.position`、`gsc.position_weighted`、...
+## あなたが触る3つのもの
 
-✅ **Result オプション（実装済み）:**
-- `limit`（デフォルト 1000、上限 50000）
-- `count_only`
+1. **`GET /wp-json/qa-platform/guide`** — AI がこのサーバーに対してクエリを組み立てるのに必要なものが全部返ります。現在の機械可読仕様、`since` タグ付きの機能フラグ、クエリ可能な tracking_id の一覧。**最初に必ずここを呼んでください。**
+2. **`POST /wp-json/qa-platform/query`** — JSON ボディで QAL クエリを受け取り、行データを返します。
+3. **このドキュメントの `ai/` サブディレクトリ。** 簡潔な `README.md` と、2本の YAML 仕様書 (`materials.yaml`, `qal-validation.yaml`) が入っています。これは `/guide` が配信しているものと同じ内容なので、認証なしでプレビューできます。 [AI Instructions](./ai/README.md) を参照してください。
 
-⚠️ **未対応**（実行時の正は `/guide` の `features` マップを確認してください）:
-- `result.sample` / `result.include_count` / `result.return` — 現在の `result` ホワイトリストには含まれません
-- JSON 以外の出力フォーマット — 現時点では `INLINE` + `JSON` のみ
-- フィルター条件をまたぐ `OR`（複数回クエリを投げるか、後処理してください）
-- 集計結果に対する HAVING 相当のフィルター
-- 1 つのビュー内での多段 join（ビューあたり 1 回の join のみ）
+このマニュアルの他のページは全部、**なぜこの3つがこの形をしているか** を人間に伝えるためにあります。
 
----
+## 最初のクエリは AI 経由で
 
-## 認証
+最初の使い方として期待されているのは、`curl` ではありません。こういう会話です。
 
-QA  ZERO API は認証に WordPress のアプリケーションパスワードを使用します。
+> 「直近30日で、オーガニック検索からのトラフィックが一番落ちたページはどれ?」
 
-### アプリケーションパスワードの作成
+これを QAL が話せる AI クライアントに渡します。クライアントは `/guide` を呼び、正しいマテリアル (`allpv`, `gsc`) を選び、QAL クエリを組み立て、`/query` を呼び、答えを返してきます。あなたは自分でクエリを書く必要はありません。
 
-1. WordPress 管理画面にログイン
-2. **ユーザー → プロフィール** に移動
-3. **アプリケーションパスワード** セクションまでスクロール
-4. アプリケーション名を入力: `"QA API Access"`
-5. **新しいアプリケーションパスワードを追加** をクリック
-6. **パスワードをコピー** — 二度と表示されません!
+もし自分でクエリを書きたい場合は、[API リファレンス](./reference/) のページで `/guide`, `/query`, 認証、エラーを動くサンプル付きで解説しています。
 
-### パスワードの使い方
+## 次に読むページ
 
-すべての API リクエストで Basic 認証の資格情報を含めてください:
-
-**フォーマット:**
-```
-Authorization: Basic base64(username:application_password)
-```
-
-**例 (curl):**
-```bash
-curl -u "admin:xxxx xxxx xxxx xxxx xxxx xxxx" \
-  "https://your-site.com/wp-json/qa-platform/guide?version=2025-10-20"
-```
-
-**例 (JavaScript):**
-```javascript
-const username = 'admin';
-const password = 'xxxx xxxx xxxx xxxx xxxx xxxx';
-const auth = btoa(`${username}:${password}`);
-
-fetch('https://your-site.com/wp-json/qa-platform/guide?version=2025-10-20', {
-  headers: {
-    'Authorization': `Basic ${auth}`
-  }
-})
-  .then(res => res.json())
-  .then(data => console.log(data));
-```
+- **[Concepts](./concepts/)** — なぜ QAL が存在するか、どんな形をしているかを理解したい場合の入口。特に [**なぜ QAL なのか**](./concepts/why-qal.md) を SQL と比較する前に読んでください。
+- **[Materials](./materials/)** — 実際に使えるデータ。各マテリアルのページには、リアルなサンプル表が載っているので、クエリを書く前に「どういう粒度のデータか」を見て感覚を掴めます。
+- **[API リファレンス](./reference/)** — `/guide`, `/query`, 認証、エラー、動作例の厳密な仕様。
+- **[AI Instructions](./ai/README.md)** — AI / MCP クライアントに配信される最小ルール集。人間が読んでも面白いです。この API が構造的にどんな制約を課しているかが一番分かるからです。
+- **[Changelog](./changelog.md)** — Update Ledger。バージョン `2025-10-20` 内の非破壊追加は、すべて `api_update` の日付つきでここに記録されます。
 
 ---
 
-## ベース URL
-
-すべてのエンドポイントは WordPress REST API 名前空間の配下にあります:
-
-```
-https://your-site.com/wp-json/qa-platform/
-```
-
-### 利用可能なエンドポイント
-
-| エンドポイント | メソッド | 用途 |
-|----------|--------|---------|
-| `/qa-platform/guide` | GET | API ドキュメント、利用可能なサイト、マテリアル、ゴール、上限情報を取得 |
-| `/qa-platform/query` | POST | QAL クエリを実行（リクエストボディは QAL オブジェクトを `qal` キーでラップすること） |
-
----
-
-## バージョンパラメーター
-
-リクエストでは必ず API バージョンを指定してください:
-
-```
-?version=2025-10-20
-```
-
-**例:**
-```
-GET /qa-platform/guide?version=2025-10-20
-POST /qa-platform/query?version=2025-10-20
-```
-
-**省略した場合:** 最新の安定バージョンが使用されます（現時点では 2025-10-20）
-
----
-
-## 最初のクエリ
-
-### ステップ 1: サイト、マテリアル、ゴールを探索する
-
-```bash
-curl -u "username:password" \
-  "https://your-site.com/wp-json/qa-platform/guide?version=2025-10-20"
-```
-
-`/guide` レスポンスは、利用可能なトラッキングサイト、各サイトのマテリアル（行数とデータ範囲付き）、設定済みのゴール、dataLayer イベント、システム上限を報告します。これが探索における唯一の正です。完全なスキーマは [エンドポイントリファレンス](./endpoints.md) を参照してください。
-
-### ステップ 2: シンプルなクエリを実行する
-
-直近 10 件のページビューを取得します:
-
-```bash
-curl -X POST \
-  -u "username:password" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "qal": {
-      "tracking_id": "abc123",
-      "materials": [{"name": "allpv"}],
-      "time": {
-        "start": "2026-03-01T00:00:00",
-        "end":   "2026-04-01T00:00:00",
-        "tz":    "Asia/Tokyo"
-      },
-      "make": {
-        "recent_pvs": {
-          "from": ["allpv"],
-          "keep": ["allpv.url", "allpv.title", "allpv.access_time"]
-        }
-      },
-      "result": {
-        "use": "recent_pvs",
-        "limit": 10
-      }
-    }
-  }' \
-  "https://your-site.com/wp-json/qa-platform/query?version=2025-10-20"
-```
-
-**メモ:** リクエストボディは QAL オブジェクトをトップレベルの `"qal"` キーでラップする必要があります — [エンドポイントリファレンス](./endpoints.md#request-body-structure) を参照してください。
-
-**レスポンス:**
-```json
-{
-  "data": [
-    {
-      "url": "https://example.com/page1",
-      "title": "Page 1",
-      "access_time": "2025-10-15T14:30:00"
-    },
-    ...
-  ],
-  "meta": {
-    "truncated": false,
-    "row_count": 10,
-    "limits": {
-      "row_limit": 5000
-    }
-  }
-}
-```
-
-### ステップ 3: 総行数をカウントする
-
-`count_only` を使うとカウントだけを取得できます:
-
-```bash
-curl -X POST \
-  -u "username:password" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "qal": {
-      "tracking_id": "abc123",
-      "materials": [{"name": "allpv"}],
-      "time": {
-        "start": "2026-03-01T00:00:00",
-        "end":   "2026-04-01T00:00:00",
-        "tz":    "Asia/Tokyo"
-      },
-      "make": {
-        "all_pvs": {
-          "from": ["allpv"],
-          "keep": ["allpv.pv_id"]
-        }
-      },
-      "result": {
-        "use": "all_pvs",
-        "count_only": true
-      }
-    }
-  }' \
-  "https://your-site.com/wp-json/qa-platform/query?version=2025-10-20"
-```
-
-**レスポンス:**
-```json
-{
-  "count": 15234
-}
-```
-
----
-
-## QAL の基本（2025-10-20 バージョン）
-
-### 最小クエリ構造
-
-```json
-{
-  "tracking_id": "abc123",
-  "materials": [{"name": "allpv"}],
-  "time": {
-    "start": "YYYY-MM-DDTHH:mm:ss",
-    "end": "YYYY-MM-DDTHH:mm:ss",
-    "tz": "Asia/Tokyo"
-  },
-  "make": {
-    "view_name": {
-      "from": ["allpv"],
-      "keep": ["allpv.column1", "allpv.column2"]
-    }
-  },
-  "result": {
-    "use": "view_name",
-    "limit": 100
-  }
-}
-```
-
-### 各パートの役割
-
-**tracking_id**: クエリ対象のサイトを指定します
-- `/guide` エンドポイントが返す tracking_id と一致する必要があります
-- 各サイトは独自のデータとマテリアルを持ちます
-
-**materials**: 使用するデータソースを宣言します
-- 利用可能なマテリアルと一致する必要があります（`allpv` または `gsc`）
-
-**time**: 時間範囲を指定します
-- `start`: 範囲の開始（含む）
-- `end`: 範囲の終了（含まない）
-- `tz`: タイムゾーン（IANA 形式）
-
-**make**: ビューを定義します
-- `from`: ソースのマテリアル（要素 1 つの配列）
-- `keep`: 含めるカラム（完全修飾名: `material.column`）
-
-**result**: 出力を指定します
-- `use`: 返すビュー
-- `limit`: 最大行数（デフォルト: 100、最大: 5000）
-- `count_only`: データの代わりにカウントを返す（任意）
-
----
-
-## よくあるパターン
-
-### パターン 1: 特定のカラムを取得する
-
-```json
-{
-  "tracking_id": "abc123",
-  "materials": [{"name": "allpv"}],
-  "time": {
-    "start": "2025-10-01T00:00:00",
-    "end": "2025-10-20T00:00:00",
-    "tz": "Asia/Tokyo"
-  },
-  "make": {
-    "basic_info": {
-      "from": ["allpv"],
-      "keep": [
-        "allpv.url",
-        "allpv.title",
-        "allpv.device_type",
-        "allpv.access_time"
-      ]
-    }
-  },
-  "result": {
-    "use": "basic_info",
-    "limit": 100
-  }
-}
-```
-
-### パターン 2: GSC キーワード
-
-```json
-{
-  "materials": [{"name": "gsc"}],
-  "time": {
-    "start": "2025-10-01T00:00:00",
-    "end": "2025-10-20T00:00:00",
-    "tz": "Asia/Tokyo"
-  },
-  "make": {
-    "keywords": {
-      "from": ["gsc"],
-      "keep": [
-        "gsc.keyword",
-        "gsc.clicks_sum",
-        "gsc.impressions_sum",
-        "gsc.ctr"
-      ]
-    }
-  },
-  "result": {
-    "use": "keywords",
-    "limit": 50
-  }
-}
-```
-
-### パターン 3: 行数をカウントする
-
-```json
-{
-  "tracking_id": "abc123",
-  "materials": [{"name": "allpv"}],
-  "time": {
-    "start": "2025-10-01T00:00:00",
-    "end": "2025-10-20T00:00:00",
-    "tz": "Asia/Tokyo"
-  },
-  "make": {
-    "total": {
-      "from": ["allpv"],
-      "keep": ["allpv.pv_id"]
-    }
-  },
-  "result": {
-    "use": "total",
-    "count_only": true
-  }
-}
-```
-
----
-
-## エラーハンドリング
-
-標準の HTTP ステータスコード:
-
-| ステータス | 意味 |
-|--------|---------|
-| 200 | 成功 |
-| 400 | Bad Request（無効な QAL） |
-| 401 | Unauthorized（認証情報が無効） |
-| 404 | Not Found（無効な tracking_id またはエンドポイント） |
-| 500 | Internal Server Error |
-
-**エラーレスポンス形式:**
-```json
-{
-  "code": "E_UNKNOWN_TRACKING_ID",
-  "message": "Unknown tracking_id: 'invalid123'",
-  "data": {
-    "tracking_id": "invalid123",
-    "available_sites": [
-      {"tracking_id": "abc123", "domain": "example.com"},
-      {"tracking_id": "def456", "domain": "blog.example.com"}
-    ]
-  }
-}
-```
-
-**よくあるエラーコード:**
-- `E_UNKNOWN_TRACKING_ID` - tracking_id が無効または欠落
-- `E_UNKNOWN_MATERIAL` - このサイトで利用できないマテリアル
-- `E_UNKNOWN_COLUMN` - 無効なカラム名
-- `E_TIME_REQUIRED` - time 指定が欠落
-- `E_FEATURE_NOT_SUPPORTED` - サポートされていない QAL 機能
-
----
-
-## コード例
-
-### JavaScript (Fetch API)
-
-```javascript
-const auth = btoa('username:password');
-const baseUrl = 'https://your-site.com/wp-json/qa-platform';
-
-async function getPageViews() {
-  const body = {
-    qal: {
-      tracking_id: "abc123",
-      materials: [{name: "allpv"}],
-      time: {
-        start: "2026-03-01T00:00:00",
-        end:   "2026-04-01T00:00:00",
-        tz:    "Asia/Tokyo"
-      },
-      make: {
-        pvs: {
-          from: ["allpv"],
-          keep: ["allpv.url", "allpv.title"]
-        }
-      },
-      result: {
-        use: "pvs",
-        limit: 10
-      }
-    }
-  };
-
-  const response = await fetch(`${baseUrl}/query?version=2025-10-20`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Basic ${auth}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(body)
-  });
-
-  const data = await response.json();
-  return data;
-}
-
-getPageViews().then(console.log);
-```
-
-### Python (Requests)
-
-```python
-import requests
-from requests.auth import HTTPBasicAuth
-
-base_url = 'https://your-site.com/wp-json/qa-platform'
-
-body = {
-    "qal": {
-        "tracking_id": "abc123",
-        "materials": [{"name": "allpv"}],
-        "time": {
-            "start": "2026-03-01T00:00:00",
-            "end":   "2026-04-01T00:00:00",
-            "tz":    "Asia/Tokyo"
-        },
-        "make": {
-            "pvs": {
-                "from": ["allpv"],
-                "keep": ["allpv.url", "allpv.title"]
-            }
-        },
-        "result": {
-            "use": "pvs",
-            "limit": 10
-        }
-    }
-}
-
-response = requests.post(
-    f'{base_url}/query?version=2025-10-20',
-    json=body,
-    auth=HTTPBasicAuth('username', 'password')
-)
-
-data = response.json()
-print(data)
-```
-
----
-
-## 次のステップ
-
-- **[エンドポイントリファレンス](./endpoints.md)** - 詳細なエンドポイントドキュメント
-- **[QAL ガイド](./qal.md)** - このバージョンの完全な QAL 構文
-- **[マテリアルリファレンス](./materials.md)** - 利用可能なマテリアルとカラム
-
-## 今後のバージョン
-
-qa-labo で追跡中の予定機能:
-- フィルター条件をまたぐ `OR` 論理
-- 集計結果に対する HAVING 相当のフィルター
-- 1 つのビュー内での多段 join
-- CSV / Parquet 出力に対応した `return.mode = "FILE"`
-- 追加の属性マテリアル
-
-この API の土台となる qa-labo 実験の継続的なメモは [Developer Blog](/blog) を参照してください。
+> **データは人を縛るためではなく、人の時間と創造性を支えるために使いたい。**
+>
+> **作業のための分析から、創造のための観測基盤へ。**
