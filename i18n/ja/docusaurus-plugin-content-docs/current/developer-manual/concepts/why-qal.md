@@ -1,5 +1,5 @@
 ---
-id: why-qal-2025-10-20
+id: why-qal
 title: なぜ QAL なのか?
 sidebar_position: 2
 ---
@@ -89,4 +89,4 @@ SQL はスキーマ設計者が選んだ語彙をそのまま採用します。Q
 
 - **[QAL とは何か?](./what-is-qal.md)** — クエリ言語の実際の形を1ページで。
 - **[Materials, Views, Result](./materials-views-result.md)** — 3つの動く部品。
-- **[AI Instructions](../ai/README.md)** — AI クライアントが従うことを期待されるルール集。
+- **[AI Instructions](../api/2025-10-20/ai/README.md)** — AI クライアントが従うことを期待されるルール集。

@@ -1,5 +1,5 @@
 ---
-id: concepts-index-2025-10-20
+id: concepts-index
 title: Concepts
 sidebar_position: 1
 ---

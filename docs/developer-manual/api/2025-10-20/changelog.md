@@ -30,7 +30,7 @@ This is the **Update History** for API version `2025-10-20`: one living document
 
 ### 2026-04-13 — `api_update: 2026-04-13` — Documentation v1.2.0
 **Added:**
-- ✅ **QAL `make.sort`** — view-level row ordering and top-N. Place `sort: { by, order, top }` inside a view in `make` to sort the view's output after `filter` / `join` / `keep` / `calc`. `by` accepts both qualified (`allpv.url`) and unqualified (`pageviews`) names, `order` is `asc` / `desc`, `top` is an optional row cap. See the [What is QAL?](./concepts/what-is-qal.md) concept page and the authoritative [`qal-validation.yaml`](./ai/qal-validation.yaml).
+- ✅ **QAL `make.sort`** — view-level row ordering and top-N. Place `sort: { by, order, top }` inside a view in `make` to sort the view's output after `filter` / `join` / `keep` / `calc`. `by` accepts both qualified (`allpv.url`) and unqualified (`pageviews`) names, `order` is `asc` / `desc`, `top` is an optional row cap. See the [What is QAL?](../../concepts/what-is-qal.md) concept page and the authoritative [`qal-validation.yaml`](./ai/qal-validation.yaml).
 - ✅ `/guide` `features.sort` now reports `true` on servers running this update — clients should use it to detect availability instead of hard-coding.
 
 **Clarified:**

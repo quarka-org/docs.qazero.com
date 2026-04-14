@@ -21,7 +21,7 @@ QA ZERO の重たい開発作業のほとんどは、**qa-labo** という兄弟
 - **ビューチェイニング** — 同じ `make` ブロック内での `from: ["<earlier_view>"]` 記法です。ここから QAL は本物のクエリ言語らしくなってきます。ベースビューで一度フィルターし、その結果を子ビューで 2 通りに集計する、といったことがカラム DB を再スキャンせずに書けます。
 - **`result.sort`、`result.sample`、`result.include_count`** — これらのキーは仕様として予約されていますが **まだ実装されていません**。`sort` は現在 `E_RESULT_FORBIDDEN_KEY` として拒否され、`sample` / `include_count` はバリデーションは通過しますが no-op です。`/guide` の `features` マップでオンになるまでは、ソートとサイズチェックはクライアント側で行ってください。
 
-[QAL とは何か?](/docs/developer-manual/api/2025-10-20/concepts/what-is-qal-2025-10-20) と [なぜ QAL なのか?](/docs/developer-manual/api/2025-10-20/concepts/why-qal-2025-10-20) のコンセプトページがこれらを網羅しており、正本である [`qal-validation.yaml`](https://github.com/quarka-org/docs.qazero.com/blob/main/docs/developer-manual/api/2025-10-20/ai/qal-validation.yaml) も、当初の「すべて無効」というスタブから、エグゼキューターの実際のルールを反映したものに更新されました。
+[QAL とは何か?](/docs/developer-manual/concepts/what-is-qal) と [なぜ QAL なのか?](/docs/developer-manual/concepts/why-qal) のコンセプトページがこれらを網羅しており、正本である [`qal-validation.yaml`](https://github.com/quarka-org/docs.qazero.com/blob/main/docs/developer-manual/api/2025-10-20/ai/qal-validation.yaml) も、当初の「すべて無効」というスタブから、エグゼキューターの実際のルールを反映したものに更新されました。
 
 ## 新しいマテリアル
 

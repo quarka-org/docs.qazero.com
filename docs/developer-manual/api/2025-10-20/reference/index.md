@@ -12,7 +12,7 @@ client code directly (no AI in the middle), this is where you want
 to be.
 
 If you are here looking for concepts or a mental model, go back to
-**[Concepts](../concepts/)**. If you are building through an AI
+**[Concepts](../../../concepts/)**. If you are building through an AI
 client, the AI only needs **[AI Instructions](../ai/README.md)** and
 the YAML specs — not these pages.
 

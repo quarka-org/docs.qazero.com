@@ -1,5 +1,5 @@
 ---
-id: materials-views-result-2025-10-20
+id: materials-views-result
 title: Materials, Views, Result
 sidebar_position: 3
 ---
@@ -14,7 +14,7 @@ sidebar_position: 3
 
 ユーザーの質問に基づいてマテリアルを選びます。「検索から何セッション来たか?」なら、欲しいのは `allpv` (粒度 = 1ページビュー) と `gsc` (粒度 = 1検索クエリ) を JOIN したもので、`click_event` ではありません。
 
-マテリアルは **[`ai/materials.yaml`](../ai/materials.yaml)** に列挙されています。ここに無い名前は存在しません。
+マテリアルは **[`ai/materials.yaml`](../api/2025-10-20/ai/materials.yaml)** に列挙されています。ここに無い名前は存在しません。
 
 ## View — 名前付きの変換
 
@@ -50,5 +50,5 @@ sidebar_position: 3
 
 ## 次に読むページ
 
-- **[Materials](../materials/)** — 実際のデータ面とサンプル表。
-- **[AI Instructions](../ai/README.md)** — AI クライアント向けのルール集。
+- **[Materials](../api/2025-10-20/materials/)** — 実際のデータ面とサンプル表。
+- **[AI Instructions](../api/2025-10-20/ai/README.md)** — AI クライアント向けのルール集。

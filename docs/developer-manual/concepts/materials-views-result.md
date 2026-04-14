@@ -1,5 +1,5 @@
 ---
-id: materials-views-result-2025-10-20
+id: materials-views-result
 title: Materials, Views, Result
 sidebar_position: 3
 ---
@@ -21,7 +21,7 @@ question is "how many sessions came from search?", you want `allpv`
 (grain = one page view) joined with `gsc` (grain = one search query),
 not `click_event`.
 
-Materials are enumerated in **[`ai/materials.yaml`](../ai/materials.yaml)**.
+Materials are enumerated in **[`ai/materials.yaml`](../api/2025-10-20/ai/materials.yaml)**.
 If a name is not in that file, it does not exist.
 
 ## View — a named transformation
@@ -73,7 +73,7 @@ because you have picked a material with the wrong grain.
 
 ## Where to go next
 
-- **[Materials](../materials/)** — the actual data surfaces, with
+- **[Materials](../api/2025-10-20/materials/)** — the actual data surfaces, with
   sample tables.
-- **[AI Instructions](../ai/README.md)** — the rule set for AI
+- **[AI Instructions](../api/2025-10-20/ai/README.md)** — the rule set for AI
   clients.

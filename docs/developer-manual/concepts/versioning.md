@@ -1,5 +1,5 @@
 ---
-id: versioning-2025-10-20
+id: versioning
 title: Versioning philosophy
 sidebar_position: 4
 ---
@@ -83,7 +83,7 @@ this scheme is designed to make impossible.
 
 ## Where to go next
 
-- **[Changelog](../changelog.md)** — the Update Ledger for version
+- **[Changelog](../api/2025-10-20/changelog.md)** — the Update Ledger for version
   `2025-10-20`, with every `update` date and what was added.
-- **[Compatibility Guide](../../compatibility.md)** — version
+- **[Compatibility Guide](../api/compatibility.md)** — version
   support windows and migration policy.

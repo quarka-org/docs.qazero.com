@@ -65,15 +65,13 @@ cloud-warehouse dependency — all point in the same direction.
 
 ## Where to go next
 
-- [API Getting Started](./api/2025-10-20/index.md) — the entry point for
+- [Get Started with AI](./get-started-with-ai.md) — the entry point for
   building your first query.
-- [Concepts](./api/2025-10-20/concepts/) — what QAL is, why it exists,
-  and how the pieces fit together.
-- [Materials](./api/2025-10-20/materials/) — the data surfaces you can
-  query, with sample rows you can actually look at.
-- [API Reference](./api/2025-10-20/reference/) — the exact shape of
-  `/guide`, `/query`, authentication, and errors.
-- [AI Instructions](./api/2025-10-20/ai/README.md) — the minimal rule
-  set served to AI / MCP clients.
+- [Concepts](./concepts/) — what QAL is, why it exists, and how the
+  pieces fit together.
+- [Version 2025-10-20](./api/2025-10-20/) — the current API version.
+  Materials, reference, and the AI spec live here.
+- [AI Instructions](./api/2025-10-20/ai/) — the minimal rule set served
+  to AI / MCP clients.
 
 > **作業のための分析から、創造のための観測基盤へ。**

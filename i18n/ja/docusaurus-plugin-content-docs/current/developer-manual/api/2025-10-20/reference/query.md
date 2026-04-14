@@ -24,7 +24,7 @@ Content-Type: application/json
 
 ### リクエストボディ
 
-有効な QAL クエリ。形は [Concepts → QAL とは何か?](../concepts/what-is-qal.md) を、正式な検証ルールは [`ai/qal-validation.yaml`](../ai/qal-validation.yaml) を参照。
+有効な QAL クエリ。形は [Concepts → QAL とは何か?](../../../concepts/what-is-qal.md) を、正式な検証ルールは [`ai/qal-validation.yaml`](../ai/qal-validation.yaml) を参照。
 
 最小の有効ボディ:
 

@@ -45,10 +45,9 @@ QA ZERO は、AI に対して中立ではありません。分析という仕事
 
 ## 次に読むページ
 
-- [API 入門](./api/2025-10-20/index.md) — 最初のクエリを組み立てるための入口。
-- [Concepts](./api/2025-10-20/concepts/) — QAL とは何か、なぜ存在するのか、各部品がどう組み合わさるのか。
-- [Materials](./api/2025-10-20/materials/) — クエリ対象のデータ面。実際に目で見えるサンプル表つき。
-- [API リファレンス](./api/2025-10-20/reference/) — `/guide`, `/query`, 認証、エラーの厳密な仕様。
-- [AI Instructions](./api/2025-10-20/ai/README.md) — AI / MCP クライアントに配信される最小ルール集。
+- [AI と使いはじめる](./get-started-with-ai.md) — 最初のクエリを組み立てるための入口。
+- [Concepts](./concepts/) — QAL とは何か、なぜ存在するのか、各部品がどう組み合わさるのか。
+- [Version 2025-10-20](./api/2025-10-20/) — 現行 API バージョン。Materials, Reference, AI 仕様書はここにあります。
+- [AI Instructions](./api/2025-10-20/ai/) — AI / MCP クライアントに配信される最小ルール集。
 
 > **作業のための分析から、創造のための観測基盤へ。**

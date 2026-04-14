@@ -30,7 +30,7 @@ api_update: 2026-04-14
 
 ### 2026-04-13 — `api_update: 2026-04-13` — Documentation v1.2.0
 **追加:**
-- ✅ **QAL `make.sort`** — ビュー単位の行ソートとトップ N 抽出。`make` 内のビューに `sort: { by, order, top }` を置くことで、`filter` / `join` / `keep` / `calc` の後にそのビューの出力をソートします。`by` は修飾あり（`allpv.url`）でも修飾なし（`pageviews`）でも指定でき、`order` は `asc` / `desc`、`top` は省略可能な行数キャップです。[QAL とは何か?](./concepts/what-is-qal.md) コンセプトページと、正本の [`qal-validation.yaml`](./ai/qal-validation.yaml) を参照。
+- ✅ **QAL `make.sort`** — ビュー単位の行ソートとトップ N 抽出。`make` 内のビューに `sort: { by, order, top }` を置くことで、`filter` / `join` / `keep` / `calc` の後にそのビューの出力をソートします。`by` は修飾あり（`allpv.url`）でも修飾なし（`pageviews`）でも指定でき、`order` は `asc` / `desc`、`top` は省略可能な行数キャップです。[QAL とは何か?](../../concepts/what-is-qal.md) コンセプトページと、正本の [`qal-validation.yaml`](./ai/qal-validation.yaml) を参照。
 - ✅ 本アップデートを導入したサーバーでは `/guide` の `features.sort` が `true` を返すようになりました。クライアントは機能の可用性をハードコードせず、この値を参照して検出してください。
 
 **訂正:**

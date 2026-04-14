@@ -1,5 +1,9 @@
 ---
-title: AI 向けインストラクション (QA ZERO API, QAL)
+id: ai-readme-2025-10-20
+slug: /developer-manual/api/2025-10-20/ai
+title: AI 向けインストラクション
+sidebar_label: AI Instructions (README)
+sidebar_position: 1
 description: QA ZERO API に対して QAL クエリを組み立てる AI クライアント向けの最小ルール集
 api_version: "2025-10-20"
 audience: ai

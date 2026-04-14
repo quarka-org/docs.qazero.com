@@ -25,7 +25,7 @@ Content-Type: application/json
 
 ### Request body
 
-A valid QAL query. See [Concepts → What is QAL?](../concepts/what-is-qal.md)
+A valid QAL query. See [Concepts → What is QAL?](../../../concepts/what-is-qal.md)
 for the shape, and [`ai/qal-validation.yaml`](../ai/qal-validation.yaml)
 for the authoritative validation rules.
 

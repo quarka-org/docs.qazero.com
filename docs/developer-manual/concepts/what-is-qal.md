@@ -1,5 +1,5 @@
 ---
-id: what-is-qal-2025-10-20
+id: what-is-qal
 title: What is QAL?
 sidebar_position: 1
 ---
@@ -101,5 +101,5 @@ of the documentation is just details on what each piece accepts.
 - **[Why QAL, not SQL?](./why-qal.md)** — the design rationale.
 - **[Materials, Views, Result](./materials-views-result.md)** — how
   the three moving parts interact in practice.
-- **[`/query` reference](../reference/query.md)** — the exact
+- **[`/query` reference](../api/2025-10-20/reference/query.md)** — the exact
   request / response shape of the execution endpoint.

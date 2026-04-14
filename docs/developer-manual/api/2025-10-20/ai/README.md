@@ -1,5 +1,9 @@
 ---
-title: AI Instructions (QA ZERO API, QAL)
+id: ai-readme-2025-10-20
+slug: /developer-manual/api/2025-10-20/ai
+title: AI Instructions
+sidebar_label: AI Instructions (README)
+sidebar_position: 1
 description: Minimal instruction set for AI clients building QAL queries against the QA ZERO API.
 api_version: "2025-10-20"
 audience: ai

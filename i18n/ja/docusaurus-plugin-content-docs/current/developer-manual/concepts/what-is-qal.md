@@ -1,5 +1,5 @@
 ---
-id: what-is-qal-2025-10-20
+id: what-is-qal
 title: QAL とは何か?
 sidebar_position: 1
 ---
@@ -82,4 +82,4 @@ sidebar_position: 1
 
 - **[なぜ QAL なのか?](./why-qal.md)** — 設計の根拠。
 - **[Materials, Views, Result](./materials-views-result.md)** — 3つの動く部品が実際どう組み合わさるか。
-- **[`/query` リファレンス](../reference/query.md)** — 実行エンドポイントのリクエスト/レスポンス仕様。
+- **[`/query` リファレンス](../api/2025-10-20/reference/query.md)** — 実行エンドポイントのリクエスト/レスポンス仕様。

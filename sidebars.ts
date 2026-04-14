@@ -93,6 +93,21 @@ const sidebars: SidebarsConfig = {
       },
       items: [
         'developer-manual/introduction',
+        'developer-manual/get-started-with-ai',
+        {
+          type: 'category',
+          label: 'Concepts',
+          link: {
+            type: 'doc',
+            id: 'developer-manual/concepts/concepts-index',
+          },
+          items: [
+            'developer-manual/concepts/what-is-qal',
+            'developer-manual/concepts/why-qal',
+            'developer-manual/concepts/materials-views-result',
+            'developer-manual/concepts/versioning',
+          ],
+        },
         'developer-manual/architecture',
         {
           type: 'category',
@@ -106,23 +121,11 @@ const sidebars: SidebarsConfig = {
             {
               type: 'category',
               label: 'Version 2025-10-20',
+              link: {
+                type: 'doc',
+                id: 'developer-manual/api/2025-10-20/version-2025-10-20',
+              },
               items: [
-                // Top of the version — "Get Started with AI"
-                'developer-manual/api/2025-10-20/getting-started-2025-10-20',
-                {
-                  type: 'category',
-                  label: 'Concepts',
-                  link: {
-                    type: 'doc',
-                    id: 'developer-manual/api/2025-10-20/concepts/concepts-index-2025-10-20',
-                  },
-                  items: [
-                    'developer-manual/api/2025-10-20/concepts/what-is-qal-2025-10-20',
-                    'developer-manual/api/2025-10-20/concepts/why-qal-2025-10-20',
-                    'developer-manual/api/2025-10-20/concepts/materials-views-result-2025-10-20',
-                    'developer-manual/api/2025-10-20/concepts/versioning-2025-10-20',
-                  ],
-                },
                 {
                   type: 'category',
                   label: 'Materials',
@@ -151,6 +154,17 @@ const sidebars: SidebarsConfig = {
                     'developer-manual/api/2025-10-20/reference/reference-query-2025-10-20',
                     'developer-manual/api/2025-10-20/reference/reference-errors-2025-10-20',
                     'developer-manual/api/2025-10-20/reference/reference-examples-2025-10-20',
+                  ],
+                },
+                {
+                  type: 'category',
+                  label: 'AI Spec',
+                  link: {
+                    type: 'doc',
+                    id: 'developer-manual/api/2025-10-20/ai/ai-readme-2025-10-20',
+                  },
+                  items: [
+                    'developer-manual/api/2025-10-20/ai/ai-readme-2025-10-20',
                   ],
                 },
                 'developer-manual/api/2025-10-20/changelog-2025-10-20',
