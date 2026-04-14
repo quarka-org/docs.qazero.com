@@ -21,7 +21,7 @@ The original release shipped `from` + `keep` and little else. You can now write 
 - **View chaining** — `from: ["<earlier_view>"]` inside the same `make` block. This is where QAL starts feeling like a real query language: filter once in a base view, then aggregate it two different ways in child views without re-scanning the column DB.
 - **`result.sort`, `result.sample`, `result.include_count`** — these keys are reserved in the spec but **not yet implemented**. `sort` is currently rejected as `E_RESULT_FORBIDDEN_KEY`, and `sample`/`include_count` pass validation but are no-ops. Sort and size-check client-side until the `features` map in `/guide` flips them on.
 
-The [QAL Guide](/docs/developer-manual/api/2025-10-20/qal-2025-10-20) has been completely rewritten to cover all of this, and the [Validation Manifest](/docs/developer-manual/api/2025-10-20/qal-validation-2025-10-20) now reflects the executor's real rules instead of the initial "everything is disabled" stub.
+The [What is QAL?](/docs/developer-manual/api/2025-10-20/concepts/what-is-qal-2025-10-20) concept page and its companion [Why QAL?](/docs/developer-manual/api/2025-10-20/concepts/why-qal-2025-10-20) cover this end-to-end, and the authoritative [`qal-validation.yaml`](https://github.com/quarka-org/docs.qazero.com/blob/main/docs/developer-manual/api/2025-10-20/ai/qal-validation.yaml) spec now reflects the executor's real rules instead of the initial "everything is disabled" stub.
 
 ## New materials
 
@@ -33,7 +33,7 @@ The [QAL Guide](/docs/developer-manual/api/2025-10-20/qal-2025-10-20) has been c
 - **`click_event`** — click events with selector, element text, destination URL, and page-relative coordinates. Joinable via `pv_id`.
 - **`datalayer_event`** (+ dynamic **`events.{name}`**) — sites that ship dataLayer events now get both a uniform index of every event and a typed per-event material whose columns reflect that event's parameters. The `/guide` response lists every `events.*` material the site exposes.
 
-And `allpv` itself grew a lot of new columns: behavioral metrics (`depth_position`, `deep_read`, `stop_max_sec`, `stop_max_pos`, `exit_pos`, `is_submit`, `dead_click_image_count`, `irritation_click_count`, `scroll_back_count`, `content_skip_count`, `exploration_count`) and generated page-type booleans (`is_article`, `is_product`, `is_form`, `is_faq`, and so on). The [Materials Reference](/docs/developer-manual/api/2025-10-20/materials-2025-10-20) has the full list.
+And `allpv` itself grew a lot of new columns: behavioral metrics (`depth_position`, `deep_read`, `stop_max_sec`, `stop_max_pos`, `exit_pos`, `is_submit`, `dead_click_image_count`, `irritation_click_count`, `scroll_back_count`, `content_skip_count`, `exploration_count`) and generated page-type booleans (`is_article`, `is_product`, `is_form`, `is_faq`, and so on). See the [`allpv` material page](/docs/developer-manual/api/2025-10-20/materials/material-allpv-2025-10-20) for the curated list, or [`ai/materials.yaml` on GitHub](https://github.com/quarka-org/docs.qazero.com/blob/main/docs/developer-manual/api/2025-10-20/ai/materials.yaml) for the full authoritative schema.
 
 ## Why "docs as a knowledge base for AI"?
 

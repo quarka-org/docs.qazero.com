@@ -21,7 +21,7 @@ QA ZERO の重たい開発作業のほとんどは、**qa-labo** という兄弟
 - **ビューチェイニング** — 同じ `make` ブロック内での `from: ["<earlier_view>"]` 記法です。ここから QAL は本物のクエリ言語らしくなってきます。ベースビューで一度フィルターし、その結果を子ビューで 2 通りに集計する、といったことがカラム DB を再スキャンせずに書けます。
 - **`result.sort`、`result.sample`、`result.include_count`** — これらのキーは仕様として予約されていますが **まだ実装されていません**。`sort` は現在 `E_RESULT_FORBIDDEN_KEY` として拒否され、`sample` / `include_count` はバリデーションは通過しますが no-op です。`/guide` の `features` マップでオンになるまでは、ソートとサイズチェックはクライアント側で行ってください。
 
-[QAL ガイド](/docs/developer-manual/api/2025-10-20/qal-2025-10-20) はこれらすべてをカバーするために全面的に書き直され、[バリデーションマニフェスト](/docs/developer-manual/api/2025-10-20/qal-validation-2025-10-20) も当初の「すべて無効」というスタブから、エグゼキューターの実際のルールを反映したものに更新されました。
+[QAL とは何か?](/docs/developer-manual/api/2025-10-20/concepts/what-is-qal-2025-10-20) と [なぜ QAL なのか?](/docs/developer-manual/api/2025-10-20/concepts/why-qal-2025-10-20) のコンセプトページがこれらを網羅しており、正本である [`qal-validation.yaml`](https://github.com/quarka-org/docs.qazero.com/blob/main/docs/developer-manual/api/2025-10-20/ai/qal-validation.yaml) も、当初の「すべて無効」というスタブから、エグゼキューターの実際のルールを反映したものに更新されました。
 
 ## 新しいマテリアル
 
@@ -33,7 +33,7 @@ QA ZERO の重たい開発作業のほとんどは、**qa-labo** という兄弟
 - **`click_event`** — セレクター、要素テキスト、遷移先 URL、ページ相対座標を含むクリックイベントです。`pv_id` で結合できます。
 - **`datalayer_event`**（+ 動的な **`events.{name}`**） — dataLayer イベントを送出しているサイトでは、全イベントの統一インデックスに加え、そのイベントのパラメーターを反映した型付きのイベント別マテリアルの両方が利用できるようになりました。`/guide` のレスポンスには、そのサイトが公開しているすべての `events.*` マテリアルが列挙されます。
 
-そして `allpv` 自身にも多数の新カラムが追加されました。行動メトリクス（`depth_position`、`deep_read`、`stop_max_sec`、`stop_max_pos`、`exit_pos`、`is_submit`、`dead_click_image_count`、`irritation_click_count`、`scroll_back_count`、`content_skip_count`、`exploration_count`）と、生成されるページタイプ判定フラグ（`is_article`、`is_product`、`is_form`、`is_faq` など）です。完全なリストは [マテリアルリファレンス](/docs/developer-manual/api/2025-10-20/materials-2025-10-20) を参照してください。
+そして `allpv` 自身にも多数の新カラムが追加されました。行動メトリクス（`depth_position`、`deep_read`、`stop_max_sec`、`stop_max_pos`、`exit_pos`、`is_submit`、`dead_click_image_count`、`irritation_click_count`、`scroll_back_count`、`content_skip_count`、`exploration_count`）と、生成されるページタイプ判定フラグ（`is_article`、`is_product`、`is_form`、`is_faq` など）です。キュレーションされたリストは [`allpv` マテリアルページ](/docs/developer-manual/api/2025-10-20/materials/material-allpv-2025-10-20) を、完全な正本スキーマは [GitHub の `ai/materials.yaml`](https://github.com/quarka-org/docs.qazero.com/blob/main/docs/developer-manual/api/2025-10-20/ai/materials.yaml) を参照してください。
 
 ## なぜ「AI のためのナレッジベースとしてのドキュメント」なのか？
 

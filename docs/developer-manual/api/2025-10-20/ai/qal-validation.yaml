@@ -1,0 +1,185 @@
+id: qal-validation-2025-10-20
+title: QAL Validation Manifest (for Executor and AI)
+version: "2025-10-20"
+update: "2026-04-14"
+type: validation_manifest
+description: >
+  Defines strict validation rules for QAL JSON execution requests.
+  Used for validating QAL structures before execution.
+
+structure:
+  required: ["tracking_id", "materials", "time", "make", "result"]
+
+rules:
+  tracking_id:
+    type: string
+    description: "Unique identifier for the tracking site to query. Must match a tracking_id from the /guide endpoint response."
+    pattern: "^[a-zA-Z0-9_-]+$"
+    errors:
+      - code: E_UNKNOWN_TRACKING_ID
+        message: "Invalid tracking_id provided."
+
+  materials:
+    type: array
+    description: "List of data sources (materials) to use in the query. Each material must have a 'name' property."
+    items:
+      type: object
+      required: ["name"]
+      properties:
+        name:
+          type: string
+          description: "Material name. Allowed values: 'allpv', 'gsc', 'ga4_age_gender', 'ga4_country', 'ga4_region', 'goal_N', 'click_event', 'datalayer_event', 'page_version', or 'events.{name}'."
+          pattern: "^(allpv|gsc|ga4_age_gender|ga4_country|ga4_region|goal_[1-9]\d*|click_event|datalayer_event|page_version|events\.[a-zA-Z0-9_]+)$"
+      additionalProperties: false
+    minItems: 1
+    errors:
+      - code: E_UNKNOWN_MATERIAL
+        message: "Material name not found in manifest."
+
+  time:
+    type: object
+    required: ["start", "end", "tz"]
+    properties:
+      start: { type: string, format: date-time }
+      end: { type: string, format: date-time }
+      tz:
+        type: string
+        description: "IANA timezone identifier (e.g., Asia/Tokyo, UTC, America/New_York). Any valid IANA timezone is accepted."
+        examples: ["Asia/Tokyo", "UTC", "Europe/London", "America/New_York", "America/Los_Angeles", "Europe/Paris"]
+    errors:
+      - code: E_TIME_REQUIRED
+        message: "Missing time.start, time.end, or time.tz."
+
+  make:
+    type: object
+    description: "Defines views (data transformations) to create from materials. Each key is a view name, and the value defines the view's structure."
+    patternProperties:
+      "^[a-zA-Z0-9_]+$":
+        type: object
+        description: "View definition. Must specify 'from' (source material) and 'keep' (columns to select). Optionally specify 'filter' for filtering, 'join' for combining materials, 'add'/'calc' for aggregation."
+        required: ["from", "keep"]
+        properties:
+          from:
+            type: array
+            description: "Specify which material to use. Must contain exactly one material name."
+            items: { type: string, pattern: "^(allpv|gsc|ga4_age_gender|ga4_country|ga4_region|goal_[1-9]\\d*|click_event|datalayer_event|page_version|events\\.[a-zA-Z0-9_]+)$" }
+            minItems: 1
+            maxItems: 1
+          keep:
+            type: array
+            description: "List of columns to include in the result. Must use fully qualified names in the format 'material.column_name' (e.g., 'allpv.url', 'gsc.keyword'). Empty array is allowed when calc is present (aggregate-all pattern)."
+            items:
+              type: string
+              pattern: "^(allpv|gsc|ga4_age_gender|ga4_country|ga4_region|goal_[1-9]\d*|click_event|datalayer_event|page_version|events\.[a-zA-Z0-9_]+)\.[a-zA-Z0-9_]+$"
+            minItems: 0
+          filter:
+            type: object
+            description: "Filter conditions to apply. Keys are plain column names (not qualified). Values are either an array (IN clause) or an object with operator keys. Supported fields depend on material type: allpv (utm_source, utm_medium, utm_campaign, device_type, country_code, depth_position, deep_read, stop_max_sec, stop_max_pos, exit_pos, is_submit, dead_click_image_count, irritation_click_count, scroll_back_count, content_skip_count, exploration_count, page_type, page_fetch_status, is_article, is_product, is_list, is_form, is_trust_info, is_faq, is_landing, is_search, is_account, is_cart, is_checkout, is_confirm, is_thanks, is_top_page, is_event, is_recipe, is_job, is_video, is_howto, is_qa_forum), gsc (search_type, keyword), ga4_age_gender (age, gender, sessions, active_users), ga4_country (country, sessions, active_users), ga4_region (region, sessions, active_users), goal_x (utm_source, utm_medium, utm_campaign, device_id, is_reject), click_event (is_external, action_id, page_id, to_url, selector, event_sec), page_version (page_id, device_id, version_no, update_date). Multiple conditions are implicitly AND."
+            additionalProperties:
+              oneOf:
+                - type: array
+                  items: { type: ["string", "boolean"] }
+                - type: object
+                  propertyNames:
+                    enum: [eq, neq, gt, gte, lt, lte, in, contains, prefix, between]
+          add:
+            type: array
+            description: "List of column names for calc results. Each element must match a key in calc."
+            items:
+              type: string
+          calc:
+            type: object
+            description: "Aggregation expressions. Keys are result column names, values are expressions like 'COUNT(material.column)'."
+            additionalProperties:
+              type: string
+          join:
+            type: object
+            description: "Join another material or view. Requires 'with' (material/view name) and 'on' (array of {left, right} column pairs). Optional 'if not match': 'keep-left' (default) or 'drop'."
+            properties:
+              with:
+                type: string
+                description: "Name of the material or previously defined view to join with."
+              on:
+                type: array
+                description: "Join conditions. Each element specifies a left and right column pair."
+                items:
+                  type: object
+                  required: ["left", "right"]
+                  properties:
+                    left: { type: string, description: "Qualified column from the current view's source." }
+                    right: { type: string, description: "Qualified column from the 'with' material/view." }
+              "if not match":
+                type: string
+                enum: ["keep-left", "drop"]
+                description: "Behavior for unmatched rows. Default: keep-left."
+            required: ["with", "on"]
+          sort:
+            type: object
+            description: "Sort results and optionally limit to top N rows. Applied after calc. The 'by' column must exist in keep or add columns. Accepts both qualified ('material.column') and unqualified ('column') names."
+            required: ["by", "order"]
+            properties:
+              by:
+                type: string
+                description: "Column name to sort by. Can be qualified (e.g., 'click_event.click_count') or unqualified (e.g., 'click_count'). Must exist in keep or add columns."
+              order:
+                type: string
+                enum: ["asc", "desc"]
+                description: "Sort order: 'asc' for ascending, 'desc' for descending."
+              top:
+                type: integer
+                description: "Return only the top N rows after sorting. Omit to return all rows."
+                minimum: 1
+            additionalProperties: false
+        additionalProperties: false
+    errors:
+      - code: E_UNKNOWN_COLUMN
+        message: "Invalid column name in keep list."
+
+  result:
+    type: object
+    description: "Specifies which view to return and how to format the result."
+    required: ["use"]
+    properties:
+      use:
+        type: string
+        description: "Name of the view (defined in 'make') to return as the result."
+      limit:
+        type: integer
+        description: "Maximum number of rows to return. Default: 1000, Maximum: 50000."
+        minimum: 1
+        maximum: 50000
+        default: 1000
+      count_only:
+        type: boolean
+        description: "If true, return only the count of rows instead of the actual data. Default: false."
+        default: false
+    additionalProperties: false
+    errors:
+      - code: E_UNKNOWN_VIEW
+        message: "Result.use does not match any defined view in make."
+
+# Feature availability map.
+#
+# Each feature records:
+#   enabled: true / false  -- whether the executor actually processes it
+#   since:   YYYY-MM-DD    -- the `update` date on which this feature became
+#                             available within the current version
+#
+# The /guide endpoint projects this map back to the legacy flat
+# `{feature_name: bool}` shape (for backward compatibility) and also exposes
+# the full {enabled, since} form as `features_detail` so AI clients can
+# decide what is usable against their known api_update.
+features:
+  # Implemented and fully processed by the executor
+  filter:        { enabled: true,  since: "2025-10-20" }
+  join:          { enabled: true,  since: "2025-10-20" }
+  calc:          { enabled: true,  since: "2025-10-20" }
+  view_chaining: { enabled: true,  since: "2025-10-20" }
+  sort:          { enabled: true,  since: "2025-10-20" }
+  # Not yet implemented. sample / include_count pass
+  # validation but are not processed; return_file/csv/parquet likewise.
+  sample:         { enabled: false }
+  include_count:  { enabled: false }
+  return_file:    { enabled: false }
+  return_csv:     { enabled: false }
+  return_parquet: { enabled: false }

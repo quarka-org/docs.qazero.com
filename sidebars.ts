@@ -107,11 +107,53 @@ const sidebars: SidebarsConfig = {
               type: 'category',
               label: 'Version 2025-10-20',
               items: [
+                // Top of the version — "Get Started with AI"
                 'developer-manual/api/2025-10-20/getting-started-2025-10-20',
-                'developer-manual/api/2025-10-20/endpoints-2025-10-20',
-                'developer-manual/api/2025-10-20/qal-2025-10-20',
-                'developer-manual/api/2025-10-20/qal-validation-2025-10-20',
-                'developer-manual/api/2025-10-20/materials-2025-10-20',
+                {
+                  type: 'category',
+                  label: 'Concepts',
+                  link: {
+                    type: 'doc',
+                    id: 'developer-manual/api/2025-10-20/concepts/concepts-index-2025-10-20',
+                  },
+                  items: [
+                    'developer-manual/api/2025-10-20/concepts/what-is-qal-2025-10-20',
+                    'developer-manual/api/2025-10-20/concepts/why-qal-2025-10-20',
+                    'developer-manual/api/2025-10-20/concepts/materials-views-result-2025-10-20',
+                    'developer-manual/api/2025-10-20/concepts/versioning-2025-10-20',
+                  ],
+                },
+                {
+                  type: 'category',
+                  label: 'Materials',
+                  link: {
+                    type: 'doc',
+                    id: 'developer-manual/api/2025-10-20/materials/materials-index-2025-10-20',
+                  },
+                  items: [
+                    'developer-manual/api/2025-10-20/materials/material-allpv-2025-10-20',
+                    'developer-manual/api/2025-10-20/materials/material-click-event-2025-10-20',
+                    'developer-manual/api/2025-10-20/materials/material-gsc-2025-10-20',
+                    'developer-manual/api/2025-10-20/materials/material-goal-n-2025-10-20',
+                    'developer-manual/api/2025-10-20/materials/material-page-version-2025-10-20',
+                  ],
+                },
+                {
+                  type: 'category',
+                  label: 'API Reference',
+                  link: {
+                    type: 'doc',
+                    id: 'developer-manual/api/2025-10-20/reference/reference-index-2025-10-20',
+                  },
+                  items: [
+                    'developer-manual/api/2025-10-20/reference/reference-authentication-2025-10-20',
+                    'developer-manual/api/2025-10-20/reference/reference-guide-2025-10-20',
+                    'developer-manual/api/2025-10-20/reference/reference-query-2025-10-20',
+                    'developer-manual/api/2025-10-20/reference/reference-errors-2025-10-20',
+                    'developer-manual/api/2025-10-20/reference/reference-examples-2025-10-20',
+                  ],
+                },
+                'developer-manual/api/2025-10-20/changelog-2025-10-20',
               ],
             },
             'developer-manual/api/api-compatibility',

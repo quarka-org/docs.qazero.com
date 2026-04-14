@@ -2,17 +2,35 @@
 id: changelog-2025-10-20
 title: アップデート履歴
 sidebar_position: 6
-last_updated: 2026-04-13
-api_update: 2026-04-13
+last_updated: 2026-04-14
+api_update: 2026-04-14
 ---
 
 # アップデート履歴 (2025-10-20)
 
 これは API バージョン `2025-10-20` の **アップデート履歴** です。バージョンごとに 1 つのリビングドキュメントを持ち、新しいエントリーを最上部に追加していきます。各エントリーには、プラグインが `/guide` レスポンスで返す `api_update` の日付をタグ付けしています。上から下へ読むことで、初回リリース以降の API の成長を追うことができ、最新エントリーをお使いのサーバーの `api_update` と突き合わせれば、実際にどの機能が利用可能かを把握できます。
 
+### 2026-04-14 — `api_update: 2026-04-14` — 開発者マニュアル再構成 + `features_detail` + `since`
+
+**追加:**
+- ✅ **`/guide` が `features_detail` を返すように** — 機能名をキーとする、エントリごとに `{ enabled, since }` 形式を持つリッチなマップ。既存のフラットな `features` マップも射影として保持されているので、古いクライアントはそのまま動きます。新しい AI クライアントは `features_detail` を優先し、各機能の `since` をサーバーの `api_update` と比較して可用性を判定してください。
+- ✅ **`qal-validation.yaml` の機能ごとの `since`** — 検証マニフェストの `features:` 下の各エントリに、`enabled: true` のとき `since: YYYY-MM-DD` タグが付きました。`/guide` エンドポイントはここから射影しています。
+- ✅ **`materials-manifest.yaml` のトップレベル `version` / `update`** — と、個別のマテリアル・フィールドへのオプショナルな `since:` タグ。純粋な追加で、既存の消費者には影響しません。
+- ✅ **新しい `ai/` サブディレクトリ** を `developer-manual/api/2025-10-20/` 以下に追加。簡潔な AI 向け指示 (`README.md`) と2本の機械可読 YAML 仕様書 (`materials.yaml`, `qal-validation.yaml`) を含みます。`/guide` エンドポイントはレガシーなフラット markdown の代わりにこのサブディレクトリを配信するようになったので、MCP / LLM クライアントは必要な内容だけを受け取ります — 人間向けの冗長な散文は含まれません。
+
+**変更:**
+- 🔄 **開発者マニュアルの再編成**。`concepts/`, `materials/`, `reference/`, `ai/` のサブディレクトリに再構成しました。トップレベルの入口は、従来の curl 先行のクイックスタートではなく **「AI と使いはじめる」** という枠組みになりました。レガシーなフラットファイル (`qal.md`, `qal-validation.md`, `materials.md`, `endpoints.md`) はこの構造に置き換わる形で削除されました。
+- 🔄 各マテリアルは手作りの **サンプル表** つきの専用ページを持つようになり、データの粒度が一目で分かります。サンプル表は3つの ID カラム (`page_id`, `session_id`, `pv_id`) だけを表示します — ID の全集合とスキーマは `ai/materials.yaml` が正本です。
+- 🔄 **`/guide` のドキュメントコンテンツは AI 向けに最適化されました。** 以前このエンドポイントは人間向けの markdown ファイル4つ (`index.md`, `endpoints.md`, `materials.md`, `qal.md`) を fetch していましたが、今は簡潔な `README.md` と2本の YAML 仕様書を fetch します。人間向けのページは引き続き docs.qazero.com に残しています。
+
+**このアップデートが非破壊である理由:**
+- レガシーなフラット `features` マップは `/guide` レスポンスで変わらず保持されています。
+- `version`, `api_update`, `features`, `sites`, あるいは `documentation.sections` の存在を読んでいる既存クライアントコードはそのまま動きます。`documentation.sections` の *内容* は変わりましたが、(AI クライアントのように) pass-through として扱っているクライアントには影響ありません。
+- QAL クエリの形は何も変わっていません。既存のマテリアルやカラムが削除・リネームされたものはありません。
+
 ### 2026-04-13 — `api_update: 2026-04-13` — Documentation v1.2.0
 **追加:**
-- ✅ **QAL `make.sort`** — ビュー単位の行ソートとトップ N 抽出。`make` 内のビューに `sort: { by, order, top }` を置くことで、`filter` / `join` / `keep` / `calc` の後にそのビューの出力をソートします。`by` は修飾あり（`allpv.url`）でも修飾なし（`pageviews`）でも指定でき、`order` は `asc` / `desc`、`top` は省略可能な行数キャップです。[QAL ガイド §4.7](./qal.md#47-sort-オプション) を参照。
+- ✅ **QAL `make.sort`** — ビュー単位の行ソートとトップ N 抽出。`make` 内のビューに `sort: { by, order, top }` を置くことで、`filter` / `join` / `keep` / `calc` の後にそのビューの出力をソートします。`by` は修飾あり（`allpv.url`）でも修飾なし（`pageviews`）でも指定でき、`order` は `asc` / `desc`、`top` は省略可能な行数キャップです。[QAL とは何か?](./concepts/what-is-qal.md) コンセプトページと、正本の [`qal-validation.yaml`](./ai/qal-validation.yaml) を参照。
 - ✅ 本アップデートを導入したサーバーでは `/guide` の `features.sort` が `true` を返すようになりました。クライアントは機能の可用性をハードコードせず、この値を参照して検出してください。
 
 **訂正:**

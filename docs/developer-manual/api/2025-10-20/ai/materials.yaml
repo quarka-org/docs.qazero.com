@@ -1,0 +1,1107 @@
+id: materials-manifest
+version: "2025-10-20"
+update: "2026-04-14"
+Plugin version:
+  QA ZERO: "3.0.0.0"
+  QA Assistants: "5.0.0.0"
+type: material_definition
+
+# Versioning model (see CLAUDE.md §10 and docs/qal/10-rest-api-specification.md):
+#
+#   version (YYYY-MM-DD)  - changes only on breaking changes. URL-visible.
+#   update  (YYYY-MM-DD)  - bumps on any non-breaking additive change within
+#                           the same version. The latest `since` tag below
+#                           should match `update` above.
+#
+# Any `material` or `field` may carry an optional `since: YYYY-MM-DD` tag
+# marking when it first became available within this version. Absent `since`
+# means "available since the version was introduced" (i.e. equal to `version`).
+
+# =============================================================================
+# 列DB共通定義
+# =============================================================================
+
+# ファイルフォーマット
+# PHPセキュリティヘッダーを付与してブラウザ直接アクセスを防止
+file_format:
+  column_db:
+    header: "<?php http_response_code(404);die();?>\n"
+    header_size: 39
+
+# データ型定義
+# bytes: バイト数, pack: PHPのpack()形式
+types:
+  uint8:  { bytes: 1, pack: "C" }
+  uint16: { bytes: 2, pack: "v" }
+  uint32: { bytes: 4, pack: "V" }
+  uint64: { bytes: 8, pack: "P" }
+
+# ステータス定義
+# - stable: 本番利用可能
+# - dev:    開発中（コードあり、テスト中）
+# - plan:   計画中（まだコードなし）
+
+# =============================================================================
+# マテリアル定義
+# =============================================================================
+
+materials:
+  allpv:
+    dataset_id: 1
+    decoders:
+      - loader: "file_functions.view_pv"
+        decoder: null
+        fields:
+          # --- 列DBカラム（type指定あり） ---
+          - material_column: "pv_id"
+            physical_column: "pv_id"
+            type: uint32
+            nullable: false
+            status: dev
+            search_hint:
+              note: "JOINキー（click_event, datalayer_event等との結合用）。フィルタ対象にはしない"
+          - material_column: "session_id"
+            physical_column: "session_id"
+            type: uint32
+            nullable: false
+            status: dev
+            search_hint:
+              note: "セッション単位の絞り込みに使用。列DBバイナリスキャンで高速。値はtracking_id×日付ごとに連番"
+          - material_column: "reader_id"
+            physical_column: "reader_id"
+            type: uint32
+            nullable: false
+            status: dev
+            search_hint:
+              note: "ユーザー単位の絞り込みに使用。列DBバイナリスキャンで高速。人間にはIDが分からないのでurl等と組み合わせて使う"
+          - material_column: "page_id"
+            physical_column: "page_id"
+            type: uint32
+            nullable: false
+            status: dev
+            search_hint:
+              note: "ページ単位の絞り込みに使用。列DBバイナリスキャンで高速。人間にはIDが分からないので通常はurlでフィルタし、page_idはJOINキーとして使う"
+          - material_column: "device_id"
+            physical_column: "device_id"
+            type: uint8
+            nullable: false
+            status: dev
+            search_hint:
+              note: "3〜5種（1=PC, 2=SP, 3=tablet）。列DBバイナリスキャンで高速。人間向けにはdevice_typeを使う"
+          - material_column: "source_id"
+            physical_column: "source_id"
+            type: uint16
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "流入元の絞り込み。列DBバイナリスキャンで高速。IDを知っていれば直接指定可能だが、人間にはutm_sourceの方が自然"
+          - material_column: "medium_id"
+            physical_column: "medium_id"
+            type: uint8
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "メディアの絞り込み。列DBバイナリスキャンで高速。IDを知っていれば直接指定可能だが、人間にはutm_mediumの方が自然"
+          - material_column: "campaign_id"
+            physical_column: "campaign_id"
+            type: uint16
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "キャンペーンの絞り込み。列DBバイナリスキャンで高速。同上、utm_campaignの方が自然"
+          - material_column: "content_id"
+            physical_column: "content_id"
+            type: uint16
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "コンテンツの絞り込み。列DBバイナリスキャンで高速。同上、utm_contentの方が自然"
+          - material_column: "access_time"
+            physical_column: "access_time"
+            type: uint32
+            nullable: false
+            status: dev
+            search_hint:
+              note: "UNIXタイムスタンプ。通常はtime_rangeパラメータで日付範囲が自動処理される。範囲フィルタ（between）で時間帯絞り込みも可能"
+          - material_column: "pv"
+            physical_column: "pv"
+            type: uint16
+            nullable: false
+            status: dev
+            search_hint:
+              note: "セッション内のPV番号（1=ランディング）。keepで取得する用途が主。pv=1でランディングページ分析"
+          - material_column: "speed_msec"
+            physical_column: "speed_msec"
+            type: uint16
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "ページ表示速度（ミリ秒）。keepで取得する用途が主。範囲フィルタで「3秒以上かかったPV」等も可能"
+          - material_column: "browse_sec"
+            physical_column: "browse_sec"
+            type: uint16
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "閲覧時間（秒）。keepで取得する用途が主。範囲フィルタで「30秒以上閲覧」等も可能"
+          - material_column: "is_last"
+            physical_column: "is_last"
+            type: uint8
+            nullable: false
+            status: dev
+            search_hint:
+              note: "セッション最終PVフラグ（0/1）。直帰・離脱分析に使用。eq:1で離脱ページを抽出"
+          - material_column: "is_newuser"
+            physical_column: "is_newuser"
+            type: uint8
+            nullable: false
+            status: dev
+            search_hint:
+              note: "新規ユーザーフラグ（0/1）。新規/リピーター分析に使用。eq:1で新規ユーザーのPVを抽出"
+          - material_column: "version_id"
+            physical_column: "version_id"
+            type: uint16
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "ページバージョンID。A/Bテスト・バージョン比較に使用。列DBバイナリスキャンで高速"
+
+          # --- 行動カラム C-1: raw_p由来 (5カラム) ---
+          - material_column: "depth_position"
+            physical_column: "depth_position"
+            type: uint8
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "最深到達率(0-100%)。ページをどこまでスクロールしたか。gte:80で下部まで読んだPV、lte:20で冒頭離脱。browse_sec・deep_readと組み合わせて読了分析に使う"
+          - material_column: "deep_read"
+            physical_column: "deep_read"
+            type: uint8
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "熟読フラグ(0/1)。3秒以上滞在した区間が5箇所以上あれば1。eq:1で熟読PVを抽出。depth_position・is_lastと組み合わせて「熟読したのに離脱」等の分析に使う"
+          - material_column: "stop_max_sec"
+            physical_column: "stop_max_sec"
+            type: uint16
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "最長停止時間(秒)。ページ内で最も長く留まった箇所の秒数。gte:30で長時間熟読。stop_max_posと組み合わせて注目箇所を特定する"
+          - material_column: "stop_max_pos"
+            physical_column: "stop_max_pos"
+            type: uint8
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "最長停止位置(0-100%)。stop_max_secを記録した位置。between:20,80でメインコンテンツ帯。stop_max_secと常にセットで使う"
+          - material_column: "exit_pos"
+            physical_column: "exit_pos"
+            type: uint8
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "離脱位置(0-100%)。最後に閲覧していた位置。lte:30で上部離脱（ファーストビュー内離脱）。is_last=1と組み合わせて離脱パターン分析に使う"
+
+          # --- 行動カラム C-2: raw_c由来 (3カラム) ---
+          - material_column: "is_submit"
+            physical_column: "is_submit"
+            type: uint8
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "フォーム送信フラグ(0/1)。ACTION_ID=2のクリックがあれば1。eq:1でCV(送信)したPVを抽出。page_idと組み合わせてフォームCVR算出に使う"
+          - material_column: "dead_click_image_count"
+            physical_column: "dead_click_image_count"
+            type: uint8
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "デッドクリック画像数。リンクのない画像へのクリック回数。gte:1でリンク不足の機会損失を示すPV。UX改善の優先度判定に使う"
+          - material_column: "irritation_click_count"
+            physical_column: "irritation_click_count"
+            type: uint8
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "イライラクリック回数。3秒以内に5回以上の連打バースト数。gte:1でUI不満を示すPV。page_idと組み合わせて問題ページ特定に使う"
+
+          # --- 行動カラム C-3: raw_e由来 (3カラム) ---
+          - material_column: "scroll_back_count"
+            physical_column: "scroll_back_count"
+            type: uint8
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "スクロールバック回数。3秒以内に1000px以上ページ上部に戻った回数。gte:1で情報を見直した行動。content_skip_countと組み合わせてナビゲーション品質を分析"
+          - material_column: "content_skip_count"
+            physical_column: "content_skip_count"
+            type: uint8
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "コンテンツスキップ回数。3秒以内に1000px以上下方へ飛ばした回数。gte:1でコンテンツが読まれていないPV。depth_positionと組み合わせて「飛ばし読み→離脱」分析に使う"
+          - material_column: "exploration_count"
+            physical_column: "exploration_count"
+            type: uint8
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "探索行動回数。5秒以内にマウスが200px以上横移動で2回折り返した回数。gte:1でクリック対象を探している行動。dead_click_image_countと組み合わせてUI迷子分析に使う"
+
+          # --- マスター参照カラム（type指定なし = DBから取得） ---
+          - material_column: "url"
+            physical_column: "url"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件（サイト規模依存）"
+              exact: "url_hashインデックスで高速"
+              prefix: "インデックスなし。全件スキャン"
+              contains: "非推奨。フルスキャン"
+              in: "IN句一括で高速"
+              note: "完全一致はurl_hashを使える"
+          - material_column: "title"
+            physical_column: "title"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "インデックスなし"
+              prefix: "インデックスなし"
+              contains: "非推奨"
+              in: "page_idで絞った後に取得"
+              note: "titleでのフィルタより、urlで絞ってtitleをkeepする方が効率的"
+          - material_column: "source_domain"
+            physical_column: "source_domain"
+            resolve_via: "source_id"
+            search_hint:
+              rows: "数百件"
+              exact: "source_domainインデックスあり。高速"
+              prefix: "高速"
+              contains: "全件取得でも数百件"
+              in: "高速"
+          - material_column: "referrer"
+            physical_column: "referrer"
+            resolve_via: "source_id"
+            search_hint:
+              rows: "数百件"
+              exact: "インデックスなし"
+              prefix: "全件取得でも数百件"
+              contains: "全件取得でも数百件"
+              in: "高速"
+          - material_column: "utm_source"
+            physical_column: "utm_source"
+            resolve_via: "source_id"
+            search_hint:
+              rows: "数百件"
+              exact: "高速（全件取得→PHP逆引き）"
+              prefix: "高速（同上）"
+              contains: "高速（同上）"
+              in: "高速（同上）"
+          - material_column: "utm_medium"
+            physical_column: "utm_medium"
+            resolve_via: "medium_id"
+            search_hint:
+              rows: "数十件（固定的）"
+              exact: "ユニークインデックスあり。高速"
+              prefix: "全件でも数十件"
+              contains: "全件でも数十件"
+              in: "高速"
+          - material_column: "utm_campaign"
+            physical_column: "utm_campaign"
+            resolve_via: "campaign_id"
+            search_hint:
+              rows: "数百件"
+              exact: "ユニークインデックスあり。高速"
+              prefix: "全件取得でも数百件"
+              contains: "全件取得でも数百件"
+              in: "高速"
+          - material_column: "utm_content"
+            physical_column: "utm_content"
+            resolve_via: "content_id"
+            search_hint:
+              rows: "数百件"
+              exact: "高速（全件取得→PHP逆引き）"
+              prefix: "全件取得でも数百件"
+              contains: "全件取得でも数百件"
+              in: "高速"
+          - material_column: "utm_term"
+            physical_column: "utm_term"
+            resolve_via: "source_id"
+            search_hint:
+              rows: "数百件"
+              exact: "高速（全件取得→PHP逆引き）"
+              prefix: "全件取得でも数百件"
+              contains: "全件取得でも数百件"
+              in: "高速"
+              note: "utm_sourcesテーブルに格納。source_idから同一クエリで取得"
+          - material_column: "ua"
+            physical_column: "ua"
+            resolve_via: "reader_id"
+            search_hint:
+              note: "UAos+UAbrowser合成。直接フィルタ非推奨。os/browserを個別に使う"
+          - material_column: "device_type"
+            physical_column: "device_type"
+            resolve_via: "device_id"
+            search_hint:
+              rows: "3種（固定）"
+              exact: "固定マッピング。DB不要。有効な値は PC, SP, tablet の3つのみ（大文字小文字を正確に守ること）。desktop, mobile, smartphone 等は無効"
+              in: "高速"
+          - material_column: "os"
+            physical_column: "os"
+            resolve_via: "reader_id"
+            search_hint:
+              rows: "数十種（UAos）"
+              exact: "UAosインデックスあり。高速"
+              prefix: "高速"
+              contains: "全件でも問題なし"
+              in: "高速"
+          - material_column: "browser"
+            physical_column: "browser"
+            resolve_via: "reader_id"
+            search_hint:
+              rows: "数十種（UAbrowser）"
+              exact: "インデックスなし"
+              prefix: "全件でも問題なし"
+              contains: "全件でも問題なし"
+              in: "高速"
+          - material_column: "language"
+            physical_column: "language"
+            resolve_via: "reader_id"
+            search_hint:
+              rows: "数十種"
+              exact: "インデックスなし"
+              prefix: "全件でも問題なし"
+              contains: "全件でも問題なし"
+              in: "高速"
+          - material_column: "country_code"
+            physical_column: "country_code"
+            resolve_via: "reader_id"
+            search_hint:
+              rows: "約200種"
+              exact: "country_codeインデックスあり。高速"
+              prefix: "高速"
+              contains: "全件でも問題なし"
+              in: "高速"
+          - material_column: "original_id"
+            physical_column: "original_id"
+            resolve_via: "reader_id"
+            search_hint:
+              rows: "ユーザー数依存"
+              exact: "original_idインデックスあり。高速"
+              prefix: "高速"
+              contains: "全件でも問題なし"
+              in: "高速"
+          - material_column: "page_type"
+            physical_column: "page_type"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件（サイト規模依存）"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "ページタイプ ビットフラグ(BIGINT UNSIGNED)。通常はis_*フラグでフィルタする方が効率的"
+          - material_column: "page_fetch_status"
+            physical_column: "page_fetch_status"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件（サイト規模依存）"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "HTML取得ステータス(TINYINT)。NULL=未取得, 1=成功, -1=失敗"
+          - material_column: "is_article"
+            physical_column: "is_article"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件（サイト規模依存）"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "記事ページフラグ(0/1)。Generated Column"
+          - material_column: "is_product"
+            physical_column: "is_product"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "商品ページフラグ(0/1)。Generated Column"
+          - material_column: "is_list"
+            physical_column: "is_list"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "一覧ページフラグ(0/1)。Generated Column"
+          - material_column: "is_form"
+            physical_column: "is_form"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "フォームページフラグ(0/1)。Generated Column"
+          - material_column: "is_trust_info"
+            physical_column: "is_trust_info"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "信頼性情報ページフラグ(0/1)。Generated Column"
+          - material_column: "is_faq"
+            physical_column: "is_faq"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "FAQページフラグ(0/1)。Generated Column"
+          - material_column: "is_landing"
+            physical_column: "is_landing"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "ランディングページフラグ(0/1)。Generated Column"
+          - material_column: "is_search"
+            physical_column: "is_search"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "検索結果ページフラグ(0/1)。Generated Column"
+          - material_column: "is_account"
+            physical_column: "is_account"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "アカウントページフラグ(0/1)。Generated Column"
+          - material_column: "is_cart"
+            physical_column: "is_cart"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "カートページフラグ(0/1)。Generated Column"
+          - material_column: "is_checkout"
+            physical_column: "is_checkout"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "決済ページフラグ(0/1)。Generated Column"
+          - material_column: "is_confirm"
+            physical_column: "is_confirm"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "確認ページフラグ(0/1)。Generated Column"
+          - material_column: "is_thanks"
+            physical_column: "is_thanks"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "サンクスページフラグ(0/1)。Generated Column"
+          - material_column: "is_top_page"
+            physical_column: "is_top_page"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "トップページフラグ(0/1)。Generated Column"
+          - material_column: "is_event"
+            physical_column: "is_event"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "イベントページフラグ(0/1)。Generated Column"
+          - material_column: "is_recipe"
+            physical_column: "is_recipe"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "レシピページフラグ(0/1)。Generated Column"
+          - material_column: "is_job"
+            physical_column: "is_job"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "求人ページフラグ(0/1)。Generated Column"
+          - material_column: "is_video"
+            physical_column: "is_video"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "動画ページフラグ(0/1)。Generated Column"
+          - material_column: "is_howto"
+            physical_column: "is_howto"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "ハウツーページフラグ(0/1)。Generated Column"
+          - material_column: "is_qa_forum"
+            physical_column: "is_qa_forum"
+            resolve_via: "page_id"
+            search_hint:
+              rows: "数千〜数万件"
+              exact: "page_idで逆引き。高速"
+              in: "高速"
+              note: "Q&Aフォーラムページフラグ(0/1)。Generated Column"
+
+          # --- 仮想カラム（virtual: true = 列DBに物理カラムなし、QAL実行時に動的算出） ---
+          # ゴール達成フラグ（is_goal_1..10）
+          # - keep: 各PVがゴールNを達成したかを0/1で返す
+          # - filter: is_goal_N=1のみ対応（=0は非対応）
+          # - AND（複数ゴール同時達成）: filter内に複数のis_goal_Nを列挙する
+          #     例: filter: {is_goal_1: 1, is_goal_3: 1} → 両方達成したPVのみ
+          # - OR（いずれかのゴール達成）: keepにis_goal_1..Nを含めて取得し、
+          #     AI側でpost-filter（いずれかが1の行を抽出）する。
+          #     またはQALを複数回発行して和集合を取る
+          - material_column: "is_goal_1"
+            physical_column: "is_goal_1"
+            type: uint8
+            virtual: true
+            status: dev
+          - material_column: "is_goal_2"
+            physical_column: "is_goal_2"
+            type: uint8
+            virtual: true
+            status: dev
+          - material_column: "is_goal_3"
+            physical_column: "is_goal_3"
+            type: uint8
+            virtual: true
+            status: dev
+          - material_column: "is_goal_4"
+            physical_column: "is_goal_4"
+            type: uint8
+            virtual: true
+            status: dev
+          - material_column: "is_goal_5"
+            physical_column: "is_goal_5"
+            type: uint8
+            virtual: true
+            status: dev
+          - material_column: "is_goal_6"
+            physical_column: "is_goal_6"
+            type: uint8
+            virtual: true
+            status: dev
+          - material_column: "is_goal_7"
+            physical_column: "is_goal_7"
+            type: uint8
+            virtual: true
+            status: dev
+          - material_column: "is_goal_8"
+            physical_column: "is_goal_8"
+            type: uint8
+            virtual: true
+            status: dev
+          - material_column: "is_goal_9"
+            physical_column: "is_goal_9"
+            type: uint8
+            virtual: true
+            status: dev
+          - material_column: "is_goal_10"
+            physical_column: "is_goal_10"
+            type: uint8
+            virtual: true
+            status: dev
+
+  click_event:
+    dataset_id: 2
+    decoders:
+      - loader: null
+        decoder: null
+        fields:
+          - material_column: "pv_id"
+            physical_column: "pv_id"
+            type: uint32
+            nullable: false
+            status: dev
+          - material_column: "session_id"
+            physical_column: "session_id"
+            type: uint32
+            nullable: false
+            status: dev
+          - material_column: "page_id"
+            physical_column: "page_id"
+            type: uint32
+            nullable: false
+            status: dev
+          - material_column: "event_sec"
+            physical_column: "event_sec"
+            type: uint16
+            nullable: false
+            status: dev
+          - material_column: "selector"
+            physical_column: "selector_id"
+            type: uint32
+            nullable: false
+            status: dev
+          - material_column: "element_text"
+            physical_column: "element_text_id"
+            type: uint16
+            nullable: true
+            default: 0
+            status: dev
+          - material_column: "element_id"
+            physical_column: "element_id_id"
+            type: uint16
+            nullable: true
+            default: 0
+            status: dev
+          - material_column: "element_class"
+            physical_column: "element_class_id"
+            type: uint16
+            nullable: true
+            default: 0
+            status: dev
+          - material_column: "element_data"
+            physical_column: "element_data_id"
+            type: uint16
+            nullable: true
+            default: 0
+            status: dev
+          - material_column: "to_url"
+            physical_column: "to_url_id"
+            type: uint16
+            nullable: true
+            default: 0
+            status: dev
+          - material_column: "is_external"
+            physical_column: "is_external"
+            type: uint8
+            nullable: false
+            default: 0
+            status: dev
+          - material_column: "action_id"
+            physical_column: "action_id"
+            type: uint8
+            nullable: false
+            status: dev
+          - material_column: "page_x_pct"
+            physical_column: "page_x_pct"
+            type: uint16
+            nullable: false
+            status: dev
+          - material_column: "page_y_pct"
+            physical_column: "page_y_pct"
+            type: uint16
+            nullable: false
+            status: dev
+
+  datalayer_event:
+    dataset_id: 3
+    decoders:
+      - loader: null
+        decoder: null
+        fields:
+          - material_column: "pv_id"
+            physical_column: "pv_id"
+            type: uint32
+            nullable: false
+            status: dev
+          - material_column: "session_id"
+            physical_column: "session_id"
+            type: uint32
+            nullable: false
+            status: dev
+          - material_column: "page_id"
+            physical_column: "page_id"
+            type: uint32
+            nullable: false
+            status: dev
+          - material_column: "event_name"
+            physical_column: "event_name_id"
+            type: uint16
+            nullable: false
+            status: dev
+          - material_column: "params_json"
+            physical_column: "params_id"
+            type: uint16
+            nullable: false
+            status: dev
+
+  # events_template: イベント詳細テーブル用テンプレート（events.purchase, events.page_view, ... として使用）
+  # Layer 2: serialize表配列。カラムはイベントごとに動的に定義される。
+  # pv_id, session_id は全イベント共通の固定カラム。
+  events_template:
+    decoders:
+      - loader: null
+        decoder: null
+        fields:
+          - material_column: "pv_id"
+            physical_column: "pv_id"
+            status: dev
+          - material_column: "session_id"
+            physical_column: "session_id"
+            status: dev
+
+  gsc:
+    dataset_id: 4
+    decoders:
+      - loader: "column_db.gsc"
+        decoder: null
+        fields:
+          # --- 列DBカラム（type指定あり） ---
+          - material_column: "page_id"
+            physical_column: "page_id"
+            type: uint32
+            nullable: false
+            status: dev
+            search_hint:
+              note: "ページ単位の絞り込み。列DBバイナリスキャンで高速"
+          - material_column: "query_id"
+            physical_column: "query_id"
+            type: uint32
+            nullable: false
+            status: dev
+            search_hint:
+              note: "キーワードID。qa_gsc_{tid}_query_logのFK。keywordフィルタはDB検索→query_id集合→binary_scan"
+          - material_column: "search_type"
+            physical_column: "search_type"
+            type: uint8
+            nullable: false
+            status: dev
+            search_hint:
+              note: "1=web, 2=image, 3=video。列DBバイナリスキャンで高速"
+          - material_column: "clicks"
+            physical_column: "clicks"
+            type: uint32
+            nullable: false
+            status: dev
+            search_hint:
+              note: "日次クリック数。数値範囲フィルタはpost_filter"
+          - material_column: "impressions"
+            physical_column: "impressions"
+            type: uint32
+            nullable: false
+            status: dev
+            search_hint:
+              note: "日次インプレッション数。数値範囲フィルタはpost_filter"
+          - material_column: "position_x100"
+            physical_column: "position_x100"
+            type: uint16
+            nullable: false
+            status: dev
+            search_hint:
+              note: "平均掲載順位×100。Material層でposition（float）に復号。数値範囲フィルタはpost_filter"
+          # --- マスター解決カラム（resolve_via指定） ---
+          - material_column: "keyword"
+            physical_column: "keyword"
+            resolve_via: "query_id"
+            status: dev
+            search_hint:
+              note: "query_id→qa_gsc_query_log.keyword。DB検索でquery_id集合を取得しbinary_scan"
+          - material_column: "url"
+            physical_column: "url"
+            resolve_via: "page_id"
+            status: dev
+          - material_column: "title"
+            physical_column: "title"
+            resolve_via: "page_id"
+            status: dev
+          - material_column: "page_type"
+            physical_column: "page_type"
+            resolve_via: "page_id"
+            status: dev
+          - material_column: "page_fetch_status"
+            physical_column: "page_fetch_status"
+            resolve_via: "page_id"
+            status: dev
+          # --- 算出カラム（virtual） ---
+          - material_column: "ctr"
+            physical_column: "ctr"
+            virtual: true
+            status: dev
+            search_hint:
+              note: "clicks / impressions。Material層で算出"
+          - material_column: "position"
+            physical_column: "position"
+            virtual: true
+            status: dev
+            search_hint:
+              note: "position_x100 / 100。Material層で算出"
+          - material_column: "position_weighted"
+            physical_column: "position_weighted"
+            virtual: true
+            status: dev
+            search_hint:
+              note: "position × impressions。Material層で算出。加重平均position計算用の素材"
+    join:
+      key: page_id
+      cardinality: "N:M"
+      filter_required: true
+      reason: >
+        GSCは1ページに対して複数キーワード×複数日の行を持つ。
+        フィルタなしでJOINすると行数が爆発する
+        （例: 100PV × 150KW行 = 15,000行）。
+        必ずkeyword等でフィルタしてからJOINすること。
+
+  # GA4属性データ（T48）
+  ga4_age_gender:
+    dataset_id: 8
+    decoders:
+      - loader: "column_db.ga4_age_gender"
+        decoder: null
+        fields:
+          - material_column: "age"
+            physical_column: "age_bracket"
+            type: uint8
+            nullable: false
+            status: dev
+            search_hint:
+              note: "年齢帯ID。0=unknown, 1=18-24, 2=25-34, 3=35-44, 4=45-54, 5=55-64, 6=65+"
+          - material_column: "gender"
+            physical_column: "gender"
+            type: uint8
+            nullable: false
+            status: dev
+            search_hint:
+              note: "性別ID。0=unknown, 1=male, 2=female"
+          - material_column: "sessions"
+            physical_column: "sessions"
+            type: uint32
+            nullable: false
+            status: dev
+          - material_column: "active_users"
+            physical_column: "active_users"
+            type: uint32
+            nullable: false
+            status: dev
+          # --- マスター解決カラム（resolve_via指定） ---
+          - material_column: "age_label"
+            physical_column: "age_label"
+            resolve_via: "age_bracket"
+            status: dev
+            search_hint:
+              note: "age_bracket→年齢帯ラベル（18-24, 25-34等）。固定マッピングで解決"
+          - material_column: "gender_label"
+            physical_column: "gender_label"
+            resolve_via: "gender"
+            status: dev
+            search_hint:
+              note: "gender→性別ラベル（male, female等）。固定マッピングで解決"
+
+  ga4_country:
+    dataset_id: 9
+    decoders:
+      - loader: "column_db.ga4_country"
+        decoder: null
+        fields:
+          - material_column: "country"
+            physical_column: "country_id"
+            type: uint16
+            nullable: false
+            status: dev
+            search_hint:
+              note: "国コードをASCII値でuint16化。例: JP=0x4A50=19024"
+          - material_column: "sessions"
+            physical_column: "sessions"
+            type: uint32
+            nullable: false
+            status: dev
+          - material_column: "active_users"
+            physical_column: "active_users"
+            type: uint32
+            nullable: false
+            status: dev
+          # --- マスター解決カラム（resolve_via指定） ---
+          - material_column: "country_code"
+            physical_column: "country_code"
+            resolve_via: "country_id"
+            status: dev
+            search_hint:
+              note: "country_id→2文字国コード。固定マッピング（ASCII逆変換）で解決"
+
+  ga4_region:
+    dataset_id: 10
+    decoders:
+      - loader: "column_db.ga4_region"
+        decoder: null
+        fields:
+          - material_column: "region"
+            physical_column: "region_id"
+            type: uint16
+            nullable: false
+            status: dev
+            search_hint:
+              note: "地域ID。1-47=都道府県、0=その他/海外"
+          - material_column: "sessions"
+            physical_column: "sessions"
+            type: uint32
+            nullable: false
+            status: dev
+          - material_column: "active_users"
+            physical_column: "active_users"
+            type: uint32
+            nullable: false
+            status: dev
+          # --- マスター解決カラム（resolve_via指定） ---
+          - material_column: "region_name"
+            physical_column: "region_name"
+            resolve_via: "region_id"
+            status: dev
+            search_hint:
+              note: "region_id→都道府県名（英語）。固定マッピングで解決"
+
+  # goal_x: ゴール設定用テンプレート（goal_1, goal_2, ... として使用）
+  goal_x:
+    decoders:
+      - loader: "file_functions.get_goal_data_by_number"
+        decoder: null
+        fields:
+          - material_column: "session_index"
+            physical_column: "session_index"
+          - material_column: "pv_index"
+            physical_column: "pv_index"
+          - material_column: "pv_id"
+            physical_column: "pv_id"
+          - material_column: "reader_id"
+            physical_column: "reader_id"
+          - material_column: "UAos"
+            physical_column: "UAos"
+          - material_column: "UAbrowser"
+            physical_column: "UAbrowser"
+          - material_column: "language"
+            physical_column: "language"
+          - material_column: "is_reject"
+            physical_column: "is_reject"
+          - material_column: "page_id"
+            physical_column: "page_id"
+          - material_column: "url"
+            physical_column: "url"
+          - material_column: "title"
+            physical_column: "title"
+          - material_column: "access_time"
+            physical_column: "access_time"
+          - material_column: "device_id"
+            physical_column: "device_id"
+          - material_column: "version_id"
+            physical_column: "version_id"
+          - material_column: "source_id"
+            physical_column: "source_id"
+          - material_column: "utm_source"
+            physical_column: "utm_source"
+          - material_column: "source_domain"
+            physical_column: "source_domain"
+          - material_column: "medium_id"
+            physical_column: "medium_id"
+          - material_column: "utm_medium"
+            physical_column: "utm_medium"
+          - material_column: "campaign_id"
+            physical_column: "campaign_id"
+          - material_column: "utm_campaign"
+            physical_column: "utm_campaign"
+          - material_column: "session_no"
+            physical_column: "session_no"
+          - material_column: "pv"
+            physical_column: "pv"
+          - material_column: "speed_msec"
+            physical_column: "speed_msec"
+          - material_column: "browse_sec"
+            physical_column: "browse_sec"
+          - material_column: "is_last"
+            physical_column: "is_last"
+          - material_column: "is_newuser"
+            physical_column: "is_newuser"
+          - material_column: "is_raw_p"
+            physical_column: "is_raw_p"
+          - material_column: "is_raw_c"
+            physical_column: "is_raw_c"
+          - material_column: "is_raw_e"
+            physical_column: "is_raw_e"
+          - material_column: "version_no"
+            physical_column: "version_no"
+
+  page_version:
+    dataset_id: 5
+    decoders:
+      - loader: null
+        decoder: null
+        fields:
+          - material_column: "version_id"
+            physical_column: "version_id"
+            status: dev
+            search_hint:
+              note: "PK / JOINキー。allpv.version_idとの結合用。直接指定よりallpv JOIN page_versionを推奨。大規模サイトではallpv側のversion_id精度に制約あり（uint16上限65535）"
+          - material_column: "page_id"
+            physical_column: "page_id"
+            status: dev
+            search_hint:
+              note: "ページ識別。通常はallpvでURL絞り込み→page_version JOINで取得。直接指定する場合はpage_idを事前に知っている必要がある"
+          - material_column: "device_id"
+            physical_column: "device_id"
+            status: dev
+            search_hint:
+              note: "デバイス識別（1=PC, 2=SP, 3=tablet）"
+          - material_column: "version_no"
+            physical_column: "version_no"
+            status: dev
+            search_hint:
+              note: "同一page_id+device_id内の版番号。1が初版。calcでMAX()を使って最新版数を取得可能"
+          - material_column: "update_date"
+            physical_column: "update_date"
+            status: dev
+            search_hint:
+              note: "バージョン作成日。time_rangeパラメータで自動フィルタされる。特定日の変更を探す場合にeqフィルタも可能"
+          - material_column: "url"
+            physical_column: "url"
+            resolve_via: "page_id"
+            status: dev
+            search_hint:
+              note: "MASTER_RESOLVER_MAP経由。page_idからURL解決"
+          - material_column: "title"
+            physical_column: "title"
+            resolve_via: "page_id"
+            status: dev
+            search_hint:
+              note: "MASTER_RESOLVER_MAP経由。page_idからタイトル解決"
+          - material_column: "device_type"
+            physical_column: "device_type"
+            resolve_via: "device_id"
+            status: dev
+            search_hint:
+              note: "PC/SP/tablet。MASTER_RESOLVER_MAP経由"
+    join:
+      key: version_id
+      cardinality: "1:1"
