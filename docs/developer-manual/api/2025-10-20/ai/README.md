@@ -87,37 +87,57 @@ in a top-level `qal` key when POSTed to `/query`:
       "top": {
         "from":  ["allpv"],
         "keep":  ["allpv.url"],
-        "calc":  {"views": "COUNT(*)"},
-        "sort":  [{"column": "views", "direction": "desc"}]
+        "calc":  {"views": "COUNT(allpv.pv_id)"},
+        "sort":  {"by": "views", "order": "desc", "top": 5}
       }
     },
-    "result": {"use": "top", "limit": 5}
+    "result": {"use": "top"}
   }
 }
 ```
 
 This returns the top 5 URLs by page view count for the given time range.
 Every other query shape is a variation on this skeleton — change the
-material, the columns in `keep`, or the functions in `calc`.
+material, the columns in `keep`, or the aggregate in `calc`.
+
+The response envelope looks like:
+
+```json
+{
+  "data": [ /* rows */ ],
+  "meta": { "total_count": 0, "returned_count": 0, "limit": 1000 }
+}
+```
+
+Consult `qal-validation.yaml` for the authoritative shape of each clause
+— this example is a friendly on-ramp, not the spec.
 
 ### 4.2 Common pitfalls
 
-These four mistakes account for almost all first-try failures. If your
+These five mistakes account for almost all first-try failures. If your
 query is rejected, check these before anything else:
 
-1. **`from` must be an array, not a string.** Write `"from": ["allpv"]`,
+1. **The POST body must wrap the query in `{"qal": ...}`.** The
+   `/query` endpoint reads the query from the top-level `qal` field. A
+   bare QAL body at the root fails validation.
+2. **`from` must be an array, not a string.** Write `"from": ["allpv"]`,
    not `"from": "allpv"`. Even a single source is wrapped in `[...]`.
-2. **`keep` entries must be qualified as `<material>.<column>`.** Write
+3. **`keep` entries must be qualified as `<material>.<column>`.** Write
    `"keep": ["allpv.url"]`, not `"keep": ["url"]`. Bare column names are
    rejected with `E_UNKNOWN_COLUMN`.
-3. **`calc` values are string expressions, not nested objects.** Write
-   `"calc": {"views": "COUNT(*)"}`, not `"calc": {"views": {"count": "*"}}`.
-   The value is a whitelisted function call like `COUNT(*)`, `SUM(col)`,
-   `AVERAGE(col)`.
-4. **The POST body must wrap the query in `{"qal": ...}`.** The
-   `/query` endpoint reads the query from the top-level `qal` field. A
-   bare QAL body at the root is treated as if `from` etc. were top-level
-   keys and fails validation.
+4. **`calc` values are string expressions of the form `FUNC(material.column)`.**
+   Write `"calc": {"views": "COUNT(allpv.pv_id)"}`, not
+   `"calc": {"views": "COUNT(*)"}` and not
+   `"calc": {"views": {"count": "*"}}`. `*` is **not** a valid column
+   reference here; you must name a real column. The allowed functions are
+   listed in `qal-validation.yaml` (currently `COUNT`, `COUNTUNIQUE`,
+   `SUM`, `AVERAGE`, `MIN`, `MAX`).
+5. **`sort` is an object, not an array.** Write
+   `"sort": {"by": "views", "order": "desc", "top": 5}`, not
+   `"sort": [{"column": "views", "direction": "desc"}]`. Keys are
+   `by` (required string), `order` (`"asc"` or `"desc"`, required), and
+   `top` (optional positive integer — use this to cap rows instead of
+   `result.limit` for top-N queries).
 
 ## 5. Rules you must follow
 

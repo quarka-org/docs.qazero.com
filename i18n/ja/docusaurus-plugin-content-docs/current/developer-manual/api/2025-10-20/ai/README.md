@@ -67,37 +67,57 @@ audience: ai
       "top": {
         "from":  ["allpv"],
         "keep":  ["allpv.url"],
-        "calc":  {"views": "COUNT(*)"},
-        "sort":  [{"column": "views", "direction": "desc"}]
+        "calc":  {"views": "COUNT(allpv.pv_id)"},
+        "sort":  {"by": "views", "order": "desc", "top": 5}
       }
     },
-    "result": {"use": "top", "limit": 5}
+    "result": {"use": "top"}
   }
 }
 ```
 
 これは指定期間のページビュー数上位5件の URL を返します。他のクエリの形は
-全てこの骨組みのバリエーションです — マテリアル、`keep` のカラム、`calc` の関数を
-変えるだけ。
+全てこの骨組みのバリエーションです — マテリアル、`keep` のカラム、`calc` の
+集計関数を変えるだけ。
+
+レスポンスの形は以下:
+
+```json
+{
+  "data": [ /* 行の配列 */ ],
+  "meta": { "total_count": 0, "returned_count": 0, "limit": 1000 }
+}
+```
+
+各句の正式な形は `qal-validation.yaml` を参照してください — この例は
+親しみやすい入り口であって、仕様書そのものではありません。
 
 ### 4.2 よくある間違い
 
-以下の4つで初回失敗のほぼ全てを説明できます。クエリが弾かれたら、まずここを
+以下の5つで初回失敗のほぼ全てを説明できます。クエリが弾かれたら、まずここを
 確認してください。
 
-1. **`from` は配列で、文字列ではない。** `"from": ["allpv"]` と書く。
+1. **POST ボディはクエリを `{"qal": ...}` でラップする必要がある。**
+   `/query` エンドポイントはトップレベルの `qal` フィールドからクエリを読む。
+   ラップせずに QAL 本体を直接ルートに置くとバリデーションが失敗する。
+2. **`from` は配列で、文字列ではない。** `"from": ["allpv"]` と書く。
    `"from": "allpv"` ではない。ソースが1つでも `[...]` でラップする。
-2. **`keep` のエントリは `<material>.<column>` の形で修飾する。**
+3. **`keep` のエントリは `<material>.<column>` の形で修飾する。**
    `"keep": ["allpv.url"]` と書く。`"keep": ["url"]` ではない。
    カラム名を裸で書くと `E_UNKNOWN_COLUMN` で拒否される。
-3. **`calc` の値は文字列式で、ネストしたオブジェクトではない。**
-   `"calc": {"views": "COUNT(*)"}` と書く。
-   `"calc": {"views": {"count": "*"}}` ではない。値は `COUNT(*)`,
-   `SUM(col)`, `AVERAGE(col)` のようなホワイトリスト関数呼び出し。
-4. **POST ボディはクエリを `{"qal": ...}` でラップする必要がある。**
-   `/query` エンドポイントはトップレベルの `qal` フィールドからクエリを読む。
-   ラップせずに QAL 本体を直接ルートに置くと、`from` 等がトップレベルキーとして
-   扱われてバリデーションが失敗する。
+4. **`calc` の値は `FUNC(material.column)` 形式の文字列式。**
+   `"calc": {"views": "COUNT(allpv.pv_id)"}` と書く。
+   `"calc": {"views": "COUNT(*)"}` も
+   `"calc": {"views": {"count": "*"}}` も無効。`*` はここでは有効な
+   カラム参照ではなく、実在のカラム名を指定する必要がある。許可された関数は
+   `qal-validation.yaml` に列挙されている (現在は `COUNT`, `COUNTUNIQUE`,
+   `SUM`, `AVERAGE`, `MIN`, `MAX`)。
+5. **`sort` はオブジェクトで、配列ではない。**
+   `"sort": {"by": "views", "order": "desc", "top": 5}` と書く。
+   `"sort": [{"column": "views", "direction": "desc"}]` ではない。
+   キーは `by` (必須、文字列)、`order` (`"asc"` か `"desc"`、必須)、
+   `top` (オプション、正の整数 — top-N クエリで行数を制限するには
+   `result.limit` の代わりにこれを使う)。
 
 ## 5. 守るべきルール
 
