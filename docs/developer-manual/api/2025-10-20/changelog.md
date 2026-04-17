@@ -2,13 +2,24 @@
 id: changelog-2025-10-20
 title: Update History
 sidebar_position: 6
-last_updated: 2026-04-14
-api_update: 2026-04-14
+last_updated: 2026-04-17
+api_update: 2026-04-17
 ---
 
 # Update History (2025-10-20)
 
 This is the **Update History** for API version `2025-10-20`: one living document per version, new entries on top. Each entry is tagged with the `api_update` date that the plugin will report in its `/guide` response. Read this top-to-bottom to see how the API has grown since the initial release, and match the most recent entry against your server's `api_update` to know which features are actually available to you.
+
+### 2026-04-17 — `api_update: 2026-04-17` — `allpv` page transition columns
+
+**Added:**
+- ✅ **`allpv.prev_page_id` / `allpv.next_page_id`** — two new physical columns (uint32) recording the page viewed immediately before and after each page view within the same session. Landing PVs have `prev_page_id = 0`; exit PVs have `next_page_id = 0`. Filter on these values to extract landing or exit page views in a single QAL query.
+- ✅ **`allpv.prev_url` / `allpv.prev_title` / `allpv.next_url` / `allpv.next_title`** — four virtual columns resolved from `prev_page_id` / `next_page_id` via the `qa_pages` master table. Use `keep` to include human-readable URLs and titles for the previous/next pages.
+- ✅ **`features.allpv_prev_next_page`** reported in `/guide` — clients can detect availability of the new columns by checking this feature flag. **Since:** 2026-04-17
+
+**Why this update is still non-breaking:**
+- All new columns are additive. Existing queries that do not reference `prev_page_id` / `next_page_id` are completely unaffected.
+- The new physical columns use `nullable: true, default: 0`, so date ranges predating this update return `0` (no transition data) rather than errors.
 
 ### 2026-04-14 — `api_update: 2026-04-14` — Developer Manual restructure + `features_detail` + `since`
 

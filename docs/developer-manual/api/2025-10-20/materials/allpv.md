@@ -61,6 +61,9 @@ are documented in [`ai/materials.yaml`](../ai/materials.yaml):
 - **Engagement depth**: `dead_click_image_count`, `scroll_back_count`,
   `content_skip_count`, `exploration_count`, `depth_position`,
   `exit_pos`.
+- **Page transition**: `prev_page_id`, `next_page_id` (physical IDs),
+  plus `prev_url`, `prev_title`, `next_url`, `next_title` (virtual,
+  resolved from `qa_pages`). **Since:** 2026-04-17
 - **Page type flags**: `is_article`, `is_product`, `is_list`,
   `is_form`, `is_top_page`, … — a whole family of boolean flags
   classifying what kind of page this is.

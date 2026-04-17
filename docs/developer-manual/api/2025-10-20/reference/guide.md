@@ -31,8 +31,8 @@ Authorization: Basic <base64 user:app_password>
 ```json
 {
   "version": "2025-10-20",
-  "api_update": "2026-04-14",
-  "timestamp": "2026-04-14T08:30:00Z",
+  "api_update": "2026-04-17",
+  "timestamp": "2026-04-17T08:30:00Z",
   "plugin_version": "3.0.0.0",
 
   "features": {
@@ -41,6 +41,7 @@ Authorization: Basic <base64 user:app_password>
     "calc":          true,
     "view_chaining": true,
     "sort":          true,
+    "allpv_prev_next_page": true,
     "sample":        false,
     "include_count": false,
     "return_file":   false,
