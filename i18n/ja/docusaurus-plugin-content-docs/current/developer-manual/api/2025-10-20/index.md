@@ -2,15 +2,15 @@
 id: version-2025-10-20
 title: Version 2025-10-20
 sidebar_position: 1
-last_updated: 2026-04-14
-api_update: 2026-04-14
+last_updated: 2026-04-17
+api_update: 2026-04-17
 ---
 
 # Version 2025-10-20
 
 :::info バージョン情報
 **API バージョン:** 2025-10-20  
-**API アップデート:** 2026-04-14  
+**API アップデート:** 2026-04-17  
 **必要なプラグインバージョン:** 3.0.0.0+  
 **ステータス:** 現行リリース
 
