@@ -1,13 +1,10 @@
 # QA ZERO v3.X Release Notes
 
-## 3.0.0.0 Release Information
+## 3.0.1.0 — 2026-02-24
 
-- **Product**: QA ZERO
-- **Version**: 3.0.0.0
-- **Release Date**: Nov 1, 2025
-- **Release Type**: Major
+- Improved heatmap rendering performance
+- Minor bug fixes
 
----
+## 3.0.0.0 — 2025-11-01
 
-### 📊 Overview
-REST API, MCP has opened.
+- REST API, MCP has opened
