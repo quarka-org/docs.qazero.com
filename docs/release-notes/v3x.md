@@ -1,5 +1,7 @@
 # QA ZERO v3.X Release Notes
 
+*The date shown is a reference. The actual timing may vary depending on the environment.*  
+
 ## 3.1.0.0 — 2026-04-16
 
 ### Improvements & Fixes
