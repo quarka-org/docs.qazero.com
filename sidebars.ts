@@ -187,10 +187,6 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: 'Release Notes',
-      link: {
-        type: 'doc',
-        id: 'release-notes/v3x',
-      },
       items: [
         'release-notes/v3x',
         'release-notes/v2x',
