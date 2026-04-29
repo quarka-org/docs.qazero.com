@@ -32,6 +32,14 @@ The authoritative column list for every material lives in
 **[`ai/materials.yaml`](../ai/materials.yaml)**. The pages here are
 friendly previews; the YAML is the source of truth.
 
+Each material in the YAML also carries a `supports_all: true | false`
+flag declaring whether it accepts `tracking_id: "all"` (the cross-site
+aggregate). Roughly: traffic-shaped materials (`allpv`, `click_event`,
+`datalayer_event`, `events.{name}`) are `true`; per-site analytical
+materials (`gsc`, `goal_N`, `page_version`, `ga4_*`) are `false`. See
+the [`/guide` reference](../reference/guide.md) for how to read the
+flag at runtime. **Since:** 2026-04-29
+
 ## About the sample tables
 
 Every material page includes a small, hand-crafted sample table with

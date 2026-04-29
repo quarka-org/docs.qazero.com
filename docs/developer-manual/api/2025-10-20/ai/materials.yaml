@@ -1,6 +1,6 @@
 id: materials-manifest
 version: "2025-10-20"
-update: "2026-04-14"
+update: "2026-04-29"
 Plugin version:
   QA ZERO: "3.0.0.0"
   QA Assistants: "5.0.0.0"
@@ -48,6 +48,7 @@ types:
 materials:
   allpv:
     dataset_id: 1
+    supports_all: true
     decoders:
       - loader: "file_functions.view_pv"
         decoder: null
@@ -266,6 +267,46 @@ materials:
             status: dev
             search_hint:
               note: "探索行動回数。5秒以内にマウスが200px以上横移動で2回折り返した回数。gte:1でクリック対象を探している行動。dead_click_image_countと組み合わせてUI迷子分析に使う"
+
+          # --- 遷移カラム: prev/next ページID ---
+          - material_column: "prev_page_id"
+            physical_column: "prev_page_id"
+            type: uint32
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "前ページID。ランディングPV（セッション最初）は0。prev_page_id=0でLP抽出。group_byで流入元分析"
+          - material_column: "next_page_id"
+            physical_column: "next_page_id"
+            type: uint32
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "次ページID。離脱PV（セッション最後）は0。next_page_id=0で離脱PV抽出。group_byで遷移先分析"
+
+          # --- 遷移カラム: prev/next マスター参照 ---
+          - material_column: "prev_url"
+            physical_column: "prev_url"
+            resolve_via: "prev_page_id"
+            search_hint:
+              note: "前ページURL。prev_page_idからqa_pagesで解決。ランディングPVはnull"
+          - material_column: "prev_title"
+            physical_column: "prev_title"
+            resolve_via: "prev_page_id"
+            search_hint:
+              note: "前ページタイトル。prev_page_idからqa_pagesで解決。ランディングPVはnull"
+          - material_column: "next_url"
+            physical_column: "next_url"
+            resolve_via: "next_page_id"
+            search_hint:
+              note: "次ページURL。next_page_idからqa_pagesで解決。離脱PVはnull"
+          - material_column: "next_title"
+            physical_column: "next_title"
+            resolve_via: "next_page_id"
+            search_hint:
+              note: "次ページタイトル。next_page_idからqa_pagesで解決。離脱PVはnull"
 
           # --- マスター参照カラム（type指定なし = DBから取得） ---
           - material_column: "url"
@@ -648,6 +689,7 @@ materials:
 
   click_event:
     dataset_id: 2
+    supports_all: true
     decoders:
       - loader: null
         decoder: null
@@ -731,6 +773,7 @@ materials:
 
   datalayer_event:
     dataset_id: 3
+    supports_all: true
     decoders:
       - loader: null
         decoder: null
@@ -765,6 +808,7 @@ materials:
   # Layer 2: serialize表配列。カラムはイベントごとに動的に定義される。
   # pv_id, session_id は全イベント共通の固定カラム。
   events_template:
+    supports_all: true
     decoders:
       - loader: null
         decoder: null
@@ -778,6 +822,7 @@ materials:
 
   gsc:
     dataset_id: 4
+    supports_all: false
     decoders:
       - loader: "column_db.gsc"
         decoder: null
@@ -880,6 +925,7 @@ materials:
   # GA4属性データ（T48）
   ga4_age_gender:
     dataset_id: 8
+    supports_all: false
     decoders:
       - loader: "column_db.ga4_age_gender"
         decoder: null
@@ -924,6 +970,7 @@ materials:
 
   ga4_country:
     dataset_id: 9
+    supports_all: false
     decoders:
       - loader: "column_db.ga4_country"
         decoder: null
@@ -955,6 +1002,7 @@ materials:
 
   ga4_region:
     dataset_id: 10
+    supports_all: false
     decoders:
       - loader: "column_db.ga4_region"
         decoder: null
@@ -986,6 +1034,7 @@ materials:
 
   # goal_x: ゴール設定用テンプレート（goal_1, goal_2, ... として使用）
   goal_x:
+    supports_all: false
     decoders:
       - loader: "file_functions.get_goal_data_by_number"
         decoder: null
@@ -1055,6 +1104,7 @@ materials:
 
   page_version:
     dataset_id: 5
+    supports_all: false
     decoders:
       - loader: null
         decoder: null

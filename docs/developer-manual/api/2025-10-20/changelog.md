@@ -2,13 +2,24 @@
 id: changelog-2025-10-20
 title: Update History
 sidebar_position: 6
-last_updated: 2026-04-17
-api_update: 2026-04-17
+last_updated: 2026-04-29
+api_update: 2026-04-29
 ---
 
 # Update History (2025-10-20)
 
 This is the **Update History** for API version `2025-10-20`: one living document per version, new entries on top. Each entry is tagged with the `api_update` date that the plugin will report in its `/guide` response. Read this top-to-bottom to see how the API has grown since the initial release, and match the most recent entry against your server's `api_update` to know which features are actually available to you.
+
+### 2026-04-29 — `api_update: 2026-04-29` — `materials.supports_all` flag
+
+**Added:**
+- ✅ **`materials.{name}.supports_all: true | false`** in [`materials.yaml`](./ai/materials.yaml) — every material now declares whether it can be queried with `tracking_id: "all"` (the cross-site aggregate built nightly). Currently `true` for `allpv`, `click_event`, `datalayer_event`, `events_template`; `false` for `gsc`, `goal_x`, `page_version`, `ga4_*`. AI clients and admin UIs should read this flag before offering "all sites" as a tracking_id choice for a given material.
+- ✅ **`features.materials_supports_all`** reported in `/guide` — clients can detect availability of the new flag by checking this feature flag. Older servers may omit `supports_all` from individual materials; treat its absence as "unknown — try and handle errors." **Since:** 2026-04-29
+- ✅ **Synced `ai/materials.yaml` and `ai/qal-validation.yaml`** with the qa-labo source for both this update and the prior 2026-04-17 update — the AI-served YAML now reflects the `prev_page_id` / `next_page_id` / `prev_url` / `prev_title` / `next_url` / `next_title` columns and the `allpv_prev_next_page` feature flag that were added on 2026-04-17. The human-readable `materials/allpv.md` and the `/guide` reference example were already correct; only the AI-facing YAML lagged behind.
+
+**Why this update is still non-breaking:**
+- The `supports_all` flag is purely additive metadata. Existing queries — including ones that pass `tracking_id: "all"` to materials that turn out to be `supports_all: false` — behave exactly as before (still return their pre-existing error / empty result).
+- The qa-labo runtime continues to enforce `tracking_id` semantics; the flag only documents the existing behavior so AI clients can decide before sending the query.
 
 ### 2026-04-17 — `api_update: 2026-04-17` — `allpv` page transition columns
 

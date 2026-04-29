@@ -31,8 +31,8 @@ Authorization: Basic <base64 user:app_password>
 ```json
 {
   "version": "2025-10-20",
-  "api_update": "2026-04-17",
-  "timestamp": "2026-04-17T08:30:00Z",
+  "api_update": "2026-04-29",
+  "timestamp": "2026-04-29T08:30:00Z",
   "plugin_version": "3.0.0.0",
 
   "features": {
@@ -42,6 +42,7 @@ Authorization: Basic <base64 user:app_password>
     "view_chaining": true,
     "sort":          true,
     "allpv_prev_next_page": true,
+    "materials_supports_all": true,
     "sample":        false,
     "include_count": false,
     "return_file":   false,
@@ -50,16 +51,18 @@ Authorization: Basic <base64 user:app_password>
   },
 
   "features_detail": {
-    "filter":        { "enabled": true,  "since": "2025-10-20" },
-    "join":          { "enabled": true,  "since": "2025-10-20" },
-    "calc":          { "enabled": true,  "since": "2025-10-20" },
-    "view_chaining": { "enabled": true,  "since": "2025-10-20" },
-    "sort":          { "enabled": true,  "since": "2025-10-20" },
-    "sample":        { "enabled": false },
-    "include_count": { "enabled": false },
-    "return_file":   { "enabled": false },
-    "return_csv":    { "enabled": false },
-    "return_parquet":{ "enabled": false }
+    "filter":                { "enabled": true,  "since": "2025-10-20" },
+    "join":                  { "enabled": true,  "since": "2025-10-20" },
+    "calc":                  { "enabled": true,  "since": "2025-10-20" },
+    "view_chaining":         { "enabled": true,  "since": "2025-10-20" },
+    "sort":                  { "enabled": true,  "since": "2025-10-20" },
+    "allpv_prev_next_page":  { "enabled": true,  "since": "2026-04-17" },
+    "materials_supports_all":{ "enabled": true,  "since": "2026-04-29" },
+    "sample":                { "enabled": false },
+    "include_count":         { "enabled": false },
+    "return_file":           { "enabled": false },
+    "return_csv":            { "enabled": false },
+    "return_parquet":        { "enabled": false }
   },
 
   "sites": [
@@ -124,6 +127,37 @@ Authorization: Basic <base64 user:app_password>
 | `sites[]`               | One entry per tracking_id the authenticated user can access.           |
 | `sites[].goals[]`       | Per-site goal definitions — the mapping from `goal_N` material to the goal it represents. |
 | `documentation.sections`| Live spec served to AI clients. `README.md` is markdown; the two `.yaml` files are the authoritative schema. |
+
+### `supports_all` flag on each material
+
+Each material in [`materials.yaml`](../ai/materials.yaml) carries a
+`supports_all: true | false` flag declaring whether the material is
+queryable with `tracking_id: "all"` (the cross-site aggregate). Read
+this from the `materials.yaml` block inside `documentation.sections`
+when deciding which materials to surface to a user picking the
+all-sites scope. **Since:** 2026-04-29
+
+```yaml
+materials:
+  allpv:
+    dataset_id: 1
+    supports_all: true     # cross-site aggregate is built nightly
+    decoders: ...
+  click_event:
+    dataset_id: 2
+    supports_all: true
+    decoders: ...
+  gsc:
+    dataset_id: 4
+    supports_all: false    # per-site only — needs a real tracking_id
+    decoders: ...
+```
+
+Servers reporting `features.materials_supports_all = true` (i.e.
+`api_update >= 2026-04-29`) are guaranteed to populate `supports_all`
+on every material. Older servers may omit the flag entirely; in that
+case treat its absence as "unknown — try the query and handle the
+error."
 
 ## Caching
 
