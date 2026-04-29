@@ -20,6 +20,8 @@ sidebar_position: 1
 
 すべてのマテリアルの正式なカラム一覧は **[`ai/materials.yaml`](../ai/materials.yaml)** にあります。ここのページは親しみやすいプレビューで、正本は YAML です。
 
+YAML 内の各マテリアルには、そのマテリアルが `tracking_id: "all"`（全サイト集約）を受け付けるかどうかを宣言する `supports_all: true | false` フラグも付いています。おおまかには、トラフィック系マテリアル (`allpv`, `click_event`, `datalayer_event`, `events.{name}`) は `true`、サイト別専用の分析マテリアル (`gsc`, `goal_N`, `page_version`, `ga4_*`) は `false` です。実行時にどう読むかは [`/guide` リファレンス](../reference/guide.md) を参照してください。**Since:** 2026-04-29
+
 ## サンプル表について
 
 各マテリアルページには、現実的な行を手作りしたサンプル表があります。意図的に **3つの ID カラム** — `page_id`, `session_id`, `pv_id` — だけを出しています。これらが JOIN に一番使う鍵だからです。実際のマテリアルは event_id, page_version_id などの追加 ID も持っていますが、YAML 仕様書で追えるので、サンプル表からは外して、データの形が一目で分かるようにしています。

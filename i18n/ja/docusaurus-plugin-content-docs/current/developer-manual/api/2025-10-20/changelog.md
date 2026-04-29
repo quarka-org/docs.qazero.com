@@ -2,13 +2,24 @@
 id: changelog-2025-10-20
 title: アップデート履歴
 sidebar_position: 6
-last_updated: 2026-04-17
-api_update: 2026-04-17
+last_updated: 2026-04-29
+api_update: 2026-04-29
 ---
 
 # アップデート履歴 (2025-10-20)
 
 これは API バージョン `2025-10-20` の **アップデート履歴** です。バージョンごとに 1 つのリビングドキュメントを持ち、新しいエントリーを最上部に追加していきます。各エントリーには、プラグインが `/guide` レスポンスで返す `api_update` の日付をタグ付けしています。上から下へ読むことで、初回リリース以降の API の成長を追うことができ、最新エントリーをお使いのサーバーの `api_update` と突き合わせれば、実際にどの機能が利用可能かを把握できます。
+
+### 2026-04-29 — `api_update: 2026-04-29` — `materials.supports_all` フラグ
+
+**追加:**
+- ✅ **`materials.{name}.supports_all: true | false`** を [`materials.yaml`](./ai/materials.yaml) に追加 — すべてのマテリアルが、`tracking_id: "all"`（夜間バッチで生成される全サイト集約）でクエリできるかどうかを宣言するようになりました。現時点で `true` は `allpv`, `click_event`, `datalayer_event`, `events_template`、`false` は `gsc`, `goal_x`, `page_version`, `ga4_*` です。AI クライアントや管理画面 UI は、特定のマテリアルに対して "全サイト" を tracking_id の選択肢として提示する前に、このフラグを必ず参照してください。
+- ✅ **`features.materials_supports_all`** を `/guide` で返すようになりました — クライアントはこの機能フラグを確認することで、新フラグの可用性を検出できます。旧バージョンのサーバーは個別マテリアルの `supports_all` を省略する可能性があります。フラグ非存在時は「不明 — クエリを投げてエラーで判定する」扱いにしてください。**Since:** 2026-04-29
+- ✅ **`ai/materials.yaml` と `ai/qal-validation.yaml` を qa-labo ソースと同期** — 今回のアップデートだけでなく、直前の 2026-04-17 アップデートぶんも反映しました。AI に配信される YAML が、2026-04-17 で追加された `prev_page_id` / `next_page_id` / `prev_url` / `prev_title` / `next_url` / `next_title` カラムと `allpv_prev_next_page` 機能フラグを反映するようになっています。人間向けの `materials/allpv.md` と `/guide` リファレンス例はすでに正しい状態でしたが、AI 向け YAML だけが追従できていませんでした。
+
+**このアップデートが非破壊である理由:**
+- `supports_all` フラグは純粋な追加メタデータです。既存のクエリ — `supports_all: false` のマテリアルに `tracking_id: "all"` を渡すクエリも含めて — は従前と全く同じ動作になります（従来どおりエラーまたは空結果を返します）。
+- qa-labo ランタイムは引き続き `tracking_id` のセマンティクスを強制します。本フラグはあくまで既存の振る舞いを文書化するだけなので、AI クライアントはクエリを投げる前に判定できるようになります。
 
 ### 2026-04-17 — `api_update: 2026-04-17` — `allpv` ページ遷移カラム
 

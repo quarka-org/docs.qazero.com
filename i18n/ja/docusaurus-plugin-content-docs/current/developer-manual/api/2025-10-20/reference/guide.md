@@ -26,8 +26,8 @@ Authorization: Basic <base64 user:app_password>
 ```json
 {
   "version": "2025-10-20",
-  "api_update": "2026-04-17",
-  "timestamp": "2026-04-17T08:30:00Z",
+  "api_update": "2026-04-29",
+  "timestamp": "2026-04-29T08:30:00Z",
   "plugin_version": "3.0.0.0",
 
   "features": {
@@ -37,6 +37,7 @@ Authorization: Basic <base64 user:app_password>
     "view_chaining": true,
     "sort":          true,
     "allpv_prev_next_page": true,
+    "materials_supports_all": true,
     "sample":        false,
     "include_count": false,
     "return_file":   false,
@@ -45,16 +46,18 @@ Authorization: Basic <base64 user:app_password>
   },
 
   "features_detail": {
-    "filter":        { "enabled": true,  "since": "2025-10-20" },
-    "join":          { "enabled": true,  "since": "2025-10-20" },
-    "calc":          { "enabled": true,  "since": "2025-10-20" },
-    "view_chaining": { "enabled": true,  "since": "2025-10-20" },
-    "sort":          { "enabled": true,  "since": "2025-10-20" },
-    "sample":        { "enabled": false },
-    "include_count": { "enabled": false },
-    "return_file":   { "enabled": false },
-    "return_csv":    { "enabled": false },
-    "return_parquet":{ "enabled": false }
+    "filter":                { "enabled": true,  "since": "2025-10-20" },
+    "join":                  { "enabled": true,  "since": "2025-10-20" },
+    "calc":                  { "enabled": true,  "since": "2025-10-20" },
+    "view_chaining":         { "enabled": true,  "since": "2025-10-20" },
+    "sort":                  { "enabled": true,  "since": "2025-10-20" },
+    "allpv_prev_next_page":  { "enabled": true,  "since": "2026-04-17" },
+    "materials_supports_all":{ "enabled": true,  "since": "2026-04-29" },
+    "sample":                { "enabled": false },
+    "include_count":         { "enabled": false },
+    "return_file":           { "enabled": false },
+    "return_csv":            { "enabled": false },
+    "return_parquet":        { "enabled": false }
   },
 
   "sites": [
@@ -119,6 +122,28 @@ Authorization: Basic <base64 user:app_password>
 | `sites[]`               | 認証ユーザーがアクセスできる tracking_id ごとのエントリ                 |
 | `sites[].goals[]`       | サイトごとのゴール定義 — `goal_N` マテリアルがどのゴールを意味するかのマッピング |
 | `documentation.sections`| AI クライアントに配信される現行仕様。`README.md` は markdown、2本の `.yaml` は正式なスキーマ |
+
+### 各マテリアルの `supports_all` フラグ
+
+[`materials.yaml`](../ai/materials.yaml) 内の各マテリアルには、そのマテリアルが `tracking_id: "all"`（全サイト集約）でクエリできるかどうかを宣言する `supports_all: true | false` フラグが付いています。ユーザーに「全サイト」スコープを選ばせる場面で、どのマテリアルを提示するか判断するときは、`documentation.sections` 内の `materials.yaml` ブロックからこのフラグを読み取ってください。**Since:** 2026-04-29
+
+```yaml
+materials:
+  allpv:
+    dataset_id: 1
+    supports_all: true     # 全サイト集約は夜間バッチで生成される
+    decoders: ...
+  click_event:
+    dataset_id: 2
+    supports_all: true
+    decoders: ...
+  gsc:
+    dataset_id: 4
+    supports_all: false    # サイト別専用 — 実在の tracking_id が必須
+    decoders: ...
+```
+
+`features.materials_supports_all = true` を返すサーバー（つまり `api_update >= 2026-04-29`）は、すべてのマテリアルに `supports_all` を設定することが保証されます。旧バージョンのサーバーはフラグを完全に省略する可能性があります。フラグ非存在時は「不明 — クエリを投げてエラーで判定する」扱いにしてください。
 
 ## キャッシュ
 
