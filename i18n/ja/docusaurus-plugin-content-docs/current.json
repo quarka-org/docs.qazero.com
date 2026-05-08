@@ -42,9 +42,5 @@
   "sidebar.releaseNotesSidebar.category.Release Notes": {
     "message": "Release Notes",
     "description": "The label for category Release Notes in sidebar releaseNotesSidebar"
-  },
-  "sidebar.faqSidebar.category.FAQ": {
-    "message": "FAQ",
-    "description": "The label for category FAQ in sidebar faqSidebar"
   }
 }

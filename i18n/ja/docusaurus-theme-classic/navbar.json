@@ -19,10 +19,6 @@
     "message": "Release Notes",
     "description": "Navbar item with label Release Notes"
   },
-  "item.label.FAQ": {
-    "message": "FAQ",
-    "description": "Navbar item with label FAQ"
-  },
   "item.label.Blog": {
     "message": "Blog",
     "description": "Navbar item with label Blog"

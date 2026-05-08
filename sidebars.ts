@@ -194,20 +194,6 @@ const sidebars: SidebarsConfig = {
       ],
     },
   ],
-
-  faqSidebar: [
-    {
-      type: 'category',
-      label: 'FAQ',
-      link: {
-        type: 'doc',
-        id: 'faq/general',
-      },
-      items: [
-        'faq/general',
-      ],
-    },
-  ],
 };
 
 export default sidebars;
