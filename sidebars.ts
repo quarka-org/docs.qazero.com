@@ -70,6 +70,7 @@ const sidebars: SidebarsConfig = {
             'user-manual/support/faq-heatmap-data',
             'user-manual/support/faq-tsv-report-fields',
             'user-manual/support/troubleshooting',
+            'user-manual/support/observed-behaviors',
           ],
         },
         {
@@ -190,20 +191,6 @@ const sidebars: SidebarsConfig = {
       items: [
         'release-notes/v3x',
         'release-notes/v2x',
-      ],
-    },
-  ],
-
-  faqSidebar: [
-    {
-      type: 'category',
-      label: 'FAQ',
-      link: {
-        type: 'doc',
-        id: 'faq/general',
-      },
-      items: [
-        'faq/general',
       ],
     },
   ],

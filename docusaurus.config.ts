@@ -145,12 +145,6 @@ const config: Config = {
           position: 'left',
           label: 'Release Notes',
         },
-        {
-          type: 'docSidebar',
-          sidebarId: 'faqSidebar',
-          position: 'left',
-          label: 'FAQ',
-        },
         {to: '/blog', label: 'Blog', position: 'left'},
         {
           type: 'localeDropdown',
@@ -181,10 +175,6 @@ const config: Config = {
             {
               label: 'Release Notes',
               to: '/docs/release-notes/v3x',
-            },
-            {
-              label: 'FAQ',
-              to: '/docs/faq/general',
             },
           ],
         },
