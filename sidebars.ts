@@ -70,6 +70,7 @@ const sidebars: SidebarsConfig = {
             'user-manual/support/faq-heatmap-data',
             'user-manual/support/faq-tsv-report-fields',
             'user-manual/support/troubleshooting',
+            'user-manual/support/observed-behaviors',
           ],
         },
         {
