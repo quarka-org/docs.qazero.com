@@ -2,7 +2,7 @@
 id: api-compatibility
 title: API 互換性
 sidebar_position: 2
-last_updated: 2025-10-06
+last_updated: 2026-05-11
 ---
 
 # API バージョン互換性
@@ -20,16 +20,33 @@ last_updated: 2025-10-06
 
 | プラグインバージョン | 互換性のある API バージョン | ステータス | 備考 |
 |----------------|------------------------|--------|-------|
-| **3.0.0.0+** | 2025-10-20 | ✅ Current | 全機能サポート |
+| **3.0.0.0+** | 2026-05-11, 2025-10-20 | ✅ Current | 両バージョンとも同じプラグインで提供。`?version=` で選択 |
 | 2.x.x.x | - | ❌ Unsupported | API 利用不可 |
+
+---
+
+## Version 2026-05-11
+
+**最小プラグインバージョン:** `3.0.0.0`
+**リリース日:** 2026-05-11
+**ステータス:** Current Release
+
+### 2025-10-20 からの変更点
+
+- **破壊的変更:** `calc` 内の `join.with` 側の `material.column` 参照が、`from` 側と同じく fetch + preserve のトリガーになりました。`click_event` を join 対象としたときに 0 を返していた `COUNT(click_event.pv_id)` のような集計が、正しいカウントを返すようになります。
+- **新エラー:** `E_CALC_COLUMN_UNRESOLVED` — ビューのスコープに存在しないマテリアルや、マテリアルのスキーマに存在しない列を `calc` から参照するクエリが、サイレントに 0 行を返す代わりにバリデーション時に失敗します。
+- **新エラー詳細:** `E_INVALID_JOIN` のレスポンスに `details.side`、`details.received_value`、`details.expected_prefix`、`details.hint` が乗るようになり、AI の修復ループが推測せずにどちら側を直すべきか分かるようになります。
+- **新しい機能フラグ:** `features_detail.calc_join_symmetric`（since `2026-05-11`）。
+
+join 側 `calc` に依存していない既存のクライアントコードは、両バージョンに対して同じく動作します。新挙動が欲しい場合は `?version=2026-05-11` を明示してください。移行は不要です。
 
 ---
 
 ## Version 2025-10-20
 
-**最小プラグインバージョン:** `3.0.0.0`  
-**リリース日:** 2025-10-20  
-**ステータス:** Current Release
+**最小プラグインバージョン:** `3.0.0.0`
+**リリース日:** 2025-10-20
+**ステータス:** Previous（引き続きサポート）
 
 ### プラグイン要件
 
@@ -60,13 +77,13 @@ last_updated: 2025-10-06
 
 ```bash
 curl -u "username:password" \
-  "https://your-site.com/wp-json/qa-platform/guide?version=2025-10-20"
+  "https://your-site.com/wp-json/qa-platform/guide?version=2026-05-11"
 ```
 
 レスポンスには以下が含まれます。
 ```json
 {
-  "version": "2025-10-20",
+  "version": "2026-05-11",
   "plugin_version": "3.0.0.0",
   ...
 }
@@ -175,7 +192,8 @@ curl -u "username:password" \
 
 | プラグインバージョン | API バージョン | リリース日 | ステータス |
 |----------------|--------------|--------------|---------|
-| 3.0.0.0 | 2025-10-20 | 2025-10-20 | Current |
+| 3.0.0.0 | 2026-05-11, 2025-10-20 | 2026-05-11（最新の version bump） | Current |
+| 3.0.0.0 | 2025-10-20 | 2025-10-20 | 初期リリース |
 
 ---
 

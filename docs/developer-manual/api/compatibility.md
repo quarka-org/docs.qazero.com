@@ -2,7 +2,7 @@
 id: api-compatibility
 title: API Compatibility
 sidebar_position: 2
-last_updated: 2025-10-06
+last_updated: 2026-05-11
 ---
 
 # API Version Compatibility
@@ -20,16 +20,35 @@ Or call the `/guide` endpoint to see your `plugin_version`.
 
 | Plugin Version | Compatible API Versions | Status | Notes |
 |----------------|------------------------|--------|-------|
-| **3.0.0.0+** | 2025-10-20 | ✅ Current | Full feature support |
+| **3.0.0.0+** | 2026-05-11, 2025-10-20 | ✅ Current | Both versions ship in the same plugin; pick via `?version=` |
 | 2.x.x.x | - | ❌ Unsupported | API not available |
+
+---
+
+## Version 2026-05-11
+
+**Minimum Plugin Version:** `3.0.0.0`
+**Released:** 2026-05-11
+**Status:** Current Release
+
+### What changed vs. 2025-10-20
+
+- **Breaking:** `calc` `material.column` references on the `join.with` side now trigger fetch + preserve, matching the `from`-side behavior. Aggregates like `COUNT(click_event.pv_id)` that previously returned 0 when `click_event` was the join target now return correct counts.
+- **New error:** `E_CALC_COLUMN_UNRESOLVED` — `calc` expressions referencing a material outside the view's scope, or a column that does not exist in the material's schema, now fail at validation instead of silently producing 0 rows.
+- **New error details:** `E_INVALID_JOIN` responses include `details.side`, `details.received_value`, `details.expected_prefix`, and `details.hint` so AI repair loops can fix the offending side without guessing.
+- **New feature flag:** `features_detail.calc_join_symmetric` (since `2026-05-11`).
+
+Existing client code that does **not** rely on join-side `calc` reads
+identically against both versions. No migration is required for those
+clients — pin `?version=2026-05-11` when you want the new behavior.
 
 ---
 
 ## Version 2025-10-20
 
-**Minimum Plugin Version:** `3.0.0.0`  
-**Released:** 2025-10-20  
-**Status:** Current Release
+**Minimum Plugin Version:** `3.0.0.0`
+**Released:** 2025-10-20
+**Status:** Previous (still supported)
 
 ### Plugin Requirements
 
@@ -60,13 +79,13 @@ Or call the `/guide` endpoint to see your `plugin_version`.
 
 ```bash
 curl -u "username:password" \
-  "https://your-site.com/wp-json/qa-platform/guide?version=2025-10-20"
+  "https://your-site.com/wp-json/qa-platform/guide?version=2026-05-11"
 ```
 
 Response includes:
 ```json
 {
-  "version": "2025-10-20",
+  "version": "2026-05-11",
   "plugin_version": "3.0.0.0",
   ...
 }
@@ -175,7 +194,8 @@ Features currently under consideration:
 
 | Plugin Version | API Versions | Release Date | Status |
 |----------------|--------------|--------------|---------|
-| 3.0.0.0 | 2025-10-20 | 2025-10-20 | Current |
+| 3.0.0.0 | 2026-05-11, 2025-10-20 | 2026-05-11 (latest version bump) | Current |
+| 3.0.0.0 | 2025-10-20 | 2025-10-20 | Initial release |
 
 ---
 

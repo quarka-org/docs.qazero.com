@@ -48,7 +48,7 @@ GitHub のアプローチに倣い、API の自然な進化を表現するため
 任意のエンドポイントに `version` クエリパラメーターを追加します。
 
 ```
-GET /qa-platform/guide?version=2025-10-20
+GET /qa-platform/guide?version=2026-05-11
 ```
 
 ### デフォルトの挙動（QA ZERO）
@@ -58,7 +58,8 @@ GET /qa-platform/guide?version=2025-10-20
 **例:**
 ```
 GET /qa-platform/query
-# 最も古い安定バージョンを使用します（現在は 2025-10-20）
+# 最も古い安定バージョンを使用します（現在は 2025-10-20）。
+# 現行リリースを明示的に選ぶ場合は ?version=2026-05-11 を指定してください。
 ```
 
 **なぜ最も古いバージョンなのか？** QA ZERO はシステム連携のための信頼できるデータウェアハウスとして機能し、新機能よりも安定性を優先します。
@@ -67,10 +68,29 @@ GET /qa-platform/query
 
 ## 利用可能なバージョン
 
-### 2025-10-20（Current）
+### 2026-05-11（Current）
 
-**ステータス:** ✅ Released  
-**必要なプラグインバージョン:** 3.0.0.0+  
+**ステータス:** ✅ Released
+**必要なプラグインバージョン:** 3.0.0.0+
+**サポート期限:** 2028-05-11（最低）
+
+**2025-10-20 からの変更（破壊的変更）:**
+- calc 列宣言の対称化 — `calc` 式の中の `material.column` 参照は、`from` 側でも `join.with` 側でも fetch + preserve のトリガーになります。join 側 calc がサイレントに 0 を返していたバグが解消されます。
+- 新しいバリデータエラー `E_CALC_COLUMN_UNRESOLVED` が、不正な calc 参照をサイレントに 0 行を返す代わりにバリデーション時に拒否します。
+- `E_INVALID_JOIN` が構造化 `details`（`side`、`received_value`、`expected_prefix`、`hint`）を返し、`on.left` / `on.right` のピンポイント・スコープルールを強制します。
+
+**ドキュメント:** [Version 2026-05-11 →](./2026-05-11/)
+
+**適したユースケース:**
+- 新規連携、および join 側 calc 参照を含むクエリを組み立てるすべてのクライアント。
+- 修復ループのためにクリーンなバリデーションシグナルを必要とする AI 駆動のクライアント。
+
+---
+
+### 2025-10-20（Previous、サポート継続中）
+
+**ステータス:** ⚠️ Stable（引き続きサポート）
+**必要なプラグインバージョン:** 3.0.0.0+
 **サポート期限:** 2027-10-20（最低）
 
 **機能:**
@@ -81,11 +101,9 @@ GET /qa-platform/query
 **ドキュメント:** [Version 2025-10-20 →](./2025-10-20/)
 
 **適したユースケース:**
-- QA ZERO API のはじめての利用
-- シンプルなページビューのクエリ
-- SEO キーワード分析
-- QAL の基本の学習
-QR
+- 対称 join 側 calc を必要としない既存の連携。
+- `2026-05-11` への移行が都合の良いタイミングまで使用 — 強制アップグレードはありません。
+
 ---
 
 ## クイックスタート
@@ -104,7 +122,7 @@ WordPress でアプリケーションパスワードを作成します。
 
 ```bash
 curl -u "username:your_app_password" \
-  "https://your-site.com/wp-json/qa-platform/guide?version=2025-10-20"
+  "https://your-site.com/wp-json/qa-platform/guide?version=2026-05-11"
 ```
 
 ### 3. 最初のクエリの実行
@@ -132,22 +150,21 @@ curl -X POST \
       "limit": 10
     }
   }' \
-  "https://your-site.com/wp-json/qa-platform/query?version=2025-10-20"
+  "https://your-site.com/wp-json/qa-platform/query?version=2026-05-11"
 ```
 
 ---
 
 ## バージョン比較
 
-| 機能 | 2025-10-20 |
-|---------|------------|
-| **マテリアル** | `allpv`, `gsc` |
-| **QAL - make** | `from`, `keep` のみ |
-| **QAL - filter** | ❌ 未サポート |
-| **QAL - join** | ❌ 未サポート |
-| **QAL - calc** | ❌ 未サポート |
-| **result オプション** | `limit`, `count_only` |
-| **返却フォーマット** | JSON のみ |
+| 機能                                              | 2025-10-20                       | 2026-05-11                                        |
+|--------------------------------------------------|----------------------------------|---------------------------------------------------|
+| **QAL — `filter` / `join` / `calc` / `sort`**    | ✅ サポート                        | ✅ サポート（変更なし）                              |
+| **`calc` — `from` 側の `material.column`**       | ✅ 自動 fetch + 集計              | ✅ 自動 fetch + 集計（変更なし）                    |
+| **`calc` — `join.with` 側の `material.column`** | ⚠️ サイレント 0 行バグ           | ✅ `from` 側と対称、正しいカウント                  |
+| **不正な `calc` 参照**                            | ⚠️ サイレントに 0 行              | ✅ バリデーション時に拒否（`E_CALC_COLUMN_UNRESOLVED`） |
+| **`E_INVALID_JOIN` の形**                         | `code` + `message` + `at`        | + `details.{side, received_value, expected_prefix, hint}` |
+| **`features_detail.calc_join_symmetric`**         | 非存在                           | `{ enabled: true, since: "2026-05-11" }`          |
 
 ---
 
@@ -157,7 +174,7 @@ curl -X POST \
 
 新しいバージョンがリリースされても、既存のクエリはそのまま動作し続けます。
 
-1. **既存のクエリ**: `?version=2025-10-20` を使い続けます
+1. **既存のクエリ**: `?version=2026-05-11` を使い続けます
 2. **新機能**: 新しいバージョンパラメーターでテストします
 3. **段階的な移行**: クエリを 1 つずつ更新していきます
 4. **強制アップグレードなし**: 古いバージョンは 24 ヶ月以上サポートされます

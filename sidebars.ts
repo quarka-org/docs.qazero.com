@@ -125,7 +125,59 @@ const sidebars: SidebarsConfig = {
             'developer-manual/api/api-overview',
             {
               type: 'category',
-              label: 'Version 2025-10-20',
+              label: 'Version 2026-05-11 (Current)',
+              link: {
+                type: 'doc',
+                id: 'developer-manual/api/2026-05-11/version-2026-05-11',
+              },
+              items: [
+                {
+                  type: 'category',
+                  label: 'Materials',
+                  link: {
+                    type: 'doc',
+                    id: 'developer-manual/api/2026-05-11/materials/materials-index-2026-05-11',
+                  },
+                  items: [
+                    'developer-manual/api/2026-05-11/materials/material-allpv-2026-05-11',
+                    'developer-manual/api/2026-05-11/materials/material-click-event-2026-05-11',
+                    'developer-manual/api/2026-05-11/materials/material-gsc-2026-05-11',
+                    'developer-manual/api/2026-05-11/materials/material-goal-n-2026-05-11',
+                    'developer-manual/api/2026-05-11/materials/material-page-version-2026-05-11',
+                  ],
+                },
+                {
+                  type: 'category',
+                  label: 'API Reference',
+                  link: {
+                    type: 'doc',
+                    id: 'developer-manual/api/2026-05-11/reference/reference-index-2026-05-11',
+                  },
+                  items: [
+                    'developer-manual/api/2026-05-11/reference/reference-authentication-2026-05-11',
+                    'developer-manual/api/2026-05-11/reference/reference-guide-2026-05-11',
+                    'developer-manual/api/2026-05-11/reference/reference-query-2026-05-11',
+                    'developer-manual/api/2026-05-11/reference/reference-errors-2026-05-11',
+                    'developer-manual/api/2026-05-11/reference/reference-examples-2026-05-11',
+                  ],
+                },
+                {
+                  type: 'category',
+                  label: 'AI Spec',
+                  link: {
+                    type: 'doc',
+                    id: 'developer-manual/api/2026-05-11/ai/ai-readme-2026-05-11',
+                  },
+                  items: [
+                    'developer-manual/api/2026-05-11/ai/ai-readme-2026-05-11',
+                  ],
+                },
+                'developer-manual/api/2026-05-11/changelog-2026-05-11',
+              ],
+            },
+            {
+              type: 'category',
+              label: 'Version 2025-10-20 (Previous)',
               link: {
                 type: 'doc',
                 id: 'developer-manual/api/2025-10-20/version-2025-10-20',
