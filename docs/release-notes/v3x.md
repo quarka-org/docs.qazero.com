@@ -2,6 +2,31 @@
 
 *The date shown is a reference. The actual timing may vary depending on the environment.*  
 
+## 3.1.2.2 — 2026-05-12
+
+### Improvements & Fixes
+
+- Enhanced AI Report  
+  Goal lists can now be included in AI prompts.  
+  Ad report fields and labels have been refined for better usability.
+
+- Redesigned data tables  
+  The toolbar has been simplified, and column visibility can now be toggled.  
+
+- Unified UTM parameter labels  
+  Labels are now consistent across analytics screens and AI reports, making comparisons easier.
+
+- Improved ad traffic display  
+  The handling of "no referrer" entries has been revised for clearer output.
+
+- Improved search engine detection  
+  Fixed an issue where organic traffic was not classified correctly in some cases.
+
+- Fixed campaign-based aggregation  
+  Fixed an issue where some aggregated data was displayed incorrectly.
+
+- Minor improvements to translations and UI display
+
 ## 3.1.0.0 — 2026-04-16
 
 ### Improvements & Fixes
