@@ -2,7 +2,7 @@
 
 *The date shown is a reference. The actual timing may vary depending on the environment.*  
 
-## 3.1.2.2 — 2026-05-12
+## 3.1.2.3 — 2026-05-14
 
 ### Improvements & Fixes
 
