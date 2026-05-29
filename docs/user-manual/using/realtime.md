@@ -14,19 +14,35 @@ It is useful for monitoring site activity and checking immediate reactions after
 
 The current site status is displayed using two metrics.
 
-### Users in the last 30 minutes
+### Active users
 
-This shows the total number of users who performed either a **page entry** or a **page transition** within the last 30 minutes.
+#### Last 30 Min
 
-If a user has no activity for 30 minutes after their last action, the session is considered complete and is no longer included in this count.
+Shows the total number of users who landed on a page or moved to another page within the last 30 minutes.
 
-### Active users in the last 1 minute
+A session is considered completed when no page activity occurs for 30 minutes. Completed sessions are excluded from this count.
 
-This shows the number of users who performed a **page entry** or a **page transition** within the last 1 minute.
+#### Last 1 Min
 
-For example, users who opened a page but did not interact (e.g., switched to another tab or remained inactive) for over a minute are not counted.
+Shows the total number of users who landed on a page or moved to another page within the last minute.
 
-This metric represents users who are **actively viewing the site right now**.
+For example, if a visitor leaves the page open but switches to another tab or remains inactive for more than one minute, they are no longer counted.
+
+This metric represents users who are actively viewing your site right now.
+
+### Device Breakdown
+
+Displays the distribution of active users by device type (Desktop, Tablet, and Mobile).
+
+### Regions TOP 5
+
+Displays the top five countries with active visitors in real time.
+
+### Referrers TOP 5
+
+Displays the top five traffic sources for active users.
+
+**direct** represents direct access. Search engines, social media platforms, and referring domains may also appear.
 
 ---
 
