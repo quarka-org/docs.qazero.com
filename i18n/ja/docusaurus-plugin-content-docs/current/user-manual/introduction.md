@@ -5,7 +5,7 @@ title: 概要
 
 # 概要
 
-QA ZERO User Manual へようこそ。
+QA ZERO ユーザーガイド へようこそ。
 
 このドキュメントでは、  
 QA ZERO の導入・設定・運用方法を目的別に説明します。

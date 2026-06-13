@@ -7,24 +7,20 @@
     "message": "QA ZERO Logo",
     "description": "The alt text of navbar logo"
   },
-  "item.label.User Manual": {
-    "message": "User Manual",
-    "description": "Navbar item with label User Manual"
+  "item.label.User Guide": {
+    "message": "ユーザーガイド",
+    "description": "Navbar item with label User Guide"
   },
-  "item.label.Developer Manual": {
-    "message": "Developer Manual",
-    "description": "Navbar item with label Developer Manual"
+  "item.label.Developer Guide": {
+    "message": "開発者ガイド",
+    "description": "Navbar item with label Developer Guide"
   },
   "item.label.Release Notes": {
-    "message": "Release Notes",
+    "message": "リリースノート",
     "description": "Navbar item with label Release Notes"
   },
   "item.label.Blog": {
-    "message": "Blog",
+    "message": "ブログ",
     "description": "Navbar item with label Blog"
-  },
-  "item.label.GitHub": {
-    "message": "GitHub",
-    "description": "Navbar item with label GitHub"
   }
 }

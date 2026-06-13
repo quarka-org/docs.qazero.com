@@ -131,13 +131,13 @@ const config: Config = {
           type: 'docSidebar',
           sidebarId: 'userManualSidebar',
           position: 'left',
-          label: 'User Manual',
+          label: 'User Guide',
         },
         {
           type: 'docSidebar',
           sidebarId: 'developerManualSidebar',
           position: 'left',
-          label: 'Developer Manual',
+          label: 'Developer Guide',
         },
         {
           type: 'docSidebar',
@@ -145,15 +145,14 @@ const config: Config = {
           position: 'left',
           label: 'Release Notes',
         },
-        {to: '/blog', label: 'Blog', position: 'left'},
+        {
+          href: 'https://qazero.com/blog/',
+          label: 'Blog',
+          position: 'left',
+          target: '_blank',
+        },
         {
           type: 'localeDropdown',
-          position: 'right',
-        },
-        // GitHub link
-        {
-          href: 'https://github.com/quarka-org/docs.qazero.com',
-          label: 'GitHub',
           position: 'right',
         },
       ],
@@ -165,42 +164,16 @@ const config: Config = {
           title: 'Documentation',
           items: [
             {
-              label: 'User Manual',
+              label: 'User Guide',
               to: '/docs/user-manual/introduction',
             },
             {
-              label: 'Developer Manual',
+              label: 'Developer Guide',
               to: '/docs/developer-manual/introduction',
             },
             {
               label: 'Release Notes',
               to: '/docs/release-notes/v3x',
-            },
-          ],
-        },
-        {
-          title: 'Community',
-          items: [
-            {
-              label: 'GitHub Issues',
-              href: 'https://github.com/quarka-org/docs.qazero.com/issues',
-            },
-            {
-              label: 'WordPress.org',
-              href: 'https://wordpress.org/plugins/',
-            },
-          ],
-        },
-        {
-          title: 'More',
-          items: [
-            {
-              label: 'Blog',
-              to: '/blog',
-            },
-            {
-              label: 'GitHub',
-              href: 'https://github.com/quarka-org/docs.qazero.com',
             },
           ],
         },
