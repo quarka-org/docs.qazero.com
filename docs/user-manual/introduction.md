@@ -5,7 +5,7 @@ title: Overview
 
 # Overview
 
-Welcome to the QA ZERO User Manual.
+Welcome to the QA ZERO User Guide.
 
 This documentation explains how to deploy, configure, and operate QA ZERO, organized by purpose.
 

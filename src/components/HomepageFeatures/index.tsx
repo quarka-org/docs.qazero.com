@@ -2,6 +2,7 @@ import type {ReactNode} from 'react';
 import clsx from 'clsx';
 import Heading from '@theme/Heading';
 import Link from '@docusaurus/Link';
+import Translate, {translate} from '@docusaurus/Translate';
 import styles from './styles.module.css';
 
 type FeatureItem = {
@@ -13,22 +14,34 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'User Manual',
+    title: translate({
+      id: 'homepage.features.userGuide.title',
+      message: 'User Guide',
+      description: 'The title of the User Guide card on the homepage',
+    }),
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
-      <>
+      <Translate
+        id="homepage.features.userGuide.description"
+        description="The description of the User Guide card on the homepage">
         Learn how to install, configure, and use QA ZERO. Complete guides for getting started and troubleshooting.
-      </>
+      </Translate>
     ),
     link: '/docs/user-manual/introduction',
   },
   {
-    title: 'Developer Manual',
+    title: translate({
+      id: 'homepage.features.developerGuide.title',
+      message: 'Developer Guide',
+      description: 'The title of the Developer Guide card on the homepage',
+    }),
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
-      <>
+      <Translate
+        id="homepage.features.developerGuide.description"
+        description="The description of the Developer Guide card on the homepage">
         Technical documentation for developers who want to integrate with or extend QA ZERO functionality.
-      </>
+      </Translate>
     ),
     link: '/docs/developer-manual/introduction',
   },
@@ -36,9 +49,11 @@ const FeatureList: FeatureItem[] = [
     title: 'API Reference',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
-      <>
+      <Translate
+        id="homepage.features.apiReference.description"
+        description="The description of the API Reference card on the homepage">
         Access QA ZERO data programmatically using our REST API with structured query language (QAL).
-      </>
+      </Translate>
     ),
     link: '/docs/developer-manual/api/',
   },

@@ -3,11 +3,11 @@ sidebar_position: 1
 title: Introduction
 ---
 
-# QA ZERO Developer Manual
+# QA ZERO Developer Guide
 
 > **AI で仕事の形は変わる。だからこそ、人がもっと面白いことに時間を使える土台を作りたい。**
 
-This is the developer manual for **QA ZERO**: a small, self-contained
+This is the developer guide for **QA ZERO**: a small, self-contained
 analytics platform designed for the AI era. It exists so that humans and
 AI assistants can get at honest, high-fidelity behavioral data about a
 website, **without** renting a cloud data warehouse and **without**

@@ -11,6 +11,26 @@
     "message": "QA ZERO公式ドキュメント - WordPressアナリティクス、ヒートマップ、セッション録画プラグイン",
     "description": "The meta description for the homepage"
   },
+  "homepage.features.userGuide.title": {
+    "message": "ユーザーガイド",
+    "description": "The title of the User Guide card on the homepage"
+  },
+  "homepage.features.userGuide.description": {
+    "message": "QA ZERO の導入・設定・使い方を解説します。はじめ方からトラブル対処まで網羅したガイドです。",
+    "description": "The description of the User Guide card on the homepage"
+  },
+  "homepage.features.developerGuide.title": {
+    "message": "開発者ガイド",
+    "description": "The title of the Developer Guide card on the homepage"
+  },
+  "homepage.features.developerGuide.description": {
+    "message": "QA ZERO と連携・機能拡張したい開発者向けの技術ドキュメントです。",
+    "description": "The description of the Developer Guide card on the homepage"
+  },
+  "homepage.features.apiReference.description": {
+    "message": "REST API と構造化クエリ言語（QAL）で、QA ZERO のデータにプログラムからアクセスできます。",
+    "description": "The description of the API Reference card on the homepage"
+  },
   "theme.ErrorPageContent.title": {
     "message": "エラーが発生しました",
     "description": "The title of the fallback page when the page crashed"

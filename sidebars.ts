@@ -12,7 +12,7 @@ const sidebars: SidebarsConfig = {
   userManualSidebar: [
     {
       type: 'category',
-      label: 'User Manual',
+      label: 'User Guide',
       link: {
         type: 'doc',
         id: 'user-manual/introduction',
@@ -92,7 +92,7 @@ const sidebars: SidebarsConfig = {
   developerManualSidebar: [
     {
       type: 'category',
-      label: 'Developer Manual',
+      label: 'Developer Guide',
       link: {
         type: 'doc',
         id: 'developer-manual/introduction',
