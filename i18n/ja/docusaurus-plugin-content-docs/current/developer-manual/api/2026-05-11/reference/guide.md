@@ -39,6 +39,8 @@ Authorization: Basic <base64 user:app_password>
     "allpv_prev_next_page":  true,
     "materials_supports_all": true,
     "calc_join_symmetric":   true,
+    "guide_local_source":    true,
+    "datalayer_observed_events": true,
     "sample":                false,
     "include_count":         false,
     "return_file":           false,
@@ -55,6 +57,8 @@ Authorization: Basic <base64 user:app_password>
     "allpv_prev_next_page":  { "enabled": true,  "since": "2026-04-17" },
     "materials_supports_all":{ "enabled": true,  "since": "2026-04-29" },
     "calc_join_symmetric":   { "enabled": true,  "since": "2026-05-11" },
+    "guide_local_source":    { "enabled": true,  "since": "2026-05-11" },
+    "datalayer_observed_events": { "enabled": true, "since": "2026-05-11" },
     "sample":                { "enabled": false },
     "include_count":         { "enabled": false },
     "return_file":           { "enabled": false },
@@ -77,12 +81,22 @@ Authorization: Basic <base64 user:app_password>
           "type": "gtype_page",
           "condition": { "url": "/thanks/", "match": "exact" }
         }
-      ]
+      ],
+      "observed_events": {
+        "purchase": {
+          "material": "events.purchase",
+          "columns": { "value": "number", "currency": "string", "items": "number" }
+        },
+        "newsletter_signup": {
+          "material": "events.newsletter_signup",
+          "columns": { "plan": "string" }
+        }
+      }
     }
   ],
 
   "documentation": {
-    "source": "https://github.com/quarka-org/docs.qazero.com/tree/main/docs/developer-manual/api/2026-05-11/ai",
+    "source": "https://docs.qazero.com/docs/developer-manual/api/2026-05-11/ai",
     "format": "mixed",
     "sections": [
       {
@@ -123,6 +137,8 @@ Authorization: Basic <base64 user:app_password>
 | `features_detail`       | リッチ `{name: {enabled, since?}}` マップ。`since` チェックにはこちらを使う |
 | `sites[]`               | 認証ユーザーがアクセスできる tracking_id ごとのエントリ                 |
 | `sites[].goals[]`       | サイトごとのゴール定義 — `goal_N` マテリアルがどのゴールを意味するかのマッピング |
+| `sites[].observed_events` | **Since 2026-05-11。** このサイトで観測されたテナント固有の dataLayer スキーマ。`datalayer_observed_events` が有効なときのみ存在。下記の [`observed_events`](#observed-events) を参照 |
+| `documentation.source`  | 配信される仕様の docs.qazero.com 上の人間向けミラーの URL。仕様そのものは `documentation.sections` にある |
 | `documentation.sections`| AI クライアントに配信される現行仕様。`README.md` は markdown、2本の `.yaml` は正式なスキーマ |
 
 ### 各マテリアルの `supports_all` フラグ
@@ -147,9 +163,37 @@ materials:
 
 `features.materials_supports_all = true` を返すサーバー（つまり `api_update >= 2026-04-29`）は、すべてのマテリアルに `supports_all` を設定することが保証されます。旧バージョンのサーバーはフラグを完全に省略する可能性があります。フラグ非存在時は「不明 — クエリを投げてエラーで判定する」扱いにしてください。
 
-## キャッシュ
+### `observed_events` — サイトごとの dataLayer スキーマ {#observed-events}
 
-サーバーはあるバージョンについて `/guide` が最初に呼ばれたときに、GitHub から `ai/` サブディレクトリをローカルキャッシュします。以降の呼び出しはローカルキャッシュから読まれます。ドキュメントソースを変更してキャッシュを無効化したい場合は、サーバー上のキャッシュディレクトリを削除してください (`wp-content/qa-zero-data/restapi/` 以下にあります)。
+**Since:** 2026-05-11（`features.datalayer_observed_events` で gate）
+
+サーバーが `datalayer_observed_events` を広告している場合、`sites[]` の各エントリー — 全サイト集約 `all` を含む — に、そのサイトで **実際に観測された dataLayer イベント** をイベント名でキーにして記述する `observed_events` マップが付きます:
+
+```jsonc
+"observed_events": {
+  "purchase": {
+    "material": "events.purchase",          // クエリする QAL マテリアル
+    "columns": { "value": "number", "currency": "string", "items": "number" }
+  }
+}
+```
+
+これを使うと、実行時かつテナントごとに、どの `events.{name}` マテリアルが存在し、各イベントがどのパラメータキー／型を持つかを発見できます。だから AI クライアントは、`value` カラムが観測されているか推測せずに、`events.purchase` を `value` カラムで集計するクエリを組み立てて「1万円以上購入したセッション数」に答えられます。
+
+注意点:
+
+- マップは **スキーマのみ** です。形を教えるだけで、実際の値は `events.{name}` マテリアルに対する QAL の `calc` で集計します（ここでは返しません）。
+- `/query` バリデータが `events.{name}` をその文字セットに制限しているため、QAL 安全なイベント名（`[A-Za-z0-9_]+`）のみが載ります。`:`、`/`、`-` 等を含む生の dataLayer 名はスキップされます。
+- イベント単位でデグレードします: あるイベントのマニフェストが欠落・破損していても、そのイベントだけをスキップし、サイト全体は失われません。
+- 旧バージョンのサーバー（フィーチャフラグなし）はキーを完全に省略します — 非存在時は「不明」扱いにしてフォールバックしてください。
+
+## `/guide` が仕様を組み立てる仕組み
+
+**Since:** 2026-05-11（`features.guide_local_source`）
+
+`documentation.sections` の内容（`README.md`、`materials.yaml`、`qal-validation.yaml`）は、リクエスト時に QA ZERO プラグイン同梱ファイル（`src/core/yaml/`）から直接読まれます。**GitHub 取得も、無効化すべきサーバー側キャッシュもありません** — サーバーが配信する仕様は、そのサーバーにインストールされたプラグインバージョンと構造的に必ず一致します。`documentation.source` は、同じファイル群の docs.qazero.com 上の人間向けミラーを指す便宜的な URL で、エンドポイントが取得するものではありません。
+
+クライアント側で仕様を長期キャッシュする場合は、サーバーの `api_update`（と `version`）をキーにしてください: `api_update` が進んだら同梱仕様が増えている可能性があるので、`/guide` を再取得してリフレッシュします。
 
 ## 典型的なクライアントフロー
 

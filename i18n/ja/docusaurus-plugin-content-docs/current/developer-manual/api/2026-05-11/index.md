@@ -2,15 +2,15 @@
 id: version-2026-05-11
 title: Version 2026-05-11
 sidebar_position: 1
-last_updated: 2026-05-11
-api_update: 2026-05-11
+last_updated: 2026-05-21
+api_update: 2026-05-21
 ---
 
 # Version 2026-05-11
 
 :::info バージョン情報
 **API バージョン:** 2026-05-11
-**API アップデート:** 2026-05-11
+**API アップデート:** 2026-05-21
 **必要なプラグインバージョン:** 3.0.0.0+
 **ステータス:** 現行リリース
 

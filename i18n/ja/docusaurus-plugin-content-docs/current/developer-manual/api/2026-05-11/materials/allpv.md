@@ -37,6 +37,7 @@ sidebar_position: 2
 
 - **流入元**: `source_id`, `medium_id`, `campaign_id`, `content_id` と生の `utm_*`。
 - **デバイス詳細**: `device_type`, `os`, `browser`, `language`, `country_code`。
+- **ブラウザビューポート**: `window_inner_width`, `window_inner_height`（uint16） — ページビュー時点のブラウザの `window.innerWidth` / `window.innerHeight` を CSS ピクセルで表します。デバイスの画面解像度ではなく *実表示コンテンツ領域* です。`0` はそのビューでソースヘッダーが欠落していたことを意味するので、実測値だけを残すには `gte: 1` でフィルターしてください。レスポンシブブレークポイントやビューポート帯の分析（タブレット帯は `between: 768, 1199`、PC 帯は `gte: 1200`）に便利です。**Since:** 2026-05-20
 - **エンゲージメント深度**: `dead_click_image_count`, `scroll_back_count`, `content_skip_count`, `exploration_count`, `depth_position`, `exit_pos`。
 - **ページ遷移**: `prev_page_id`, `next_page_id`（物理 ID）と、`prev_url`, `prev_title`, `next_url`, `next_title`（`qa_pages` から解決される仮想カラム）。**Since:** 2026-04-17
 - **ページ種別フラグ**: `is_article`, `is_product`, `is_list`, `is_form`, `is_top_page`, … ページの種類を分類する boolean フラグ群。

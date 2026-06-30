@@ -28,8 +28,8 @@ rules:
       properties:
         name:
           type: string
-          description: "Material name. Allowed values: 'allpv', 'gsc', 'ga4_age_gender', 'ga4_country', 'ga4_region', 'goal_N', 'click_event', 'datalayer_event', 'page_version', or 'events.{name}'."
-          pattern: "^(allpv|gsc|ga4_age_gender|ga4_country|ga4_region|goal_[1-9]\d*|click_event|datalayer_event|page_version|events\.[a-zA-Z0-9_]+)$"
+          description: "Material name. Allowed values: 'allpv', 'gsc', 'ga4_age_gender', 'ga4_country', 'ga4_region', 'goal_N', 'click_event', 'datalayer_event', 'page_version', 'summary_landingpage', 'summary_allpage', 'summary_days_access_detail', or 'events.{name}'."
+          pattern: "^(allpv|gsc|ga4_age_gender|ga4_country|ga4_region|goal_[1-9]\d*|click_event|datalayer_event|page_version|summary_landingpage|summary_allpage|summary_days_access_detail|events\.[a-zA-Z0-9_]+)$"
       additionalProperties: false
     minItems: 1
     errors:
@@ -62,7 +62,7 @@ rules:
           from:
             type: array
             description: "Specify which material to use. Must contain exactly one material name."
-            items: { type: string, pattern: "^(allpv|gsc|ga4_age_gender|ga4_country|ga4_region|goal_[1-9]\\d*|click_event|datalayer_event|page_version|events\\.[a-zA-Z0-9_]+)$" }
+            items: { type: string, pattern: "^(allpv|gsc|ga4_age_gender|ga4_country|ga4_region|goal_[1-9]\\d*|click_event|datalayer_event|page_version|summary_landingpage|summary_allpage|summary_days_access_detail|events\\.[a-zA-Z0-9_]+)$" }
             minItems: 1
             maxItems: 1
           keep:
@@ -70,11 +70,11 @@ rules:
             description: "List of columns to include in the result. Must use fully qualified names in the format 'material.column_name' (e.g., 'allpv.url', 'gsc.keyword'). Empty array is allowed when calc is present (aggregate-all pattern)."
             items:
               type: string
-              pattern: "^(allpv|gsc|ga4_age_gender|ga4_country|ga4_region|goal_[1-9]\d*|click_event|datalayer_event|page_version|events\.[a-zA-Z0-9_]+)\.[a-zA-Z0-9_]+$"
+              pattern: "^(allpv|gsc|ga4_age_gender|ga4_country|ga4_region|goal_[1-9]\d*|click_event|datalayer_event|page_version|summary_landingpage|summary_allpage|summary_days_access_detail|events\.[a-zA-Z0-9_]+)\.[a-zA-Z0-9_]+$"
             minItems: 0
           filter:
             type: object
-            description: "Filter conditions to apply. Keys are plain column names (not qualified). Values are either an array (IN clause) or an object with operator keys. Supported fields depend on material type: allpv (utm_source, utm_medium, utm_campaign, device_type, country_code, depth_position, deep_read, stop_max_sec, stop_max_pos, exit_pos, is_submit, dead_click_image_count, irritation_click_count, scroll_back_count, content_skip_count, exploration_count, prev_page_id, next_page_id, page_type, page_fetch_status, is_article, is_product, is_list, is_form, is_trust_info, is_faq, is_landing, is_search, is_account, is_cart, is_checkout, is_confirm, is_thanks, is_top_page, is_event, is_recipe, is_job, is_video, is_howto, is_qa_forum), gsc (search_type, keyword, ctr, position, position_weighted), ga4_age_gender (age, gender, sessions, active_users), ga4_country (country, sessions, active_users), ga4_region (region, sessions, active_users), goal_x (utm_source, utm_medium, utm_campaign, device_id, is_reject), click_event (is_external, action_id, page_id, to_url, selector, event_sec), page_version (page_id, device_id, version_no, update_date). Multiple conditions are implicitly AND. Performance hint: prefer filtering by indexed columns (e.g. search_type, keyword, page_id) over computed virtual columns (e.g. ctr, position_weighted) for large datasets."
+            description: "Filter conditions to apply. Keys are plain column names (not qualified). Values are either an array (IN clause) or an object with operator keys. Supported fields depend on material type: allpv (utm_source, utm_medium, utm_campaign, device_type, country_code, depth_position, deep_read, stop_max_sec, stop_max_pos, exit_pos, is_submit, dead_click_image_count, irritation_click_count, scroll_back_count, content_skip_count, exploration_count, prev_page_id, next_page_id, page_type, page_fetch_status, is_article, is_product, is_list, is_form, is_trust_info, is_faq, is_landing, is_search, is_account, is_cart, is_checkout, is_confirm, is_thanks, is_top_page, is_event, is_recipe, is_job, is_video, is_howto, is_qa_forum), gsc (search_type, keyword, ctr, position, position_weighted), ga4_age_gender (age, gender, sessions, active_users), ga4_country (country, sessions, active_users), ga4_region (region, sessions, active_users), goal_x (utm_source, utm_medium, utm_campaign, device_id, is_reject), click_event (is_external, action_id, page_id, to_url, selector, event_sec), page_version (page_id, device_id, version_no, update_date), summary_landingpage (page_id, device_id, utm_source, utm_medium, utm_campaign, is_newuser, second_page, is_QA), summary_allpage (page_id, device_id, utm_source, utm_medium, utm_campaign, is_newuser, is_QA), summary_days_access_detail (device_id, utm_source, utm_medium, utm_campaign, is_newuser, is_QA). Multiple conditions are implicitly AND. Performance hint: prefer filtering by indexed columns (e.g. search_type, keyword, page_id) over computed virtual columns (e.g. ctr, position_weighted) for large datasets."
             additionalProperties:
               oneOf:
                 - type: array
@@ -184,6 +184,14 @@ features:
   # 旧仕様で 0 行を返していた「join 側 calc 参照」のバグ動作が、新仕様では
   # 正しく集計できる + 存在しない列参照は E_CALC_COLUMN_UNRESOLVED で実行前エラー化。
   calc_join_symmetric: { enabled: true, since: "2026-05-11" }
+  # T86: /guide のソースを GitHub raw fetch から src/core/yaml/ 同梱ファイル直読みに切り替え。
+  # クライアントから見ると `documentation.source` URL が docs.qazero.com を指すように変わる以外に
+  # 振る舞いの違いは無い（常に成功する方向の差分）。
+  guide_local_source: { enabled: true, since: "2026-05-11" }
+  # T86: /guide レスポンスに Layer 2 dataLayer manifest 由来の sites[].observed_events を追加。
+  # スキーマのみ（値の集約は QAL の calc で取得）。AI クライアントが「観測されたイベント名・
+  # パラメータキー・型」を知り、events.{name} マテリアルへの問い合わせを正しく組み立てられる。
+  datalayer_observed_events: { enabled: true, since: "2026-05-11" }
   # Not yet implemented. sample / include_count pass
   # validation but are not processed; return_file/csv/parquet likewise.
   sample:         { enabled: false }

@@ -1,6 +1,6 @@
 id: materials-manifest
 version: "2025-10-20"
-update: "2026-04-29"
+update: "2026-05-21"
 Plugin version:
   QA ZERO: "3.0.0.0"
   QA Assistants: "5.0.0.0"
@@ -8,14 +8,22 @@ type: material_definition
 
 # Versioning model (see CLAUDE.md §10 and docs/qal/10-rest-api-specification.md):
 #
-#   version (YYYY-MM-DD)  - changes only on breaking changes. URL-visible.
-#   update  (YYYY-MM-DD)  - bumps on any non-breaking additive change within
-#                           the same version. The latest `since` tag below
-#                           should match `update` above.
+# This is a LIVING DOCUMENT: a single version-less file (materials-manifest.yaml)
+# shipped to every client. It is NOT forked per version — only qal-validation,
+# the unit of breaking change, is version-suffixed. The `version:` / `update:`
+# fields below are the authoritative source build-manifest.php reads (there is
+# no version in the filename to read from).
 #
-# Any `material` or `field` may carry an optional `since: YYYY-MM-DD` tag
-# marking when it first became available within this version. Absent `since`
-# means "available since the version was introduced" (i.e. equal to `version`).
+#   version (YYYY-MM-DD)  - changes only on breaking changes. URL-visible.
+#   update  (YYYY-MM-DD)  - bumps on any non-breaking additive change.
+#
+# Any `material` or `field` may carry a `since: YYYY-MM-DD` tag marking when it
+# first became available. Absent `since` means "available since the version was
+# introduced" (i.e. equal to `version`). Because this one file is distributed to
+# clients pinned to older versions too, ANY newly added material/field MUST carry
+# a `since:` tag — without it, a client on an older server would assume the field
+# has always existed and try to use a column its server cannot serve (see T105
+# §6.4). Adding a field without `since:` is a bug.
 
 # =============================================================================
 # 列DB共通定義
@@ -49,6 +57,7 @@ materials:
   allpv:
     dataset_id: 1
     supports_all: true
+    since: "2026-04-29"   # supports_all (the `_all` aggregate scope) became available on this date
     decoders:
       - loader: "file_functions.view_pv"
         decoder: null
@@ -63,11 +72,11 @@ materials:
               note: "JOINキー（click_event, datalayer_event等との結合用）。フィルタ対象にはしない"
           - material_column: "session_id"
             physical_column: "session_id"
-            type: uint32
+            type: uint64
             nullable: false
             status: dev
             search_hint:
-              note: "セッション単位の絞り込みに使用。列DBバイナリスキャンで高速。値はtracking_id×日付ごとに連番"
+              note: "セッション単位の絞り込みに使用。列DBバイナリスキャンで高速。値は YYYYMM × 10^9 + month_seq の合成 uint64 で月内連番（月をまたぐとリセット）"
           - material_column: "reader_id"
             physical_column: "reader_id"
             type: uint32
@@ -89,6 +98,12 @@ materials:
             status: dev
             search_hint:
               note: "3〜5種（1=PC, 2=SP, 3=tablet）。列DBバイナリスキャンで高速。人間向けにはdevice_typeを使う"
+            value_mappings:
+              label_column: "device_type"
+              map:
+                1: "PC"
+                2: "SP"
+                3: "tablet"
           - material_column: "source_id"
             physical_column: "source_id"
             type: uint16
@@ -268,6 +283,24 @@ materials:
             search_hint:
               note: "探索行動回数。5秒以内にマウスが200px以上横移動で2回折り返した回数。gte:1でクリック対象を探している行動。dead_click_image_countと組み合わせてUI迷子分析に使う"
 
+          # --- 行動カラム C-4: raw_e ヘッダー由来 (ブラウザウィンドウサイズ) ---
+          - material_column: "window_inner_width"
+            physical_column: "window_inner_width"
+            type: uint16
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "ブラウザのwindow.innerWidth(px)。実表示コンテンツ領域の横幅。0はraw_eヘッダー欠落の可能性。gte:1で実値のみ抽出。between:768,1199でタブレット帯、gte:1200でPC帯のセグメント分析に使う"
+          - material_column: "window_inner_height"
+            physical_column: "window_inner_height"
+            type: uint16
+            nullable: true
+            default: 0
+            status: dev
+            search_hint:
+              note: "ブラウザのwindow.innerHeight(px)。実表示コンテンツ領域の縦幅。0はraw_eヘッダー欠落の可能性。gte:1で実値のみ抽出。window_inner_widthと組み合わせてビューポートサイズ別の挙動分析に使う"
+
           # --- 遷移カラム: prev/next ページID ---
           - material_column: "prev_page_id"
             physical_column: "prev_page_id"
@@ -275,6 +308,7 @@ materials:
             nullable: true
             default: 0
             status: dev
+            since: "2026-04-17"
             search_hint:
               note: "前ページID。ランディングPV（セッション最初）は0。prev_page_id=0でLP抽出。group_byで流入元分析"
           - material_column: "next_page_id"
@@ -283,6 +317,7 @@ materials:
             nullable: true
             default: 0
             status: dev
+            since: "2026-04-17"
             search_hint:
               note: "次ページID。離脱PV（セッション最後）は0。next_page_id=0で離脱PV抽出。group_byで遷移先分析"
 
@@ -290,21 +325,25 @@ materials:
           - material_column: "prev_url"
             physical_column: "prev_url"
             resolve_via: "prev_page_id"
+            since: "2026-04-17"
             search_hint:
               note: "前ページURL。prev_page_idからqa_pagesで解決。ランディングPVはnull"
           - material_column: "prev_title"
             physical_column: "prev_title"
             resolve_via: "prev_page_id"
+            since: "2026-04-17"
             search_hint:
               note: "前ページタイトル。prev_page_idからqa_pagesで解決。ランディングPVはnull"
           - material_column: "next_url"
             physical_column: "next_url"
             resolve_via: "next_page_id"
+            since: "2026-04-17"
             search_hint:
               note: "次ページURL。next_page_idからqa_pagesで解決。離脱PVはnull"
           - material_column: "next_title"
             physical_column: "next_title"
             resolve_via: "next_page_id"
+            since: "2026-04-17"
             search_hint:
               note: "次ページタイトル。next_page_idからqa_pagesで解決。離脱PVはnull"
 
@@ -701,7 +740,7 @@ materials:
             status: dev
           - material_column: "session_id"
             physical_column: "session_id"
-            type: uint32
+            type: uint64
             nullable: false
             status: dev
           - material_column: "page_id"
@@ -785,7 +824,7 @@ materials:
             status: dev
           - material_column: "session_id"
             physical_column: "session_id"
-            type: uint32
+            type: uint64
             nullable: false
             status: dev
           - material_column: "page_id"
@@ -899,19 +938,19 @@ materials:
             virtual: true
             status: dev
             search_hint:
-              note: "clicks / impressions。Material層で算出"
+              note: "clicks / impressions。Material層で算出。filter は復号後の post_filter（大量行では遅い）"
           - material_column: "position"
             physical_column: "position"
             virtual: true
             status: dev
             search_hint:
-              note: "position_x100 / 100。Material層で算出"
+              note: "position_x100 / 100。Material層で算出。filter は position_x100 にリライトされ列DBスキャン可能（速い）"
           - material_column: "position_weighted"
             physical_column: "position_weighted"
             virtual: true
             status: dev
             search_hint:
-              note: "position × impressions。Material層で算出。加重平均position計算用の素材"
+              note: "position × impressions。Material層で算出。加重平均position計算用の素材。filter は復号後の post_filter（大量行では遅い）"
     join:
       key: page_id
       cardinality: "N:M"
@@ -1155,3 +1194,325 @@ materials:
     join:
       key: version_id
       cardinality: "1:1"
+
+  # ---------------------------------------------------------------------------
+  # サマリー積分マテリアル（T102）
+  #
+  # 夜間バッチが「年初からの累計」を作る積分系サマリー3種を QAL から直接呼べる
+  # ようにしたもの。loader は class-qahm-db.php の安定関数（summary_days_*）を
+  # 呼ぶ（Storage は switch で直接ディスパッチ。loader 文字列は自己記述用）。
+  #
+  # 重要な性質:
+  #  - 戻り値は「指定期間の累計1セット」。date 次元を持たない（日次内訳なし）。
+  #    日次トレンドが必要なら allpv（date 次元あり）を使う。
+  #  - ID→ラベル変換は loader 側で完了済み。utm_source / utm_medium /
+  #    utm_campaign はラベル文字列が入った状態で返る → resolve_via は貼らない。
+  #  - device_id は数値ID（1=PC, 2=SP, 3=tablet）のまま返る。
+  #  - 任意期間（年跨ぎ含む）に対応。group_by は固定（柔軟化しない）。
+  # ---------------------------------------------------------------------------
+
+  # summary_landingpage: 入口（ランディングページ）別の累計集計
+  summary_landingpage:
+    supports_all: true
+    decoders:
+      - loader: "db.summary_days_landingpages"   # ドキュメント用（Storage は switch で直接分岐）
+        decoder: null
+        fields:
+          - material_column: "page_id"
+            physical_column: "page_id"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。入口ページ識別。ページ別の絞り込みは page_id で行う（page_url 部分一致は未対応、必要なら allpv）"
+          - material_column: "device_id"
+            physical_column: "device_id"
+            type: uint8
+            status: dev
+            search_hint:
+              note: "サマリー由来。デバイス識別（1=PC, 2=SP, 3=tablet）。数値IDのまま。表示用ラベルは value_mappings 経由で device_type 列が自動付与される"
+            value_mappings:
+              label_column: "device_type"
+              map:
+                1: "PC"
+                2: "SP"
+                3: "tablet"
+          - material_column: "utm_source"
+            physical_column: "utm_source"
+            status: dev
+            search_hint:
+              note: "サマリー由来。流入元（ラベル文字列。loader 側でID解決済み）"
+          - material_column: "utm_medium"
+            physical_column: "utm_medium"
+            status: dev
+            search_hint:
+              note: "サマリー由来。流入メディア（ラベル文字列。loader 側でID解決済み）"
+          - material_column: "utm_campaign"
+            physical_column: "utm_campaign"
+            status: dev
+            search_hint:
+              note: "サマリー由来。流入キャンペーン（ラベル文字列。loader 側でID解決済み）"
+          - material_column: "source_domain"
+            physical_column: "source_domain"
+            status: dev
+            search_hint:
+              note: "サマリー由来。流入元ドメイン（広告トラフィックは loader 側で補完される）"
+          - material_column: "is_newuser"
+            physical_column: "is_newuser"
+            type: uint8
+            status: dev
+            search_hint:
+              note: "サマリー由来。新規ユーザーフラグ（1=新規, 0=リピート）"
+          - material_column: "second_page"
+            physical_column: "second_page"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。入口の次に閲覧したページID（2ページ目）。0は離脱"
+          - material_column: "is_QA"
+            physical_column: "is_QA"
+            type: uint8
+            status: dev
+            search_hint:
+              note: "サマリー由来。QAツール経由フラグ"
+          - material_column: "pv_count"
+            physical_column: "pv_count"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。指定期間のページビュー累計。数値範囲フィルタは post_filter"
+          - material_column: "session_count"
+            physical_column: "session_count"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。指定期間のセッション累計。数値範囲フィルタは post_filter"
+          - material_column: "user_count"
+            physical_column: "user_count"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。指定期間のユーザー累計。数値範囲フィルタは post_filter"
+          - material_column: "bounce_count"
+            physical_column: "bounce_count"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。指定期間の直帰数累計。数値範囲フィルタは post_filter"
+          - material_column: "session_time"
+            physical_column: "session_time"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。指定期間の滞在時間合計（秒）。数値範囲フィルタは post_filter"
+          - material_column: "title"
+            physical_column: "title"
+            status: dev
+            search_hint:
+              note: "サマリー由来。入口ページのタイトル（loader 側で page_id から復元）"
+          - material_column: "url"
+            physical_column: "url"
+            status: dev
+            search_hint:
+              note: "サマリー由来。入口ページのURL（loader 側で page_id から復元）"
+          - material_column: "wp_qa_id"
+            physical_column: "wp_qa_id"
+            status: dev
+            search_hint:
+              note: "サマリー由来。WordPress 投稿ID（loader 側で page_id から復元）"
+
+  # summary_allpage: ページ別の累計集計（ランキング用途）
+  summary_allpage:
+    supports_all: true
+    decoders:
+      - loader: "db.summary_days_allpages"   # ドキュメント用（Storage は switch で直接分岐）
+        decoder: null
+        fields:
+          - material_column: "page_id"
+            physical_column: "page_id"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。ページ識別。ページ別ランキングはこのマテリアル。page_url 部分一致は未対応、必要なら allpv"
+          - material_column: "device_id"
+            physical_column: "device_id"
+            type: uint8
+            status: dev
+            search_hint:
+              note: "サマリー由来。デバイス識別（1=PC, 2=SP, 3=tablet）。数値IDのまま。表示用ラベルは value_mappings 経由で device_type 列が自動付与される"
+            value_mappings:
+              label_column: "device_type"
+              map:
+                1: "PC"
+                2: "SP"
+                3: "tablet"
+          - material_column: "utm_source"
+            physical_column: "utm_source"
+            status: dev
+            search_hint:
+              note: "サマリー由来。流入元（ラベル文字列。loader 側でID解決済み）"
+          - material_column: "utm_medium"
+            physical_column: "utm_medium"
+            status: dev
+            search_hint:
+              note: "サマリー由来。流入メディア（ラベル文字列。loader 側でID解決済み）"
+          - material_column: "utm_campaign"
+            physical_column: "utm_campaign"
+            status: dev
+            search_hint:
+              note: "サマリー由来。流入キャンペーン（ラベル文字列。loader 側でID解決済み）"
+          - material_column: "source_domain"
+            physical_column: "source_domain"
+            status: dev
+            search_hint:
+              note: "サマリー由来。流入元ドメイン（広告トラフィックは loader 側で補完される）"
+          - material_column: "is_newuser"
+            physical_column: "is_newuser"
+            type: uint8
+            status: dev
+            search_hint:
+              note: "サマリー由来。新規ユーザーフラグ（1=新規, 0=リピート）"
+          - material_column: "is_QA"
+            physical_column: "is_QA"
+            type: uint8
+            status: dev
+            search_hint:
+              note: "サマリー由来。QAツール経由フラグ"
+          - material_column: "pv_count"
+            physical_column: "pv_count"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。指定期間のページビュー累計。数値範囲フィルタは post_filter"
+          - material_column: "user_count"
+            physical_column: "user_count"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。指定期間のユーザー累計。数値範囲フィルタは post_filter"
+          - material_column: "bounce_count"
+            physical_column: "bounce_count"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。指定期間の直帰数累計。数値範囲フィルタは post_filter"
+          - material_column: "exit_count"
+            physical_column: "exit_count"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。指定期間の離脱数累計。数値範囲フィルタは post_filter"
+          - material_column: "time_on_page"
+            physical_column: "time_on_page"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。指定期間の滞在時間合計（秒）。数値範囲フィルタは post_filter"
+          - material_column: "lp_count"
+            physical_column: "lp_count"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。指定期間に入口（ランディングページ）になった回数の累計"
+          - material_column: "title"
+            physical_column: "title"
+            status: dev
+            search_hint:
+              note: "サマリー由来。ページのタイトル（loader 側で page_id から復元）"
+          - material_column: "url"
+            physical_column: "url"
+            status: dev
+            search_hint:
+              note: "サマリー由来。ページのURL（loader 側で page_id から復元）"
+          - material_column: "wp_qa_id"
+            physical_column: "wp_qa_id"
+            status: dev
+            search_hint:
+              note: "サマリー由来。WordPress 投稿ID（loader 側で page_id から復元）"
+
+  # summary_days_access_detail: 流入元（utm 三軸）×デバイス別の累計集計
+  summary_days_access_detail:
+    supports_all: true
+    decoders:
+      - loader: "db.summary_days_access_detail"   # ドキュメント用（Storage は switch で直接分岐）
+        decoder: null
+        fields:
+          - material_column: "device_id"
+            physical_column: "device_id"
+            type: uint8
+            status: dev
+            search_hint:
+              note: "サマリー由来。デバイス識別（1=PC, 2=SP, 3=tablet）。数値IDのまま。表示用ラベルは value_mappings 経由で device_type 列が自動付与される"
+            value_mappings:
+              label_column: "device_type"
+              map:
+                1: "PC"
+                2: "SP"
+                3: "tablet"
+          - material_column: "utm_source"
+            physical_column: "utm_source"
+            status: dev
+            search_hint:
+              note: "サマリー由来。流入元（ラベル文字列。loader 側でID解決済み）"
+          - material_column: "utm_medium"
+            physical_column: "utm_medium"
+            status: dev
+            search_hint:
+              note: "サマリー由来。流入メディア（ラベル文字列。loader 側でID解決済み）"
+          - material_column: "utm_campaign"
+            physical_column: "utm_campaign"
+            status: dev
+            search_hint:
+              note: "サマリー由来。流入キャンペーン（ラベル文字列。loader 側でID解決済み）"
+          - material_column: "source_domain"
+            physical_column: "source_domain"
+            status: dev
+            search_hint:
+              note: "サマリー由来。流入元ドメイン（広告トラフィックは loader 側で補完される）"
+          - material_column: "is_newuser"
+            physical_column: "is_newuser"
+            type: uint8
+            status: dev
+            search_hint:
+              note: "サマリー由来。新規ユーザーフラグ（1=新規, 0=リピート）"
+          - material_column: "is_QA"
+            physical_column: "is_QA"
+            type: uint8
+            status: dev
+            search_hint:
+              note: "サマリー由来。QAツール経由フラグ"
+          - material_column: "pv_count"
+            physical_column: "pv_count"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。指定期間のページビュー累計。数値範囲フィルタは post_filter"
+          - material_column: "session_count"
+            physical_column: "session_count"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。指定期間のセッション累計。数値範囲フィルタは post_filter"
+          - material_column: "user_count"
+            physical_column: "user_count"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。指定期間のユーザー累計。数値範囲フィルタは post_filter"
+          - material_column: "bounce_count"
+            physical_column: "bounce_count"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。指定期間の直帰数累計。数値範囲フィルタは post_filter"
+          - material_column: "time_on_page"
+            physical_column: "time_on_page"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。指定期間の滞在時間合計（秒）。数値範囲フィルタは post_filter"
+          - material_column: "is_newuser_count"
+            physical_column: "is_newuser_count"
+            type: uint32
+            status: dev
+            search_hint:
+              note: "サマリー由来。指定期間の新規ユーザー数累計（このマテリアル固有のカラム）"

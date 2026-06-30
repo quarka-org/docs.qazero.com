@@ -17,6 +17,7 @@ sidebar_position: 1
 - **[`gsc`](./gsc.md)** — Google Search Console データ。検索クエリ、インプレッション、オーガニック CTR に。
 - **[`goal_N`](./goal_n.md)** — サイトごとに設定された conversion / goal イベント。コンバージョン率の質問に。
 - **[`page_version`](./page_version.md)** — ページバージョンのメタデータ。コンテンツ変更や A/B テストのスライシングに。
+- **[`summary_landingpage` / `summary_allpage` / `summary_days_access_detail`](./summary.md)** — 1ファイル読み込みで提供される、集計済みの期間累計サマリー。入口ページ別セッション数、ページランキング、流入元別アクセス詳細など、期間にわたるロールアップが欲しく、*日次の内訳は不要* なときに使います。**Since:** 2026-05-21
 
 すべてのマテリアルの正式なカラム一覧は **[`ai/materials.yaml`](../ai/materials.yaml)** にあります。ここのページは親しみやすいプレビューで、正本は YAML です。
 
