@@ -27,6 +27,12 @@ natural human question about a website.
   per site. Use when the question is about conversion rates.
 - **[`page_version`](./page_version.md)** — page version metadata.
   Use when slicing by content changes or A/B.
+- **[`summary_landingpage` / `summary_allpage` /
+  `summary_days_access_detail`](./summary.md)** — pre-aggregated,
+  period-cumulative summaries served from a single file read. Use when
+  the question is a roll-up over a date range (landing-page sessions,
+  page ranking, access detail by source) and you do *not* need a daily
+  breakdown. **Since:** 2026-05-21
 
 The authoritative column list for every material lives in
 **[`ai/materials.yaml`](../ai/materials.yaml)**. The pages here are

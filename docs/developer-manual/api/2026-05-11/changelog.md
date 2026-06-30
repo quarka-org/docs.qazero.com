@@ -2,8 +2,8 @@
 id: changelog-2026-05-11
 title: Update History
 sidebar_position: 6
-last_updated: 2026-05-11
-api_update: 2026-05-11
+last_updated: 2026-05-21
+api_update: 2026-05-21
 ---
 
 # Update History (2026-05-11)
@@ -11,6 +11,26 @@ api_update: 2026-05-11
 This is the **Update History** for API version `2026-05-11`: one living document per version, new entries on top. Each entry is tagged with the `api_update` date that the plugin will report in its `/guide` response. Read this top-to-bottom to see how the API has grown since the initial release of this version, and match the most recent entry against your server's `api_update` to know which features are actually available to you.
 
 The entries below the **Initial Release of `2026-05-11`** section are carried over from the predecessor version `2025-10-20` for context. The breaking-change entry at the top describes the contract delta you need to know when migrating.
+
+### 2026-05-21 — `api_update: 2026-05-21` — summary integral materials (T102)
+
+**Added:**
+- ✅ **Three pre-aggregated summary materials** — `summary_landingpage`, `summary_allpage`, and `summary_days_access_detail` are now queryable as first-class QAL materials. Each returns the **period-cumulative** roll-up that the nightly batch already maintains (year-to-date integrals, served from a single file read), so questions like "landing-page sessions for any date range" or "page ranking by pageviews" no longer require scanning millions of `allpv` rows. All three are `supports_all: true` (the cross-site `tracking_id: "all"` aggregate exists). See [`summary_*` materials](./materials/summary.md) and the authoritative [`materials.yaml`](./ai/materials.yaml). **Since:** 2026-05-21
+- ✅ **Validator material patterns extended** — `summary_landingpage` / `summary_allpage` / `summary_days_access_detail` are now accepted in `materials[].name`, `make.*.from`, and `make.*.keep` (see [`qal-validation.yaml`](./ai/qal-validation.yaml)).
+
+**Important property (read before using):**
+- 🔸 These materials have **no `date` dimension**. Each query returns one cumulative set for the requested period (cross-year ranges supported), not a daily breakdown. If you need a daily trend, use `allpv` (which has a `date` dimension) instead. Numeric-range filtering on the count columns (`pv_count`, `session_count`, …) is applied as a `post_filter` after the cumulative roll-up.
+
+**Why this update is still non-breaking:**
+- The three materials are purely additive. No existing material, column, query shape, or feature flag changed. Queries that do not name a `summary_*` material are completely unaffected.
+
+### 2026-05-20 — `api_update: 2026-05-20` — `allpv` browser window-size columns (T101)
+
+**Added:**
+- ✅ **`allpv.window_inner_width` / `allpv.window_inner_height`** — two new columns (uint16) recording the browser's live `window.innerWidth` / `window.innerHeight` in CSS pixels at the moment of the page view: the **actual rendered content area**, not the device's screen resolution. Use them for responsive-breakpoint analysis and viewport-segment splits (e.g. `between: 768, 1199` for the tablet band, `gte: 1200` for desktop). A value of `0` means the source header was absent for that page view; filter `gte: 1` to keep only real measurements. See [`allpv`](./materials/allpv.md) and [`materials.yaml`](./ai/materials.yaml). **Since:** 2026-05-20
+
+**Why this update is still non-breaking:**
+- Both columns are additive (`nullable: true, default: 0`). Existing queries that do not reference them are unaffected; date ranges predating the column return `0` rather than an error.
 
 ### 2026-05-11 — `api_update: 2026-05-11` — Version `2026-05-11` initial release — symmetric calc column declaration
 
@@ -36,6 +56,17 @@ The entries below the **Initial Release of `2026-05-11`** section are carried ov
 
 **Why this is a version bump and not an update:**
 - The fix changes observable execution semantics for queries that *had been considered valid by the validator*. Even though the new semantics are arguably "what every client always meant," anything depending on the old behavior (e.g., an integration that worked around the silent-zero bug by adding columns to `keep`) is now strictly speaking running on a different contract. Per the versioning policy, that is a version bump, not an update.
+
+### 2026-05-11 — `api_update: 2026-05-11` — `/guide` local source + observed dataLayer events (T86)
+
+*Shipped with the initial `2026-05-11` release; documented here retroactively. Both items below are additive `/guide` changes and carry `since: 2026-05-11`.*
+
+**Added:**
+- ✅ **`features.datalayer_observed_events`** (and `features_detail.datalayer_observed_events`, `since: 2026-05-11`). When enabled, each entry in `/guide`'s `sites[]` — including the cross-site `all` aggregate — gains an `observed_events` map describing the **tenant-specific dataLayer schema** actually observed for that site: `{ event_name: { material: "events.{name}", columns: { … } } }`. This lets an AI client discover which custom `events.{name}` materials exist and what parameter keys/types each carries, so it can compose a correct `events.{name}` query without guessing. The map is schema only — values are aggregated via QAL `calc`, not returned here. Only event names that are QAL-safe (`[A-Za-z0-9_]+`) are surfaced; a missing or corrupt per-event manifest skips that one event rather than blanking the whole site.
+- ✅ **`features.guide_local_source`** (`since: 2026-05-11`). The `/guide` endpoint now reads its `documentation.sections` (`README.md`, `materials.yaml`, `qal-validation.yaml`) directly from the plugin-bundled `src/core/yaml/` files instead of fetching them from GitHub at runtime. The plugin version and the served spec are therefore guaranteed to match, and no GitHub round-trip or cache-invalidation step is involved. `documentation.source` now points at the human-readable docs.qazero.com mirror of those files for reference. This is observationally a no-op for clients except that the spec can no longer lag the installed plugin.
+
+**Why this update is still non-breaking:**
+- `observed_events` is an additive optional key inside each `sites[]` entry; clients that ignore it are unaffected, and servers on older versions simply omit it (gated on the feature flag). The local-source switch changes only where the server reads its own bundled files from — the response shape clients consume is unchanged.
 
 ---
 

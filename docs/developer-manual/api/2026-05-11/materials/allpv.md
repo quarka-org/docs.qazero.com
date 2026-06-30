@@ -58,6 +58,14 @@ are documented in [`ai/materials.yaml`](../ai/materials.yaml):
   `content_id`, plus the raw `utm_*` fields.
 - **Device details**: `device_type`, `os`, `browser`, `language`,
   `country_code`.
+- **Browser viewport**: `window_inner_width`, `window_inner_height`
+  (uint16) — the browser's live `window.innerWidth` / `window.innerHeight`
+  in CSS pixels at the moment of the page view: the *actual rendered
+  content area*, not the device's screen resolution. `0` means the
+  source header was missing for that view; filter `gte: 1` to keep only
+  real measurements. Useful for responsive-breakpoint and viewport-band
+  analysis (`between: 768, 1199` ≈ tablet, `gte: 1200` ≈ desktop).
+  **Since:** 2026-05-20
 - **Engagement depth**: `dead_click_image_count`, `scroll_back_count`,
   `content_skip_count`, `exploration_count`, `depth_position`,
   `exit_pos`.

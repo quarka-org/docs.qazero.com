@@ -44,6 +44,8 @@ Authorization: Basic <base64 user:app_password>
     "allpv_prev_next_page":  true,
     "materials_supports_all": true,
     "calc_join_symmetric":   true,
+    "guide_local_source":    true,
+    "datalayer_observed_events": true,
     "sample":                false,
     "include_count":         false,
     "return_file":           false,
@@ -60,6 +62,8 @@ Authorization: Basic <base64 user:app_password>
     "allpv_prev_next_page":  { "enabled": true,  "since": "2026-04-17" },
     "materials_supports_all":{ "enabled": true,  "since": "2026-04-29" },
     "calc_join_symmetric":   { "enabled": true,  "since": "2026-05-11" },
+    "guide_local_source":    { "enabled": true,  "since": "2026-05-11" },
+    "datalayer_observed_events": { "enabled": true, "since": "2026-05-11" },
     "sample":                { "enabled": false },
     "include_count":         { "enabled": false },
     "return_file":           { "enabled": false },
@@ -82,12 +86,22 @@ Authorization: Basic <base64 user:app_password>
           "type": "gtype_page",
           "condition": { "url": "/thanks/", "match": "exact" }
         }
-      ]
+      ],
+      "observed_events": {
+        "purchase": {
+          "material": "events.purchase",
+          "columns": { "value": "number", "currency": "string", "items": "number" }
+        },
+        "newsletter_signup": {
+          "material": "events.newsletter_signup",
+          "columns": { "plan": "string" }
+        }
+      }
     }
   ],
 
   "documentation": {
-    "source": "https://github.com/quarka-org/docs.qazero.com/tree/main/docs/developer-manual/api/2026-05-11/ai",
+    "source": "https://docs.qazero.com/docs/developer-manual/api/2026-05-11/ai",
     "format": "mixed",
     "sections": [
       {
@@ -128,6 +142,8 @@ Authorization: Basic <base64 user:app_password>
 | `features_detail`       | Rich `{name: {enabled, since?}}` map. Use this for `since` checks.    |
 | `sites[]`               | One entry per tracking_id the authenticated user can access.           |
 | `sites[].goals[]`       | Per-site goal definitions — the mapping from `goal_N` material to the goal it represents. |
+| `sites[].observed_events` | **Since 2026-05-11.** Tenant-specific dataLayer schema observed for this site. Present only when `datalayer_observed_events` is enabled. See [`observed_events`](#observed-events) below. |
+| `documentation.source`  | URL of the human-readable mirror of the served spec on docs.qazero.com. The spec itself is in `documentation.sections`. |
 | `documentation.sections`| Live spec served to AI clients. `README.md` is markdown; the two `.yaml` files are the authoritative schema. |
 
 ### `supports_all` flag on each material
@@ -161,13 +177,59 @@ on every material. Older servers may omit the flag entirely; in that
 case treat its absence as "unknown — try the query and handle the
 error."
 
-## Caching
+### `observed_events` — per-site dataLayer schema {#observed-events}
 
-The server caches the `ai/` subdirectory from GitHub locally the
-first time `/guide` is called for a given version. Subsequent calls
-read from the local cache. If you change the docs source and want
-the cache invalidated, delete the cache directory on the server
-(it lives under `wp-content/qa-zero-data/restapi/`).
+**Since:** 2026-05-11 (gated on `features.datalayer_observed_events`)
+
+When the server advertises `datalayer_observed_events`, every entry in
+`sites[]` — including the cross-site `all` aggregate — carries an
+`observed_events` map describing the **dataLayer events actually
+observed for that site**, keyed by event name:
+
+```jsonc
+"observed_events": {
+  "purchase": {
+    "material": "events.purchase",          // the QAL material to query
+    "columns": { "value": "number", "currency": "string", "items": "number" }
+  }
+}
+```
+
+Use it to discover, at runtime and per tenant, which `events.{name}`
+materials exist and what parameter keys/types each one carries — so an
+AI client can answer "how many sessions purchased more than ¥10,000"
+by composing an `events.purchase` query on the `value` column instead
+of guessing whether that column is observed.
+
+Notes:
+
+- The map is **schema only**. It tells you the shape; the actual values
+  are aggregated through QAL `calc` on the `events.{name}` material, not
+  returned here.
+- Only QAL-safe event names (`[A-Za-z0-9_]+`) appear, because the
+  `/query` validator restricts `events.{name}` to that character set.
+  Raw dataLayer names containing `:`, `/`, `-`, etc. are skipped.
+- It degrades per-event: a missing or corrupt manifest for one event
+  skips that event only, never the whole site.
+- Older servers (without the feature flag) omit the key entirely —
+  treat its absence as "unknown" and fall back gracefully.
+
+## How `/guide` builds its spec
+
+**Since:** 2026-05-11 (`features.guide_local_source`)
+
+The `documentation.sections` content (`README.md`, `materials.yaml`,
+`qal-validation.yaml`) is read directly from the files bundled inside
+the QA ZERO plugin (`src/core/yaml/`) at request time. There is **no
+GitHub fetch and no server-side cache to invalidate** — the spec a
+server serves always matches the plugin version installed on it, by
+construction. `documentation.source` is a convenience URL pointing at
+the human-readable mirror of those same files on docs.qazero.com; it is
+not fetched by the endpoint.
+
+If you maintain a long-lived client cache of the spec, key it on the
+server's `api_update` (and `version`): when `api_update` advances, the
+bundled spec may have grown, so re-call `/guide` and refresh.
 
 ## Typical client flow
 
