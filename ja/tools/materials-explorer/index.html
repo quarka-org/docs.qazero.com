@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QA Materials Explorer — v0 prototype</title>
+<style>
+  :root{
+    --coral:#F28080; --coral-ink:#c85c5c; --sky:#80C6F2; --sky-ink:#3a86b8;
+    --yellow:#F2F180; --rose:#9D8888; --slate:#586973; --ink:#1b2227;
+    --bg:#f4f6f8; --surface:#ffffff; --line:#e2e7ea; --line-strong:#cdd5da;
+    --body:#3d4b5f; --muted:#7a8894;
+    --key:#8a6d3b; --key-bg:#fbf3e3; --key-line:#ead9b8;
+    --signal:#3a86b8; --signal-bg:#eef6fb;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;height:100%;}
+  body{
+    font-family:-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+    color:var(--ink); background:var(--bg); line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{display:flex;flex-direction:column;height:100vh;}
+
+  /* ---- Header ---- */
+  header{
+    background:var(--surface);border-bottom:1px solid var(--line);
+    padding:14px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  }
+  header .brand{font-weight:800;font-size:16px;letter-spacing:.01em;}
+  header .brand .zero{color:var(--coral);}
+  header .tag{font-size:11px;color:var(--muted);border:1px solid var(--line-strong);
+    border-radius:20px;padding:1px 9px;}
+  header .lead{font-size:12px;color:var(--muted);}
+  header .counts{display:flex;gap:18px;margin-left:auto;}
+  header .counts .c{text-align:right;}
+  header .counts .n{font-weight:800;font-size:18px;color:var(--slate);line-height:1;}
+  header .counts .n b{color:var(--coral);}
+  header .counts .l{font-size:10px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;}
+
+  /* ---- Body split ---- */
+  .split{display:flex;flex:1;min-height:0;}
+
+  /* Sidebar: materials */
+  .side{width:246px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--line);
+    overflow-y:auto;padding:10px 0;}
+  .side h2{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);
+    margin:8px 16px 6px;font-weight:700;}
+  .mat{display:block;width:100%;text-align:left;border:none;background:none;font-family:inherit;
+    padding:9px 16px;cursor:pointer;border-left:3px solid transparent;transition:background .14s;}
+  .mat:hover{background:var(--bg);}
+  .mat:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(128,198,242,.55);}
+  .mat.active{background:#fbf1f1;border-left-color:var(--coral);}
+  .mat .mn{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;font-weight:700;color:var(--ink);}
+  .mat.active .mn{color:var(--coral-ink);}
+  .mat .mg{font-size:11px;color:var(--muted);margin-top:1px;line-height:1.35;}
+  .mat .mc{font-size:10.5px;color:var(--muted);margin-top:3px;}
+  .mat .mc b{color:var(--signal);} .mat .mc i{color:var(--key);font-style:normal;}
+
+  /* Main */
+  .main{flex:1;overflow-y:auto;padding:20px 26px 60px;}
+  .toolbar{display:flex;gap:12px;align-items:center;margin-bottom:18px;flex-wrap:wrap;}
+  .search{position:relative;flex:1;min-width:220px;max-width:460px;}
+  .search label{position:absolute;left:-9999px;}
+  .search input{width:100%;height:40px;border:1px solid var(--line-strong);border-radius:10px;
+    padding:0 14px 0 38px;font-size:14px;font-family:inherit;background:var(--surface);color:var(--ink);}
+  .search input::placeholder{color:var(--muted);}
+  .search input:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(128,198,242,.45);}
+  .search .ic{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;}
+  .segbtns{display:flex;border:1px solid var(--line-strong);border-radius:9px;overflow:hidden;}
+  .segbtns button{border:none;background:var(--surface);font-family:inherit;font-size:12.5px;
+    padding:8px 14px;cursor:pointer;color:var(--body);display:flex;align-items:center;gap:6px;transition:background .14s;}
+  .segbtns button+button{border-left:1px solid var(--line);}
+  .segbtns button[aria-pressed="true"]{background:var(--slate);color:#fff;}
+  .segbtns button:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(128,198,242,.6);}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
+  .dot.key{background:var(--key);} .dot.signal{background:var(--signal);}
+
+  .mhead{margin:0 0 4px;}
+  .mhead h1{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:22px;margin:0;color:var(--ink);}
+  .mhead .desc{font-size:13.5px;color:var(--body);margin:4px 0 2px;max-width:74ch;}
+  .mhead .meta{font-size:11.5px;color:var(--muted);margin-top:6px;display:flex;gap:14px;flex-wrap:wrap;}
+  .mhead .meta b{color:var(--slate);}
+
+  /* Groups */
+  .grp{border:1px solid var(--line);border-radius:12px;background:var(--surface);margin-top:14px;overflow:hidden;}
+  .grp.iskey{background:var(--key-bg);border-color:var(--key-line);}
+  .grp>summary{list-style:none;cursor:pointer;padding:12px 16px;display:flex;align-items:center;gap:10px;}
+  .grp>summary::-webkit-details-marker{display:none;}
+  .grp>summary:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(128,198,242,.55);}
+  .grp .tw{transition:transform .18s;color:var(--muted);font-size:12px;width:12px;}
+  .grp[open] .tw{transform:rotate(90deg);}
+  .grp .gname{font-weight:700;font-size:14px;color:var(--ink);}
+  .grp.iskey .gname{color:var(--key);}
+  .grp .gtag{font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+    padding:1px 8px;border-radius:10px;}
+  .gtag.key{background:#fff;color:var(--key);border:1px solid var(--key-line);}
+  .gtag.signal{background:var(--signal-bg);color:var(--signal);border:1px solid #cfe6f5;}
+  .grp .gcount{font-size:11.5px;color:var(--muted);margin-left:auto;}
+  .grp .gdesc{font-size:11.5px;color:var(--muted);padding:0 16px 4px 38px;margin-top:-4px;}
+  .grp .rows{border-top:1px solid var(--line);}
+  .grp.iskey .rows{border-top-color:var(--key-line);}
+
+  .row{display:grid;grid-template-columns:210px 1fr;gap:14px;padding:10px 16px 10px 38px;
+    border-bottom:1px solid var(--line);align-items:start;}
+  .grp.iskey .row{border-bottom-color:var(--key-line);}
+  .row:last-child{border-bottom:none;}
+  .row .cn{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--ink);
+    font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .row.star .cn::before{content:"✦";color:var(--coral);font-size:12px;}
+  .row .note{font-size:12.5px;color:var(--body);}
+  .badges{display:inline-flex;gap:4px;flex-wrap:wrap;margin-top:3px;}
+  .b{font-size:10px;font-weight:600;padding:0 6px;border-radius:5px;line-height:16px;
+    font-family:ui-monospace,Menlo,monospace;}
+  .b.type{background:#eef1f3;color:var(--slate);}
+  .b.since{background:#eaf6ee;color:#4f9166;}
+  .b.virtual{background:#f3ecfa;color:#8257b5;}
+  .b.resolved{background:#fdf0e8;color:#c26a3a;}
+  .b.joinkey{background:#fff;color:var(--key);border:1px solid var(--key-line);}
+
+  .empty{padding:40px;text-align:center;color:var(--muted);font-size:14px;}
+  .foot{margin-top:26px;font-size:11.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;}
+  .foot b{color:var(--slate);}
+  mark{background:var(--yellow);color:var(--ink);padding:0 1px;border-radius:2px;}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <span class="brand">QA <span class="zero">Materials</span> Explorer</span>
+    <span class="tag">v0 prototype</span>
+    <div class="counts">
+      <div class="c"><div class="n" id="cMat">–</div><div class="l">materials</div></div>
+      <div class="c"><div class="n" id="cSig">–</div><div class="l">signals</div></div>
+      <div class="c"><div class="n" id="cTot">–</div><div class="l">total fields</div></div>
+    </div>
+  </header>
+
+  <div class="split">
+    <nav class="side" id="side" aria-label="Materials">
+      <h2>Materials</h2>
+      <!-- material buttons injected -->
+    </nav>
+
+    <main class="main">
+      <div class="toolbar">
+        <div class="search">
+          <label for="q">フィールドを検索</label>
+          <span class="ic" aria-hidden="true">⌕</span>
+          <input id="q" type="search" placeholder="フィールド名・意味で検索（例: scroll, position, deep）" autocomplete="off">
+        </div>
+        <div class="segbtns" role="group" aria-label="表示するフィールド種別">
+          <button id="segAll"    aria-pressed="true">すべて</button>
+          <button id="segKey"    aria-pressed="false"><span class="dot key"></span>キー</button>
+          <button id="segSignal" aria-pressed="false"><span class="dot signal"></span>シグナル</button>
+        </div>
+      </div>
+
+      <div class="mhead" id="mhead"></div>
+      <div id="groups"></div>
+
+      <div class="foot">
+        <b>読み方:</b> <span class="dot key" style="vertical-align:middle"></span> <b>キー</b>＝JOIN・絞り込みに使う識別子／
+        <span class="dot signal" style="vertical-align:middle"></span> <b>シグナル</b>＝分析対象の行動値。<span style="color:var(--coral)">✦</span> = QA 固有の行動シグナル。
+        バッジ: <span class="b type">type</span> 格納型 · <span class="b since">since</span> 追加update日 · <span class="b joinkey">join</span> 結合キー。
+      </div>
+    </main>
+  </div>
+</div>
+
+<script src="explorer-data.js"></script>
+<script>
+// ---- Data (auto-generated from yaml — do not hand-edit) ----
+const DATA = window.MATERIALS_DATA;
+// ---- State ----------------------------------------------------------------
+let current = "allpv";
+let seg = "all";           // all | key | signal
+let query = "";
+
+// ---- Helpers --------------------------------------------------------------
+const $ = s => document.querySelector(s);
+const el = (t,c) => { const e=document.createElement(t); if(c) e.className=c; return e; };
+const norm = s => (s||"").toLowerCase();
+function esc(s){ return (s||"").replace(/[&<>]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[m])); }
+function mark(text, q){
+  if(!q) return esc(text);
+  const i = norm(text).indexOf(norm(q));
+  if(i<0) return esc(text);
+  return esc(text.slice(0,i))+"<mark>"+esc(text.slice(i,i+q.length))+"</mark>"+esc(text.slice(i+q.length));
+}
+function matchCol(col, fam){
+  if(!query) return true;
+  const q = norm(query);
+  return norm(col.n).includes(q) || norm(col.note).includes(q) || norm(fam).includes(q);
+}
+function countSignals(m){ return m.groups.filter(g=>g.kind==="signal").reduce((a,g)=>a+g.cols.length,0); }
+function countKeys(m){ return m.groups.filter(g=>g.kind==="key").reduce((a,g)=>a+g.cols.length,0); }
+function countAll(m){ return m.groups.reduce((a,g)=>a+g.cols.length,0); }
+
+// ---- Render: counters -----------------------------------------------------
+function renderCounts(){
+  const mats = Object.values(DATA);
+  $("#cMat").textContent = mats.length;
+  const sig = mats.reduce((a,m)=>a+countSignals(m),0);
+  const tot = mats.reduce((a,m)=>a+countAll(m),0);
+  $("#cSig").innerHTML = "<b>"+sig+"</b>";
+  $("#cTot").textContent = tot;
+}
+
+// ---- Render: sidebar ------------------------------------------------------
+function renderSide(){
+  const side = $("#side");
+  side.querySelectorAll(".mat").forEach(n=>n.remove());
+  Object.entries(DATA).forEach(([id,m])=>{
+    const b = el("button","mat"+(id===current?" active":""));
+    b.type="button";
+    b.innerHTML = `<div class="mn">${id}</div><div class="mg">${esc(m.grain)}</div>`+
+      `<div class="mc"><i>${countKeys(m)} キー</i> · <b>${countSignals(m)} シグナル</b></div>`;
+    b.addEventListener("click",()=>{ current=id; query=""; $("#q").value=""; render(); renderSide(); });
+    side.appendChild(b);
+  });
+}
+
+// ---- Render: main ---------------------------------------------------------
+function badges(col){
+  let h="";
+  if(col.type) h+=`<span class="b type">${col.type}</span>`;
+  if(col.join) h+=`<span class="b joinkey">join</span>`;
+  if(col.since) h+=`<span class="b since">since ${col.since}</span>`;
+  return h;
+}
+function render(){
+  const m = DATA[current];
+  $("#mhead").innerHTML =
+    `<h1>${current}</h1>`+
+    `<p class="desc">${esc(m.blurb)}</p>`+
+    `<div class="meta"><span>${esc(m.grain)}</span>`+
+    `<span><b>${countSignals(m)}</b> signals · <b>${countAll(m)}</b> fields</span>`+
+    `<span>tracking_id "all": <b>${m.supports_all?"対応":"非対応"}</b></span></div>`;
+
+  const wrap = $("#groups");
+  wrap.innerHTML="";
+  let shown=0;
+  m.groups.forEach(g=>{
+    if(seg==="key" && g.kind!=="key") return;
+    if(seg==="signal" && g.kind!=="signal") return;
+    const cols = g.cols.filter(c=>matchCol(c,g.fam));
+    if(!cols.length) return;
+    shown += cols.length;
+    const openByDefault = !!query || g.kind==="key" || !!g.star;
+    const d = el("details","grp"+(g.kind==="key"?" iskey":""));
+    if(openByDefault) d.open=true;
+    const sum = el("summary");
+    sum.innerHTML =
+      `<span class="tw">▶</span>`+
+      `<span class="gname">${esc(g.fam)}</span>`+
+      `<span class="gtag ${g.kind}">${g.kind==="key"?"キー":"シグナル"}</span>`+
+      (g.star?`<span title="QA 固有の行動シグナル" style="color:var(--coral)">✦</span>`:``)+
+      `<span class="gcount">${cols.length}</span>`;
+    d.appendChild(sum);
+    if(g.desc){ const gd=el("div","gdesc"); gd.textContent=g.desc; d.appendChild(gd); }
+    const rows = el("div","rows");
+    cols.forEach(c=>{
+      const r = el("div","row"+(c.star?" star":""));
+      r.innerHTML =
+        `<div class="cn">${mark(c.n,query)}<span class="badges">${badges(c)}</span></div>`+
+        `<div class="note">${mark(c.note,query)}</div>`;
+      rows.appendChild(r);
+    });
+    d.appendChild(rows);
+    wrap.appendChild(d);
+  });
+  if(!shown){
+    const e=el("div","empty"); e.textContent="該当するフィールドがありません。検索語を変えてみてください。";
+    wrap.appendChild(e);
+  }
+}
+
+// ---- Segmented control ----------------------------------------------------
+function syncSeg(){
+  $("#segAll").setAttribute("aria-pressed", seg==="all");
+  $("#segKey").setAttribute("aria-pressed", seg==="key");
+  $("#segSignal").setAttribute("aria-pressed", seg==="signal");
+}
+$("#segAll").addEventListener("click",()=>{seg="all";syncSeg();render();});
+$("#segKey").addEventListener("click",()=>{seg="key";syncSeg();render();});
+$("#segSignal").addEventListener("click",()=>{seg="signal";syncSeg();render();});
+
+// ---- Search ---------------------------------------------------------------
+$("#q").addEventListener("input",e=>{ query=e.target.value.trim(); render(); });
+
+// ---- Boot -----------------------------------------------------------------
+renderCounts();
+renderSide();
+syncSeg();
+render();
+</script>
+</body>
+</html>

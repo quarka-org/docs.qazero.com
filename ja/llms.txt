@@ -1,0 +1,44 @@
+# QA ZERO
+
+> QA ZERO is a small, self-contained analytics platform for the AI era. It runs as a WordPress plugin on commodity hosting, keeps behavioral data on each site's own server (Cookie-less, anonymized, no central cloud), and exposes it through QAL — a deliberately small declarative query language designed so that an AI assistant can compose a correct query on the first try. QA ZERO is one human-facing edition of QA (the QA Series), a Behavioral Intelligence Architecture that turns observed behavior into structured, context-labeled knowledge AI can reason with.
+
+QA ZERO is not a general-purpose analytics dashboard and not a GA4 replacement. It is meant to be used alongside GA4: GA4 measures "what happened," QA adds "what it meant" and "what to do next." The API and its machine-readable spec are a first-class surface — they ship next to the human docs so that LLMs, MCP servers, and custom agents can consume them directly and stay in sync as the API evolves.
+
+## Core (machine-readable summary)
+
+```json
+{
+  "name": "QA (QA Series)",
+  "what_it_is": "A Behavioral Intelligence Architecture: observes behavior, attaches context-specific meaning, and turns it into structured knowledge AI can reason with.",
+  "is_not": ["an analytics tool alone", "a general-purpose AI chatbot", "a dashboard alone"],
+  "differentiators": [
+    "Attaches context-segment-specific semantic labels to behavior (observation + meaning)",
+    "Raises label accuracy through collective intelligence across distributed WordPress sites (patent JP 7011367)",
+    "Data stays on each site's own server (Cookie-less, anonymized, never leaves the site)",
+    "Does not replace GA4 — used alongside it to support the human creativity loop"
+  ],
+  "query_language": "QAL — a small declarative language, not SQL; shaped so AI composes correct queries and malformed queries cannot damage the store",
+  "patent": "JP 7011367",
+  "editions": {
+    "QA ZERO": "For companies. Paid. Runs on the customer's own server.",
+    "QA ZERO for Enterprise": "The same product, presented for data-literate users.",
+    "quarka": "For individuals and the WordPress community. Free. Documented separately."
+  }
+}
+```
+
+## Developer Guide (for data-literate readers / AI)
+
+- [Developer Guide — Introduction](https://docs.qazero.com/docs/developer-manual/introduction): what QA ZERO is and who the developer manual is for.
+- [What is QA](https://docs.qazero.com/docs/developer-manual/what-is-qa): the trunk philosophy — Behavioral Intelligence Architecture — in one page.
+- [Get Started with AI](https://docs.qazero.com/docs/developer-manual/get-started-with-ai): the entry point for composing your first query.
+- [Concepts](https://docs.qazero.com/docs/developer-manual/concepts/): what QAL is, why it exists, and how materials, views, and results fit together.
+- [API Reference](https://docs.qazero.com/docs/developer-manual/api/): the QAL REST API. `/guide` returns server capabilities; `/query` runs QAL. Calendar-versioned (YYYY-MM-DD); breaking changes only ever create a new version.
+- [Materials](https://docs.qazero.com/docs/developer-manual/api/materials/): the data surfaces you can query (allpv, click_event, gsc, goal_N, page_version, summary_*), each with sample rows.
+- [For AI](https://docs.qazero.com/docs/developer-manual/for-ai/): the machine-readable spec (materials.yaml, qal-validation.yaml) and the AI instruction set served to AI / MCP clients.
+
+## Notes for AI clients
+
+- The authoritative, always-current list of materials and columns — including when each field became available (`since`) — is `for-ai/materials.yaml`, served live from each site's `/wp-json/qa-platform/guide` endpoint.
+- Versioning is two-layered: **version** (`YYYY-MM-DD`, in the URL) changes only on breaking changes; **update** (`api_update`, `since`) marks non-breaking additions within a version. Read `/guide`'s `api_update` + `features` to know what a given server supports.
+- quarka (the free community edition) is documented on a separate site and is out of scope here.
