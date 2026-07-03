@@ -26,7 +26,7 @@ Content-Type: application/json
 ### Request body
 
 A valid QAL query. See [Concepts → What is QAL?](../../../concepts/what-is-qal.md)
-for the shape, and [`ai/qal-validation.yaml`](../ai/qal-validation.yaml)
+for the shape, and [`ai/qal-validation.yaml`](../qal-validation.yaml)
 for the authoritative validation rules.
 
 Minimal valid body:
@@ -134,7 +134,7 @@ These come straight from `ai/qal-validation.yaml`:
 
 ## Where to go next
 
-- **[AI Instructions](../ai/README.md)** — if you are building a
+- **[AI Instructions](../../../for-ai/index.md)** — if you are building a
   client that composes QAL queries.
 - **[Examples](./examples.md)** — worked end-to-end curl
   sequences.

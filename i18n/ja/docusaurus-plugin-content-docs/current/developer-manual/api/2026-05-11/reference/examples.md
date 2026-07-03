@@ -158,4 +158,4 @@ curl -s -u "admin:xxxx xxxx xxxx xxxx xxxx xxxx" \
 
 - **[`/guide`](./guide.md)** — ディスカバリレスポンスから何を取り出すか。
 - **[`/query`](./query.md)** — リクエスト/レスポンスの詳細。
-- **[Materials](../materials/)** — クエリできるデータ。
+- **[Materials](../../materials/)** — クエリできるデータ。

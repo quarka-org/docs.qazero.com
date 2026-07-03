@@ -65,13 +65,17 @@ cloud-warehouse dependency — all point in the same direction.
 
 ## Where to go next
 
+- [What is QA](./what-is-qa.md) — the trunk the editions grow from, and
+  why the API is shaped the way it is.
 - [Get Started with AI](./get-started-with-ai.md) — the entry point for
   building your first query.
 - [Concepts](./concepts/) — what QAL is, why it exists, and how the
   pieces fit together.
-- [Version 2025-10-20](./api/2025-10-20/) — the current API version.
-  Materials, reference, and the AI spec live here.
-- [AI Instructions](./api/2025-10-20/ai/) — the minimal rule set served
-  to AI / MCP clients.
+- [API Reference](./api/) — the REST API surface. Current version:
+  **2026-05-11** (`2025-10-20` supported as an archive).
+- [Materials](./api/materials/) — the version-independent catalogue of
+  data surfaces you can query.
+- [For AI — Instructions & Spec](./for-ai/) — the minimal rule set and
+  machine-readable spec served to AI / MCP clients.
 
 > **作業のための分析から、創造のための観測基盤へ。**

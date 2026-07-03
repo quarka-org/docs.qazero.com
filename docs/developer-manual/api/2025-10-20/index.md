@@ -12,7 +12,7 @@ api_update: 2026-04-29
 **API Version:** 2025-10-20  
 **API Update:** 2026-04-29  
 **Plugin Version Required:** 3.0.0.0+  
-**Status:** Current Release
+**Status:** Previous (supported — 24-month archive)
 
 `2025-10-20` is the URL-visible version — it only changes on breaking
 revisions. `api_update` bumps on every non-breaking addition within
@@ -29,18 +29,23 @@ version-independent and apply to every API version.
 
 ## What is in this version
 
-- **[Materials](./materials/)** — the data surfaces you can query.
-  One page per material, each with a hand-crafted sample table so
-  the grain of the data is visible at a glance.
+Version-pinned pages (fixed to `2025-10-20`):
+
 - **[API Reference](./reference/)** — exact shapes of `/guide`,
   `/query`, authentication, and errors, with worked examples.
-- **[AI Spec](./ai/)** — the subset of this directory served to
-  AI / MCP clients via `/guide`: a concise instruction README and
-  the two machine-readable YAML specs (`materials.yaml`,
-  `qal-validation.yaml`).
+- **[`qal-validation.yaml`](./qal-validation.yaml)** — the feature-flag
+  and validator spec for this version (machine-readable, version-pinned).
 - **[Update History](./changelog.md)** — the Update Ledger for this
   version. Every non-breaking addition is logged here against its
   `api_update` date.
+
+Shared, version-independent pages (living — the same catalogue serves
+every version):
+
+- **[Materials](../materials/)** — the data surfaces you can query.
+- **[For AI — Instructions & Spec](../../for-ai/)** — the concise
+  instruction set plus `materials.yaml`, served to AI / MCP clients
+  via `/guide`.
 
 ## Before you start
 

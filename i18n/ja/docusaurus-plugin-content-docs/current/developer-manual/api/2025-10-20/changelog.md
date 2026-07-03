@@ -13,7 +13,7 @@ api_update: 2026-04-29
 ### 2026-04-29 — `api_update: 2026-04-29` — `materials.supports_all` フラグ
 
 **追加:**
-- ✅ **`materials.{name}.supports_all: true | false`** を [`materials.yaml`](./ai/materials.yaml) に追加 — すべてのマテリアルが、`tracking_id: "all"`（夜間バッチで生成される全サイト集約）でクエリできるかどうかを宣言するようになりました。現時点で `true` は `allpv`, `click_event`, `datalayer_event`, `events_template`、`false` は `gsc`, `goal_x`, `page_version`, `ga4_*` です。AI クライアントや管理画面 UI は、特定のマテリアルに対して "全サイト" を tracking_id の選択肢として提示する前に、このフラグを必ず参照してください。
+- ✅ **`materials.{name}.supports_all: true | false`** を [`materials.yaml`](../../for-ai/materials.yaml) に追加 — すべてのマテリアルが、`tracking_id: "all"`（夜間バッチで生成される全サイト集約）でクエリできるかどうかを宣言するようになりました。現時点で `true` は `allpv`, `click_event`, `datalayer_event`, `events_template`、`false` は `gsc`, `goal_x`, `page_version`, `ga4_*` です。AI クライアントや管理画面 UI は、特定のマテリアルに対して "全サイト" を tracking_id の選択肢として提示する前に、このフラグを必ず参照してください。
 - ✅ **`features.materials_supports_all`** を `/guide` で返すようになりました — クライアントはこの機能フラグを確認することで、新フラグの可用性を検出できます。旧バージョンのサーバーは個別マテリアルの `supports_all` を省略する可能性があります。フラグ非存在時は「不明 — クエリを投げてエラーで判定する」扱いにしてください。**Since:** 2026-04-29
 - ✅ **`ai/materials.yaml` と `ai/qal-validation.yaml` を qa-labo ソースと同期** — 今回のアップデートだけでなく、直前の 2026-04-17 アップデートぶんも反映しました。AI に配信される YAML が、2026-04-17 で追加された `prev_page_id` / `next_page_id` / `prev_url` / `prev_title` / `next_url` / `next_title` カラムと `allpv_prev_next_page` 機能フラグを反映するようになっています。人間向けの `materials/allpv.md` と `/guide` リファレンス例はすでに正しい状態でしたが、AI 向け YAML だけが追従できていませんでした。
 
@@ -52,7 +52,7 @@ api_update: 2026-04-29
 
 ### 2026-04-13 — `api_update: 2026-04-13` — Documentation v1.2.0
 **追加:**
-- ✅ **QAL `make.sort`** — ビュー単位の行ソートとトップ N 抽出。`make` 内のビューに `sort: { by, order, top }` を置くことで、`filter` / `join` / `keep` / `calc` の後にそのビューの出力をソートします。`by` は修飾あり（`allpv.url`）でも修飾なし（`pageviews`）でも指定でき、`order` は `asc` / `desc`、`top` は省略可能な行数キャップです。[QAL とは何か?](../../concepts/what-is-qal.md) コンセプトページと、正本の [`qal-validation.yaml`](./ai/qal-validation.yaml) を参照。
+- ✅ **QAL `make.sort`** — ビュー単位の行ソートとトップ N 抽出。`make` 内のビューに `sort: { by, order, top }` を置くことで、`filter` / `join` / `keep` / `calc` の後にそのビューの出力をソートします。`by` は修飾あり（`allpv.url`）でも修飾なし（`pageviews`）でも指定でき、`order` は `asc` / `desc`、`top` は省略可能な行数キャップです。[QAL とは何か?](../../concepts/what-is-qal.md) コンセプトページと、正本の [`qal-validation.yaml`](./qal-validation.yaml) を参照。
 - ✅ 本アップデートを導入したサーバーでは `/guide` の `features.sort` が `true` を返すようになりました。クライアントは機能の可用性をハードコードせず、この値を参照して検出してください。
 
 **訂正:**

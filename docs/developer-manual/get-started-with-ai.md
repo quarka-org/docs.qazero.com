@@ -45,11 +45,11 @@ operate it responsibly, on any server, for anyone who has a website.**
    `tracking_id`s you can query. **Call this first.**
 2. **`POST /wp-json/qa-platform/query`** — accepts a QAL query in the
    JSON body and returns rows.
-3. **The `ai/` subdirectory of the current API version.** It contains
-   a concise `README.md` plus two YAML specs (`materials.yaml`,
-   `qal-validation.yaml`). This is the same content the `/guide`
-   endpoint serves, so you can preview it without authenticating.
-   See [AI Instructions](./api/2025-10-20/ai/).
+3. **The [`for-ai/`](./for-ai/) section.** It contains a concise
+   instruction set plus the machine-readable `materials.yaml`, alongside
+   the version-pinned `qal-validation.yaml`. This is the same content the
+   `/guide` endpoint serves, so you can preview it without authenticating.
+   See [For AI — Instructions & Spec](./for-ai/).
 
 Everything else in this manual is there to help humans understand
 *why* those three pieces are shaped the way they are.
@@ -90,9 +90,13 @@ rationale.
   *why* QAL exists and how it is shaped. In particular, read
   [**Why QAL**](./concepts/why-qal.md) before you try to compare it
   to SQL.
-- **[Version 2025-10-20](./api/2025-10-20/)** — the current API
-  version. Materials, reference, and the AI spec live here.
-- **[AI Instructions](./api/2025-10-20/ai/)** — the minimal rule set
+- **[API Reference](./api/)** — the REST API surface. The current
+  version is **2026-05-11**; `2025-10-20` remains supported as an
+  archive. Version-pinned reference, `qal-validation.yaml`, and the
+  changelog live under each version.
+- **[Materials](./api/materials/)** — the version-independent catalogue
+  of data surfaces you can query.
+- **[For AI — Instructions & Spec](./for-ai/)** — the minimal rule set
   served to AI / MCP clients. Useful to read even as a human, because
   it reveals exactly what constraints the API enforces.
 

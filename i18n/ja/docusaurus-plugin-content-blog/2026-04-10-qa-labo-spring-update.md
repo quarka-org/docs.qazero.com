@@ -33,7 +33,7 @@ QA ZERO の重たい開発作業のほとんどは、**qa-labo** という兄弟
 - **`click_event`** — セレクター、要素テキスト、遷移先 URL、ページ相対座標を含むクリックイベントです。`pv_id` で結合できます。
 - **`datalayer_event`**（+ 動的な **`events.{name}`**） — dataLayer イベントを送出しているサイトでは、全イベントの統一インデックスに加え、そのイベントのパラメーターを反映した型付きのイベント別マテリアルの両方が利用できるようになりました。`/guide` のレスポンスには、そのサイトが公開しているすべての `events.*` マテリアルが列挙されます。
 
-そして `allpv` 自身にも多数の新カラムが追加されました。行動メトリクス（`depth_position`、`deep_read`、`stop_max_sec`、`stop_max_pos`、`exit_pos`、`is_submit`、`dead_click_image_count`、`irritation_click_count`、`scroll_back_count`、`content_skip_count`、`exploration_count`）と、生成されるページタイプ判定フラグ（`is_article`、`is_product`、`is_form`、`is_faq` など）です。キュレーションされたリストは [`allpv` マテリアルページ](/docs/developer-manual/api/2025-10-20/materials/material-allpv-2025-10-20) を、完全な正本スキーマは [GitHub の `ai/materials.yaml`](https://github.com/quarka-org/docs.qazero.com/blob/main/docs/developer-manual/api/2025-10-20/ai/materials.yaml) を参照してください。
+そして `allpv` 自身にも多数の新カラムが追加されました。行動メトリクス（`depth_position`、`deep_read`、`stop_max_sec`、`stop_max_pos`、`exit_pos`、`is_submit`、`dead_click_image_count`、`irritation_click_count`、`scroll_back_count`、`content_skip_count`、`exploration_count`）と、生成されるページタイプ判定フラグ（`is_article`、`is_product`、`is_form`、`is_faq` など）です。キュレーションされたリストは [`allpv` マテリアルページ](/docs/developer-manual/api/materials/material-allpv) を、完全な正本スキーマは [GitHub の `ai/materials.yaml`](https://github.com/quarka-org/docs.qazero.com/blob/main/docs/developer-manual/api/2025-10-20/ai/materials.yaml) を参照してください。
 
 ## なぜ「AI のためのナレッジベースとしてのドキュメント」なのか？
 

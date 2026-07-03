@@ -161,4 +161,4 @@ The response will be a scalar count, not a row set.
 - **[`/guide`](./guide.md)** — what to parse from the discovery
   response.
 - **[`/query`](./query.md)** — request/response shape in detail.
-- **[Materials](../materials/)** — what data exists to query.
+- **[Materials](../../materials/)** — what data exists to query.

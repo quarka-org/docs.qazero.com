@@ -48,6 +48,6 @@ QA ZERO は、AI に対して中立ではありません。分析という仕事
 - [AI と使いはじめる](./get-started-with-ai.md) — 最初のクエリを組み立てるための入口。
 - [Concepts](./concepts/) — QAL とは何か、なぜ存在するのか、各部品がどう組み合わさるのか。
 - [Version 2025-10-20](./api/2025-10-20/) — 現行 API バージョン。Materials, Reference, AI 仕様書はここにあります。
-- [AI Instructions](./api/2025-10-20/ai/) — AI / MCP クライアントに配信される最小ルール集。
+- [AI Instructions](./for-ai/) — AI / MCP クライアントに配信される最小ルール集。
 
 > **作業のための分析から、創造のための観測基盤へ。**

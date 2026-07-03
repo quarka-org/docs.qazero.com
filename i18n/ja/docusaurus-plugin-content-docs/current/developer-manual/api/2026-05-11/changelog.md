@@ -15,8 +15,8 @@ api_update: 2026-05-21
 ### 2026-05-21 — `api_update: 2026-05-21` — サマリー積分マテリアル（T102）
 
 **追加:**
-- ✅ **集計済みサマリーマテリアル3種** — `summary_landingpage`、`summary_allpage`、`summary_days_access_detail` を QAL のファーストクラスマテリアルとしてクエリできるようになりました。それぞれ、夜間バッチがすでに保持している **期間累計**（年初来の積分、1ファイル読み込みで提供）を返すので、「任意期間の入口ページ別セッション数」や「ページビュー別のページランキング」といった問いに、数百万行の `allpv` をスキャンせず答えられます。3種とも `supports_all: true`（全サイト集約 `tracking_id: "all"` が存在します）。[`summary_*` マテリアル](./materials/summary.md) と正本の [`materials.yaml`](./ai/materials.yaml) を参照してください。**Since:** 2026-05-21
-- ✅ **バリデータのマテリアルパターンを拡張** — `summary_landingpage` / `summary_allpage` / `summary_days_access_detail` が `materials[].name`、`make.*.from`、`make.*.keep` で受理されるようになりました（[`qal-validation.yaml`](./ai/qal-validation.yaml) を参照）。
+- ✅ **集計済みサマリーマテリアル3種** — `summary_landingpage`、`summary_allpage`、`summary_days_access_detail` を QAL のファーストクラスマテリアルとしてクエリできるようになりました。それぞれ、夜間バッチがすでに保持している **期間累計**（年初来の積分、1ファイル読み込みで提供）を返すので、「任意期間の入口ページ別セッション数」や「ページビュー別のページランキング」といった問いに、数百万行の `allpv` をスキャンせず答えられます。3種とも `supports_all: true`（全サイト集約 `tracking_id: "all"` が存在します）。[`summary_*` マテリアル](../materials/summary.md) と正本の [`materials.yaml`](../../for-ai/materials.yaml) を参照してください。**Since:** 2026-05-21
+- ✅ **バリデータのマテリアルパターンを拡張** — `summary_landingpage` / `summary_allpage` / `summary_days_access_detail` が `materials[].name`、`make.*.from`、`make.*.keep` で受理されるようになりました（[`qal-validation.yaml`](./qal-validation.yaml) を参照）。
 
 **重要な性質（使う前に読んでください）:**
 - 🔸 これらのマテリアルには **`date` 次元がありません**。各クエリは要求した期間に対する累計1セットを返します（年跨ぎの範囲に対応）。日次の内訳ではありません。日次トレンドが必要なら `allpv`（`date` 次元あり）を使ってください。カウントカラム（`pv_count`、`session_count` …）への数値範囲フィルターは、累計のロールアップ後に `post_filter` として適用されます。
@@ -27,7 +27,7 @@ api_update: 2026-05-21
 ### 2026-05-20 — `api_update: 2026-05-20` — `allpv` ブラウザウィンドウサイズ列（T101）
 
 **追加:**
-- ✅ **`allpv.window_inner_width` / `allpv.window_inner_height`** — ページビュー時点のブラウザの `window.innerWidth` / `window.innerHeight` を CSS ピクセルで記録する2つの新規列（uint16）です。デバイスの画面解像度ではなく **実表示コンテンツ領域** を表します。レスポンシブブレークポイント分析やビューポート帯のセグメント分割（例: タブレット帯は `between: 768, 1199`、PC 帯は `gte: 1200`）に使います。値が `0` のときはそのページビューでソースヘッダーが欠落していたことを意味するので、実測値だけを残すには `gte: 1` でフィルターしてください。[`allpv`](./materials/allpv.md) と [`materials.yaml`](./ai/materials.yaml) を参照してください。**Since:** 2026-05-20
+- ✅ **`allpv.window_inner_width` / `allpv.window_inner_height`** — ページビュー時点のブラウザの `window.innerWidth` / `window.innerHeight` を CSS ピクセルで記録する2つの新規列（uint16）です。デバイスの画面解像度ではなく **実表示コンテンツ領域** を表します。レスポンシブブレークポイント分析やビューポート帯のセグメント分割（例: タブレット帯は `between: 768, 1199`、PC 帯は `gte: 1200`）に使います。値が `0` のときはそのページビューでソースヘッダーが欠落していたことを意味するので、実測値だけを残すには `gte: 1` でフィルターしてください。[`allpv`](../materials/allpv.md) と [`materials.yaml`](../../for-ai/materials.yaml) を参照してください。**Since:** 2026-05-20
 
 **このアップデートが非破壊である理由:**
 - 両列とも追加（`nullable: true, default: 0`）です。参照しない既存クエリは無影響で、列導入より前の期間範囲はエラーではなく `0` を返します。
@@ -75,7 +75,7 @@ api_update: 2026-05-21
 ### 2026-04-29 — `api_update: 2026-04-29` — `materials.supports_all` フラグ
 
 **追加:**
-- ✅ **`materials.{name}.supports_all: true | false`** を [`materials.yaml`](./ai/materials.yaml) に追加 — すべてのマテリアルが、`tracking_id: "all"`（夜間バッチで生成される全サイト集約）でクエリできるかどうかを宣言するようになりました。現時点で `true` は `allpv`, `click_event`, `datalayer_event`, `events_template`、`false` は `gsc`, `goal_x`, `page_version`, `ga4_*` です。AI クライアントや管理画面 UI は、特定のマテリアルに対して "全サイト" を tracking_id の選択肢として提示する前に、このフラグを必ず参照してください。
+- ✅ **`materials.{name}.supports_all: true | false`** を [`materials.yaml`](../../for-ai/materials.yaml) に追加 — すべてのマテリアルが、`tracking_id: "all"`（夜間バッチで生成される全サイト集約）でクエリできるかどうかを宣言するようになりました。現時点で `true` は `allpv`, `click_event`, `datalayer_event`, `events_template`、`false` は `gsc`, `goal_x`, `page_version`, `ga4_*` です。AI クライアントや管理画面 UI は、特定のマテリアルに対して "全サイト" を tracking_id の選択肢として提示する前に、このフラグを必ず参照してください。
 - ✅ **`features.materials_supports_all`** を `/guide` で返すようになりました — クライアントはこの機能フラグを確認することで、新フラグの可用性を検出できます。旧バージョンのサーバーは個別マテリアルの `supports_all` を省略する可能性があります。フラグ非存在時は「不明 — クエリを投げてエラーで判定する」扱いにしてください。**Since:** 2026-04-29
 - ✅ **`ai/materials.yaml` と `ai/qal-validation.yaml` を qa-labo ソースと同期** — 今回のアップデートだけでなく、直前の 2026-04-17 アップデートぶんも反映しました。AI に配信される YAML が、2026-04-17 で追加された `prev_page_id` / `next_page_id` / `prev_url` / `prev_title` / `next_url` / `next_title` カラムと `allpv_prev_next_page` 機能フラグを反映するようになっています。人間向けの `materials/allpv.md` と `/guide` リファレンス例はすでに正しい状態でしたが、AI 向け YAML だけが追従できていませんでした。
 
@@ -114,7 +114,7 @@ api_update: 2026-05-21
 
 ### 2026-04-13 — `api_update: 2026-04-13` — Documentation v1.2.0
 **追加:**
-- ✅ **QAL `make.sort`** — ビュー単位の行ソートとトップ N 抽出。`make` 内のビューに `sort: { by, order, top }` を置くことで、`filter` / `join` / `keep` / `calc` の後にそのビューの出力をソートします。`by` は修飾あり（`allpv.url`）でも修飾なし（`pageviews`）でも指定でき、`order` は `asc` / `desc`、`top` は省略可能な行数キャップです。[QAL とは何か?](../../concepts/what-is-qal.md) コンセプトページと、正本の [`qal-validation.yaml`](./ai/qal-validation.yaml) を参照。
+- ✅ **QAL `make.sort`** — ビュー単位の行ソートとトップ N 抽出。`make` 内のビューに `sort: { by, order, top }` を置くことで、`filter` / `join` / `keep` / `calc` の後にそのビューの出力をソートします。`by` は修飾あり（`allpv.url`）でも修飾なし（`pageviews`）でも指定でき、`order` は `asc` / `desc`、`top` は省略可能な行数キャップです。[QAL とは何か?](../../concepts/what-is-qal.md) コンセプトページと、正本の [`qal-validation.yaml`](./qal-validation.yaml) を参照。
 - ✅ 本アップデートを導入したサーバーでは `/guide` の `features.sort` が `true` を返すようになりました。クライアントは機能の可用性をハードコードせず、この値を参照して検出してください。
 
 **訂正:**

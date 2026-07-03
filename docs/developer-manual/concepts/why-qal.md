@@ -153,5 +153,5 @@ To be explicit about the boundary:
   query language, in one page.
 - **[Materials, Views, Result](./materials-views-result.md)** — the
   three moving parts.
-- **[AI Instructions](../api/2025-10-20/ai/README.md)** — the rule set an AI client
+- **[AI Instructions](../for-ai/index.md)** — the rule set an AI client
   is expected to follow.

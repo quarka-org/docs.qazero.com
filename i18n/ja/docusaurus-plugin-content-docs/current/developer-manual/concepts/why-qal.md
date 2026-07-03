@@ -89,4 +89,4 @@ SQL はスキーマ設計者が選んだ語彙をそのまま採用します。Q
 
 - **[QAL とは何か?](./what-is-qal.md)** — クエリ言語の実際の形を1ページで。
 - **[Materials, Views, Result](./materials-views-result.md)** — 3つの動く部品。
-- **[AI Instructions](../api/2025-10-20/ai/README.md)** — AI クライアントが従うことを期待されるルール集。
+- **[AI Instructions](../for-ai/index.md)** — AI クライアントが従うことを期待されるルール集。

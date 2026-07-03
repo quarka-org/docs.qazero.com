@@ -85,7 +85,7 @@ Authorization: Basic <base64 user:app_password>
   ],
 
   "documentation": {
-    "source": "https://github.com/quarka-org/docs.qazero.com/tree/main/docs/developer-manual/api/2025-10-20/ai",
+    "source": "https://github.com/quarka-org/docs.qazero.com/tree/main/docs/developer-manual/for-ai",
     "format": "mixed",
     "sections": [
       {
@@ -130,7 +130,7 @@ Authorization: Basic <base64 user:app_password>
 
 ### `supports_all` flag on each material
 
-Each material in [`materials.yaml`](../ai/materials.yaml) carries a
+Each material in [`materials.yaml`](../../../for-ai/materials.yaml) carries a
 `supports_all: true | false` flag declaring whether the material is
 queryable with `tracking_id: "all"` (the cross-site aggregate). Read
 this from the `materials.yaml` block inside `documentation.sections`
@@ -180,6 +180,6 @@ the cache invalidated, delete the cache directory on the server
 ## Where to go next
 
 - **[`/query` reference](./query.md)** — the execution endpoint.
-- **[AI Instructions](../ai/README.md)** — what goes into the
+- **[AI Instructions](../../../for-ai/index.md)** — what goes into the
   README block inside `documentation.sections`.
 - **[Errors](./errors.md)** — canonical error codes.

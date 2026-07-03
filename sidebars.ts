@@ -99,6 +99,7 @@ const sidebars: SidebarsConfig = {
       },
       items: [
         'developer-manual/introduction',
+        'developer-manual/what-is-qa',
         'developer-manual/get-started-with-ai',
         {
           type: 'category',
@@ -126,27 +127,28 @@ const sidebars: SidebarsConfig = {
             'developer-manual/api/api-overview',
             {
               type: 'category',
+              label: 'Materials',
+              link: {
+                type: 'doc',
+                id: 'developer-manual/api/materials/materials-index',
+              },
+              items: [
+                'developer-manual/api/materials/material-allpv',
+                'developer-manual/api/materials/material-click-event',
+                'developer-manual/api/materials/material-gsc',
+                'developer-manual/api/materials/material-goal-n',
+                'developer-manual/api/materials/material-page-version',
+                'developer-manual/api/materials/material-summary',
+              ],
+            },
+            {
+              type: 'category',
               label: 'Version 2026-05-11 (Current)',
               link: {
                 type: 'doc',
                 id: 'developer-manual/api/2026-05-11/version-2026-05-11',
               },
               items: [
-                {
-                  type: 'category',
-                  label: 'Materials',
-                  link: {
-                    type: 'doc',
-                    id: 'developer-manual/api/2026-05-11/materials/materials-index-2026-05-11',
-                  },
-                  items: [
-                    'developer-manual/api/2026-05-11/materials/material-allpv-2026-05-11',
-                    'developer-manual/api/2026-05-11/materials/material-click-event-2026-05-11',
-                    'developer-manual/api/2026-05-11/materials/material-gsc-2026-05-11',
-                    'developer-manual/api/2026-05-11/materials/material-goal-n-2026-05-11',
-                    'developer-manual/api/2026-05-11/materials/material-page-version-2026-05-11',
-                  ],
-                },
                 {
                   type: 'category',
                   label: 'API Reference',
@@ -162,17 +164,6 @@ const sidebars: SidebarsConfig = {
                     'developer-manual/api/2026-05-11/reference/reference-examples-2026-05-11',
                   ],
                 },
-                {
-                  type: 'category',
-                  label: 'AI Spec',
-                  link: {
-                    type: 'doc',
-                    id: 'developer-manual/api/2026-05-11/ai/ai-readme-2026-05-11',
-                  },
-                  items: [
-                    'developer-manual/api/2026-05-11/ai/ai-readme-2026-05-11',
-                  ],
-                },
                 'developer-manual/api/2026-05-11/changelog-2026-05-11',
               ],
             },
@@ -184,21 +175,6 @@ const sidebars: SidebarsConfig = {
                 id: 'developer-manual/api/2025-10-20/version-2025-10-20',
               },
               items: [
-                {
-                  type: 'category',
-                  label: 'Materials',
-                  link: {
-                    type: 'doc',
-                    id: 'developer-manual/api/2025-10-20/materials/materials-index-2025-10-20',
-                  },
-                  items: [
-                    'developer-manual/api/2025-10-20/materials/material-allpv-2025-10-20',
-                    'developer-manual/api/2025-10-20/materials/material-click-event-2025-10-20',
-                    'developer-manual/api/2025-10-20/materials/material-gsc-2025-10-20',
-                    'developer-manual/api/2025-10-20/materials/material-goal-n-2025-10-20',
-                    'developer-manual/api/2025-10-20/materials/material-page-version-2025-10-20',
-                  ],
-                },
                 {
                   type: 'category',
                   label: 'API Reference',
@@ -214,25 +190,15 @@ const sidebars: SidebarsConfig = {
                     'developer-manual/api/2025-10-20/reference/reference-examples-2025-10-20',
                   ],
                 },
-                {
-                  type: 'category',
-                  label: 'AI Spec',
-                  link: {
-                    type: 'doc',
-                    id: 'developer-manual/api/2025-10-20/ai/ai-readme-2025-10-20',
-                  },
-                  items: [
-                    'developer-manual/api/2025-10-20/ai/ai-readme-2025-10-20',
-                  ],
-                },
                 'developer-manual/api/2025-10-20/changelog-2025-10-20',
               ],
             },
             'developer-manual/api/api-compatibility',
-            'developer-manual/api/VERSION_MANAGEMENT',
-            'developer-manual/api/RELEASE_UPDATE_GUIDE',
           ],
         },
+        'developer-manual/for-ai/for-ai-index',
+        'developer-manual/integrations/integrations-index',
+        'developer-manual/extending/extending-index',
       ],
     },
   ],

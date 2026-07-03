@@ -192,19 +192,19 @@ Breaking changes only happen with new version dates:
 
 ## Getting Help
 
-- **Documentation**: [Version 2025-10-20](./2025-10-20/)
-- **Support**: https://support.claude.com
-- **Repository**: https://github.com/quarka-org/docs.qazero.com
+- **Current version**: [Version 2026-05-11](./2026-05-11/)
+- **Materials catalogue**: [Materials](./materials/)
+- **For AI clients**: [For AI — Instructions & Spec](../for-ai/)
 
 ---
 
 ## Next Steps
 
-👉 **[Get Started with Version 2025-10-20](./2025-10-20/)** - Complete API documentation
+👉 **[Get Started with Version 2026-05-11](./2026-05-11/)** - Complete API documentation
 
 **What you'll learn:**
 - Authentication setup
-- Available materials (allpv, gsc)
+- Available materials (allpv, click_event, gsc, goal_N, page_version, summary_*)
 - QAL query basics
 - Endpoint reference
 - Code examples in multiple languages

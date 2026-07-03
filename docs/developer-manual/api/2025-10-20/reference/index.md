@@ -13,7 +13,7 @@ to be.
 
 If you are here looking for concepts or a mental model, go back to
 **[Concepts](../../../concepts/)**. If you are building through an AI
-client, the AI only needs **[AI Instructions](../ai/README.md)** and
+client, the AI only needs **[AI Instructions](../../../for-ai/index.md)** and
 the YAML specs — not these pages.
 
 ## In this section

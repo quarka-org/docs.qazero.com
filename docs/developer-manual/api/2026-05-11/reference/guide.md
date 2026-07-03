@@ -101,7 +101,7 @@ Authorization: Basic <base64 user:app_password>
   ],
 
   "documentation": {
-    "source": "https://docs.qazero.com/docs/developer-manual/api/2026-05-11/ai",
+    "source": "https://docs.qazero.com/docs/developer-manual/for-ai",
     "format": "mixed",
     "sections": [
       {
@@ -148,7 +148,7 @@ Authorization: Basic <base64 user:app_password>
 
 ### `supports_all` flag on each material
 
-Each material in [`materials.yaml`](../ai/materials.yaml) carries a
+Each material in [`materials.yaml`](../../../for-ai/materials.yaml) carries a
 `supports_all: true | false` flag declaring whether the material is
 queryable with `tracking_id: "all"` (the cross-site aggregate). Read
 this from the `materials.yaml` block inside `documentation.sections`
@@ -244,6 +244,6 @@ bundled spec may have grown, so re-call `/guide` and refresh.
 ## Where to go next
 
 - **[`/query` reference](./query.md)** — the execution endpoint.
-- **[AI Instructions](../ai/README.md)** — what goes into the
+- **[AI Instructions](../../../for-ai/index.md)** — what goes into the
   README block inside `documentation.sections`.
 - **[Errors](./errors.md)** — canonical error codes.

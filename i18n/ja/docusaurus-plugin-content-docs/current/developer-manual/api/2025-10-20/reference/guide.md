@@ -80,7 +80,7 @@ Authorization: Basic <base64 user:app_password>
   ],
 
   "documentation": {
-    "source": "https://github.com/quarka-org/docs.qazero.com/tree/main/docs/developer-manual/api/2025-10-20/ai",
+    "source": "https://github.com/quarka-org/docs.qazero.com/tree/main/docs/developer-manual/for-ai",
     "format": "mixed",
     "sections": [
       {
@@ -125,7 +125,7 @@ Authorization: Basic <base64 user:app_password>
 
 ### 各マテリアルの `supports_all` フラグ
 
-[`materials.yaml`](../ai/materials.yaml) 内の各マテリアルには、そのマテリアルが `tracking_id: "all"`（全サイト集約）でクエリできるかどうかを宣言する `supports_all: true | false` フラグが付いています。ユーザーに「全サイト」スコープを選ばせる場面で、どのマテリアルを提示するか判断するときは、`documentation.sections` 内の `materials.yaml` ブロックからこのフラグを読み取ってください。**Since:** 2026-04-29
+[`materials.yaml`](../../../for-ai/materials.yaml) 内の各マテリアルには、そのマテリアルが `tracking_id: "all"`（全サイト集約）でクエリできるかどうかを宣言する `supports_all: true | false` フラグが付いています。ユーザーに「全サイト」スコープを選ばせる場面で、どのマテリアルを提示するか判断するときは、`documentation.sections` 内の `materials.yaml` ブロックからこのフラグを読み取ってください。**Since:** 2026-04-29
 
 ```yaml
 materials:
@@ -160,5 +160,5 @@ materials:
 ## 次に読むページ
 
 - **[`/query` リファレンス](./query.md)** — 実行エンドポイント。
-- **[AI Instructions](../ai/README.md)** — `documentation.sections` の README ブロックに何が入っているか。
+- **[AI Instructions](../../../for-ai/index.md)** — `documentation.sections` の README ブロックに何が入っているか。
 - **[エラー](./errors.md)** — 正式なエラーコード一覧。

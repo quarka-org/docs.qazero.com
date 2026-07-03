@@ -15,8 +15,8 @@ The entries below the **Initial Release of `2026-05-11`** section are carried ov
 ### 2026-05-21 — `api_update: 2026-05-21` — summary integral materials (T102)
 
 **Added:**
-- ✅ **Three pre-aggregated summary materials** — `summary_landingpage`, `summary_allpage`, and `summary_days_access_detail` are now queryable as first-class QAL materials. Each returns the **period-cumulative** roll-up that the nightly batch already maintains (year-to-date integrals, served from a single file read), so questions like "landing-page sessions for any date range" or "page ranking by pageviews" no longer require scanning millions of `allpv` rows. All three are `supports_all: true` (the cross-site `tracking_id: "all"` aggregate exists). See [`summary_*` materials](./materials/summary.md) and the authoritative [`materials.yaml`](./ai/materials.yaml). **Since:** 2026-05-21
-- ✅ **Validator material patterns extended** — `summary_landingpage` / `summary_allpage` / `summary_days_access_detail` are now accepted in `materials[].name`, `make.*.from`, and `make.*.keep` (see [`qal-validation.yaml`](./ai/qal-validation.yaml)).
+- ✅ **Three pre-aggregated summary materials** — `summary_landingpage`, `summary_allpage`, and `summary_days_access_detail` are now queryable as first-class QAL materials. Each returns the **period-cumulative** roll-up that the nightly batch already maintains (year-to-date integrals, served from a single file read), so questions like "landing-page sessions for any date range" or "page ranking by pageviews" no longer require scanning millions of `allpv` rows. All three are `supports_all: true` (the cross-site `tracking_id: "all"` aggregate exists). See [`summary_*` materials](../materials/summary.md) and the authoritative [`materials.yaml`](../../for-ai/materials.yaml). **Since:** 2026-05-21
+- ✅ **Validator material patterns extended** — `summary_landingpage` / `summary_allpage` / `summary_days_access_detail` are now accepted in `materials[].name`, `make.*.from`, and `make.*.keep` (see [`qal-validation.yaml`](./qal-validation.yaml)).
 
 **Important property (read before using):**
 - 🔸 These materials have **no `date` dimension**. Each query returns one cumulative set for the requested period (cross-year ranges supported), not a daily breakdown. If you need a daily trend, use `allpv` (which has a `date` dimension) instead. Numeric-range filtering on the count columns (`pv_count`, `session_count`, …) is applied as a `post_filter` after the cumulative roll-up.
@@ -27,7 +27,7 @@ The entries below the **Initial Release of `2026-05-11`** section are carried ov
 ### 2026-05-20 — `api_update: 2026-05-20` — `allpv` browser window-size columns (T101)
 
 **Added:**
-- ✅ **`allpv.window_inner_width` / `allpv.window_inner_height`** — two new columns (uint16) recording the browser's live `window.innerWidth` / `window.innerHeight` in CSS pixels at the moment of the page view: the **actual rendered content area**, not the device's screen resolution. Use them for responsive-breakpoint analysis and viewport-segment splits (e.g. `between: 768, 1199` for the tablet band, `gte: 1200` for desktop). A value of `0` means the source header was absent for that page view; filter `gte: 1` to keep only real measurements. See [`allpv`](./materials/allpv.md) and [`materials.yaml`](./ai/materials.yaml). **Since:** 2026-05-20
+- ✅ **`allpv.window_inner_width` / `allpv.window_inner_height`** — two new columns (uint16) recording the browser's live `window.innerWidth` / `window.innerHeight` in CSS pixels at the moment of the page view: the **actual rendered content area**, not the device's screen resolution. Use them for responsive-breakpoint analysis and viewport-segment splits (e.g. `between: 768, 1199` for the tablet band, `gte: 1200` for desktop). A value of `0` means the source header was absent for that page view; filter `gte: 1` to keep only real measurements. See [`allpv`](../materials/allpv.md) and [`materials.yaml`](../../for-ai/materials.yaml). **Since:** 2026-05-20
 
 **Why this update is still non-breaking:**
 - Both columns are additive (`nullable: true, default: 0`). Existing queries that do not reference them are unaffected; date ranges predating the column return `0` rather than an error.
@@ -75,7 +75,7 @@ The entries below the **Initial Release of `2026-05-11`** section are carried ov
 ### 2026-04-29 — `api_update: 2026-04-29` — `materials.supports_all` flag
 
 **Added:**
-- ✅ **`materials.{name}.supports_all: true | false`** in [`materials.yaml`](./ai/materials.yaml) — every material now declares whether it can be queried with `tracking_id: "all"` (the cross-site aggregate built nightly). Currently `true` for `allpv`, `click_event`, `datalayer_event`, `events_template`; `false` for `gsc`, `goal_x`, `page_version`, `ga4_*`. AI clients and admin UIs should read this flag before offering "all sites" as a tracking_id choice for a given material.
+- ✅ **`materials.{name}.supports_all: true | false`** in [`materials.yaml`](../../for-ai/materials.yaml) — every material now declares whether it can be queried with `tracking_id: "all"` (the cross-site aggregate built nightly). Currently `true` for `allpv`, `click_event`, `datalayer_event`, `events_template`; `false` for `gsc`, `goal_x`, `page_version`, `ga4_*`. AI clients and admin UIs should read this flag before offering "all sites" as a tracking_id choice for a given material.
 - ✅ **`features.materials_supports_all`** reported in `/guide` — clients can detect availability of the new flag by checking this feature flag. Older servers may omit `supports_all` from individual materials; treat its absence as "unknown — try and handle errors." **Since:** 2026-04-29
 - ✅ **Synced `ai/materials.yaml` and `ai/qal-validation.yaml`** with the qa-labo source for both this update and the prior 2026-04-17 update — the AI-served YAML now reflects the `prev_page_id` / `next_page_id` / `prev_url` / `prev_title` / `next_url` / `next_title` columns and the `allpv_prev_next_page` feature flag that were added on 2026-04-17. The human-readable `materials/allpv.md` and the `/guide` reference example were already correct; only the AI-facing YAML lagged behind.
 
@@ -114,7 +114,7 @@ The entries below the **Initial Release of `2026-05-11`** section are carried ov
 
 ### 2026-04-13 — `api_update: 2026-04-13` — Documentation v1.2.0
 **Added:**
-- ✅ **QAL `make.sort`** — view-level row ordering and top-N. Place `sort: { by, order, top }` inside a view in `make` to sort the view's output after `filter` / `join` / `keep` / `calc`. `by` accepts both qualified (`allpv.url`) and unqualified (`pageviews`) names, `order` is `asc` / `desc`, `top` is an optional row cap. See the [What is QAL?](../../concepts/what-is-qal.md) concept page and the authoritative [`qal-validation.yaml`](./ai/qal-validation.yaml).
+- ✅ **QAL `make.sort`** — view-level row ordering and top-N. Place `sort: { by, order, top }` inside a view in `make` to sort the view's output after `filter` / `join` / `keep` / `calc`. `by` accepts both qualified (`allpv.url`) and unqualified (`pageviews`) names, `order` is `asc` / `desc`, `top` is an optional row cap. See the [What is QAL?](../../concepts/what-is-qal.md) concept page and the authoritative [`qal-validation.yaml`](./qal-validation.yaml).
 - ✅ `/guide` `features.sort` now reports `true` on servers running this update — clients should use it to detect availability instead of hard-coding.
 
 **Clarified:**
