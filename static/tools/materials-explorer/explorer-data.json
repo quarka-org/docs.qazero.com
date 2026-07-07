@@ -1,0 +1,840 @@
+{
+    "allpv": {
+        "grain": "1行 = 1ページビュー",
+        "supports_all": true,
+        "blurb": "全ページビューの生データ。熟読・離脱位置・イライラクリック等の行動シグナルも同じ行に持つ。",
+        "groups": [
+            {
+                "fam": "キー & ID",
+                "kind": "key",
+                "desc": "JOIN と絞り込みに使う識別子。フィルタは通常 url / device_type 等の解決済みカラムで行う。",
+                "cols": [
+                    {
+                        "n": "pv_id",
+                        "note": "ページビュー識別。click_event 等との結合キー。",
+                        "type": "uint32",
+                        "join": 1
+                    },
+                    {
+                        "n": "session_id",
+                        "note": "セッション単位の絞り込み。列DBバイナリスキャンで高速。",
+                        "type": "uint64",
+                        "join": 1
+                    },
+                    {
+                        "n": "reader_id",
+                        "note": "ユーザー単位の絞り込み。url 等と組み合わせて使う。",
+                        "type": "uint32",
+                        "join": 1
+                    },
+                    {
+                        "n": "page_id",
+                        "note": "ページ単位。通常は url で絞り、page_id は JOIN キー。",
+                        "type": "uint32",
+                        "join": 1
+                    },
+                    {
+                        "n": "device_id",
+                        "note": "端末ID。1=PC, 2=SP, 3=tablet。ラベルは device_type。",
+                        "type": "uint8"
+                    },
+                    {
+                        "n": "source_id",
+                        "note": "流入元ID。ラベルは utm_source。",
+                        "type": "uint16"
+                    },
+                    {
+                        "n": "medium_id",
+                        "note": "メディアID。ラベルは utm_medium。",
+                        "type": "uint8"
+                    },
+                    {
+                        "n": "campaign_id",
+                        "note": "キャンペーンID。ラベルは utm_campaign。",
+                        "type": "uint16"
+                    },
+                    {
+                        "n": "content_id",
+                        "note": "コンテンツID。ラベルは utm_content。",
+                        "type": "uint16"
+                    },
+                    {
+                        "n": "version_id",
+                        "note": "ページ版ID。A/B・バージョン比較に使用。",
+                        "type": "uint16"
+                    },
+                    {
+                        "n": "prev_page_id",
+                        "note": "前ページID。0 でランディング抽出。",
+                        "type": "uint32",
+                        "since": "2026-04-17"
+                    },
+                    {
+                        "n": "next_page_id",
+                        "note": "次ページID。0 で離脱PV抽出。",
+                        "type": "uint32",
+                        "since": "2026-04-17"
+                    }
+                ]
+            },
+            {
+                "fam": "セッションの基本",
+                "kind": "signal",
+                "desc": "閲覧の基礎メトリクス。範囲フィルタ可（browse_sec gte:30 等）。",
+                "cols": [
+                    {
+                        "n": "access_time",
+                        "note": "UNIX時刻。通常は期間パラメータで自動処理。時間帯絞り込みも可。",
+                        "type": "uint32"
+                    },
+                    {
+                        "n": "pv",
+                        "note": "セッション内のPV番号（1=ランディング）。",
+                        "type": "uint16"
+                    },
+                    {
+                        "n": "speed_msec",
+                        "note": "表示速度(ms)。「3秒以上かかったPV」等も抽出可。",
+                        "type": "uint16"
+                    },
+                    {
+                        "n": "browse_sec",
+                        "note": "閲覧時間(秒)。",
+                        "type": "uint16"
+                    },
+                    {
+                        "n": "is_last",
+                        "note": "セッション最終PV(0/1)。離脱ページ抽出に。",
+                        "type": "uint8"
+                    },
+                    {
+                        "n": "is_newuser",
+                        "note": "新規ユーザー(0/1)。",
+                        "type": "uint8"
+                    }
+                ]
+            },
+            {
+                "fam": "読了の深さ",
+                "kind": "signal",
+                "desc": "PV単位のスクロール到達率・熟読・停止位置。",
+                "cols": [
+                    {
+                        "n": "depth_position",
+                        "note": "最深到達率(0-100%)。gte:80 で下部まで読了、lte:20 で冒頭離脱。",
+                        "type": "uint8",
+                        "star": 1
+                    },
+                    {
+                        "n": "deep_read",
+                        "note": "熟読フラグ。3秒以上滞在の区間が5箇所以上で1。",
+                        "type": "uint8",
+                        "star": 1
+                    },
+                    {
+                        "n": "stop_max_sec",
+                        "note": "最長停止時間(秒)。最も長く留まった箇所。",
+                        "type": "uint16"
+                    },
+                    {
+                        "n": "stop_max_pos",
+                        "note": "最長停止位置(0-100%)。stop_max_sec とセット。",
+                        "type": "uint8"
+                    },
+                    {
+                        "n": "exit_pos",
+                        "note": "離脱位置(0-100%)。lte:30 でファーストビュー内離脱。",
+                        "type": "uint8",
+                        "star": 1
+                    }
+                ],
+                "star": 1
+            },
+            {
+                "fam": "フラストレーション",
+                "kind": "signal",
+                "desc": "連打・デッドクリック・フォーム送信。UI不満のシグナル。",
+                "cols": [
+                    {
+                        "n": "irritation_click_count",
+                        "note": "3秒以内に5回以上の連打バースト数。gte:1 でUI不満。",
+                        "type": "uint8",
+                        "star": 1
+                    },
+                    {
+                        "n": "dead_click_image_count",
+                        "note": "リンクの無い画像へのクリック数。gte:1 で機会損失。",
+                        "type": "uint8",
+                        "star": 1
+                    },
+                    {
+                        "n": "is_submit",
+                        "note": "フォーム送信(0/1)。フォームCVR算出に。",
+                        "type": "uint8"
+                    }
+                ],
+                "star": 1
+            },
+            {
+                "fam": "探索行動",
+                "kind": "signal",
+                "desc": "見直し・飛ばし読み・迷いのマウス挙動。ナビゲーションの質を測る。",
+                "cols": [
+                    {
+                        "n": "scroll_back_count",
+                        "note": "3秒以内に1000px以上上へ戻った回数=見直し。",
+                        "type": "uint8",
+                        "star": 1
+                    },
+                    {
+                        "n": "content_skip_count",
+                        "note": "1000px以上下へ飛ばした回数=読まれていない。",
+                        "type": "uint8",
+                        "star": 1
+                    },
+                    {
+                        "n": "exploration_count",
+                        "note": "マウスが横に往復した回数=クリック対象を探して迷子。",
+                        "type": "uint8",
+                        "star": 1
+                    }
+                ],
+                "star": 1
+            },
+            {
+                "fam": "ビューポート",
+                "kind": "signal",
+                "desc": "実表示領域サイズ。レスポンシブ帯別のセグメントに。",
+                "cols": [
+                    {
+                        "n": "window_inner_width",
+                        "note": "innerWidth(px)。between:768,1199 でタブレット帯、gte:1200 でPC帯。",
+                        "type": "uint16"
+                    },
+                    {
+                        "n": "window_inner_height",
+                        "note": "innerHeight(px)。",
+                        "type": "uint16"
+                    }
+                ]
+            },
+            {
+                "fam": "ページ遷移",
+                "kind": "signal",
+                "desc": "前後どのページを見ていたか。導線分析に。",
+                "cols": [
+                    {
+                        "n": "prev_url",
+                        "note": "前ページURL。ランディングPVは null。",
+                        "since": "2026-04-17"
+                    },
+                    {
+                        "n": "prev_title",
+                        "note": "前ページタイトル。",
+                        "since": "2026-04-17"
+                    },
+                    {
+                        "n": "next_url",
+                        "note": "次ページURL。離脱PVは null。",
+                        "since": "2026-04-17"
+                    },
+                    {
+                        "n": "next_title",
+                        "note": "次ページタイトル。",
+                        "since": "2026-04-17"
+                    }
+                ]
+            },
+            {
+                "fam": "流入元 & リファラー",
+                "kind": "signal",
+                "desc": "どこから来たか。",
+                "cols": [
+                    {
+                        "n": "url",
+                        "note": "ページURL。完全一致は url_hash で高速。"
+                    },
+                    {
+                        "n": "title",
+                        "note": "ページタイトル。url で絞って keep する方が効率的。"
+                    },
+                    {
+                        "n": "source_domain",
+                        "note": "流入元ドメイン。インデックスあり・高速。"
+                    },
+                    {
+                        "n": "referrer",
+                        "note": "リファラー。"
+                    },
+                    {
+                        "n": "utm_source",
+                        "note": "流入元。"
+                    },
+                    {
+                        "n": "utm_medium",
+                        "note": "メディア。ユニークインデックス・高速。"
+                    },
+                    {
+                        "n": "utm_campaign",
+                        "note": "キャンペーン。ユニークインデックス・高速。"
+                    },
+                    {
+                        "n": "utm_content",
+                        "note": "コンテンツ。"
+                    },
+                    {
+                        "n": "utm_term",
+                        "note": "検索語(utm)。"
+                    }
+                ]
+            },
+            {
+                "fam": "デバイス & ユーザー",
+                "kind": "signal",
+                "desc": "端末・OS・言語・国。",
+                "cols": [
+                    {
+                        "n": "device_type",
+                        "note": "PC / SP / tablet の3値（正確な大小文字で）。"
+                    },
+                    {
+                        "n": "os",
+                        "note": "OS(UAos)。インデックスあり・高速。"
+                    },
+                    {
+                        "n": "browser",
+                        "note": "ブラウザ(UAbrowser)。"
+                    },
+                    {
+                        "n": "language",
+                        "note": "言語。"
+                    },
+                    {
+                        "n": "country_code",
+                        "note": "国コード(約200種)。インデックスあり・高速。"
+                    },
+                    {
+                        "n": "ua",
+                        "note": "UA合成。直接フィルタ非推奨、os/browser を個別に。"
+                    },
+                    {
+                        "n": "original_id",
+                        "note": "元ID。インデックスあり・高速。"
+                    }
+                ]
+            },
+            {
+                "fam": "ページ種別フラグ",
+                "kind": "signal",
+                "desc": "ページの種類を自動分類（Generated Column）。is_* で直接フィルタ。",
+                "cols": [
+                    {
+                        "n": "page_type",
+                        "note": "ページタイプ・ビットフラグ。通常は is_* で絞る方が効率的。"
+                    },
+                    {
+                        "n": "page_fetch_status",
+                        "note": "HTML取得状態。1=成功, -1=失敗。"
+                    },
+                    {
+                        "n": "is_article",
+                        "note": "記事(0/1)。"
+                    },
+                    {
+                        "n": "is_product",
+                        "note": "商品(0/1)。"
+                    },
+                    {
+                        "n": "is_list",
+                        "note": "一覧(0/1)。"
+                    },
+                    {
+                        "n": "is_form",
+                        "note": "フォーム(0/1)。"
+                    },
+                    {
+                        "n": "is_trust_info",
+                        "note": "信頼性情報(0/1)。"
+                    },
+                    {
+                        "n": "is_faq",
+                        "note": "FAQ(0/1)。"
+                    },
+                    {
+                        "n": "is_landing",
+                        "note": "ランディング(0/1)。"
+                    },
+                    {
+                        "n": "is_search",
+                        "note": "検索結果(0/1)。"
+                    },
+                    {
+                        "n": "is_account",
+                        "note": "アカウント(0/1)。"
+                    },
+                    {
+                        "n": "is_cart",
+                        "note": "カート(0/1)。"
+                    },
+                    {
+                        "n": "is_checkout",
+                        "note": "決済(0/1)。"
+                    },
+                    {
+                        "n": "is_confirm",
+                        "note": "確認(0/1)。"
+                    },
+                    {
+                        "n": "is_thanks",
+                        "note": "サンクス(0/1)。"
+                    },
+                    {
+                        "n": "is_top_page",
+                        "note": "トップ(0/1)。"
+                    },
+                    {
+                        "n": "is_event",
+                        "note": "イベント(0/1)。"
+                    },
+                    {
+                        "n": "is_recipe",
+                        "note": "レシピ(0/1)。"
+                    },
+                    {
+                        "n": "is_job",
+                        "note": "求人(0/1)。"
+                    },
+                    {
+                        "n": "is_video",
+                        "note": "動画(0/1)。"
+                    },
+                    {
+                        "n": "is_howto",
+                        "note": "ハウツー(0/1)。"
+                    },
+                    {
+                        "n": "is_qa_forum",
+                        "note": "Q&Aフォーラム(0/1)。"
+                    }
+                ]
+            },
+            {
+                "fam": "ゴール達成",
+                "kind": "signal",
+                "desc": "設定した各ゴールの達成可否。定義は /guide の sites[].goals。",
+                "cols": [
+                    {
+                        "n": "is_goal_1",
+                        "note": "ゴール1達成(0/1)。",
+                        "type": "uint8"
+                    },
+                    {
+                        "n": "is_goal_2",
+                        "note": "ゴール2達成(0/1)。",
+                        "type": "uint8"
+                    },
+                    {
+                        "n": "is_goal_3",
+                        "note": "ゴール3達成(0/1)。",
+                        "type": "uint8"
+                    },
+                    {
+                        "n": "is_goal_4",
+                        "note": "ゴール4達成(0/1)。",
+                        "type": "uint8"
+                    },
+                    {
+                        "n": "is_goal_5",
+                        "note": "ゴール5達成(0/1)。",
+                        "type": "uint8"
+                    },
+                    {
+                        "n": "is_goal_6",
+                        "note": "ゴール6達成(0/1)。",
+                        "type": "uint8"
+                    },
+                    {
+                        "n": "is_goal_7",
+                        "note": "ゴール7達成(0/1)。",
+                        "type": "uint8"
+                    },
+                    {
+                        "n": "is_goal_8",
+                        "note": "ゴール8達成(0/1)。",
+                        "type": "uint8"
+                    },
+                    {
+                        "n": "is_goal_9",
+                        "note": "ゴール9達成(0/1)。",
+                        "type": "uint8"
+                    },
+                    {
+                        "n": "is_goal_10",
+                        "note": "ゴール10達成(0/1)。",
+                        "type": "uint8"
+                    }
+                ]
+            }
+        ]
+    },
+    "click_event": {
+        "grain": "1行 = 1クリック",
+        "supports_all": true,
+        "blurb": "全クリックを自動保存している生データ。セレクタや座標なども保有し、生PVログとJOIN可能。",
+        "groups": [
+            {
+                "fam": "キー & ID",
+                "kind": "key",
+                "desc": "allpv と結合するキー。",
+                "cols": [
+                    {
+                        "n": "pv_id",
+                        "note": "どのPV上のクリックか。allpv と結合。",
+                        "type": "uint32",
+                        "join": 1
+                    },
+                    {
+                        "n": "session_id",
+                        "note": "セッション単位。",
+                        "type": "uint64",
+                        "join": 1
+                    },
+                    {
+                        "n": "page_id",
+                        "note": "ページ単位。",
+                        "type": "uint32",
+                        "join": 1
+                    }
+                ]
+            },
+            {
+                "fam": "クリックの中身",
+                "kind": "signal",
+                "desc": "何が・いつ押されたか。event_sec で「読んでから押したか」が分かる。",
+                "cols": [
+                    {
+                        "n": "event_sec",
+                        "note": "ページ表示からクリックまでの秒数。",
+                        "type": "uint16",
+                        "star": 1
+                    },
+                    {
+                        "n": "element_text",
+                        "note": "クリックされた要素のテキスト。",
+                        "type": "uint16"
+                    },
+                    {
+                        "n": "selector",
+                        "note": "CSSセレクタ。",
+                        "type": "uint32"
+                    },
+                    {
+                        "n": "to_url",
+                        "note": "遷移先URL。",
+                        "type": "uint16"
+                    },
+                    {
+                        "n": "is_external",
+                        "note": "外部リンク(0/1)。",
+                        "type": "uint8"
+                    },
+                    {
+                        "n": "action_id",
+                        "note": "アクション種別（遷移/送信/外部…）。",
+                        "type": "uint8"
+                    },
+                    {
+                        "n": "element_id",
+                        "note": "要素id。",
+                        "type": "uint16"
+                    },
+                    {
+                        "n": "element_class",
+                        "note": "要素class。",
+                        "type": "uint16"
+                    },
+                    {
+                        "n": "element_data",
+                        "note": "data属性。",
+                        "type": "uint16"
+                    }
+                ],
+                "star": 1
+            },
+            {
+                "fam": "クリック座標",
+                "kind": "signal",
+                "desc": "クリック位置(%)。ヒートマップ的な集計に。",
+                "cols": [
+                    {
+                        "n": "page_x_pct",
+                        "note": "クリックX位置(%)。",
+                        "type": "uint16"
+                    },
+                    {
+                        "n": "page_y_pct",
+                        "note": "クリックY位置(%)。上部/下部の分析に。",
+                        "type": "uint16"
+                    }
+                ]
+            }
+        ]
+    },
+    "gsc": {
+        "grain": "1行 = (ページ×検索語×日×検索面)",
+        "supports_all": false,
+        "blurb": "Search Console を (ページ×検索語×日) の粒度で保存。生PVログとJOIN可能。",
+        "groups": [
+            {
+                "fam": "キー & ID",
+                "kind": "key",
+                "desc": "allpv とは page_id が N:M（多対多）。無フィルタで JOIN すると行が掛け算で膨張（デカルト積＝行爆発）するため、先に url / keyword 等で絞ってから JOIN する。",
+                "cols": [
+                    {
+                        "n": "page_id",
+                        "note": "ページ単位。allpv と N:M。無フィルタ JOIN は行爆発するので先に絞る。",
+                        "type": "uint32",
+                        "join": 1
+                    },
+                    {
+                        "n": "query_id",
+                        "note": "キーワードID。keyword で検索→query_id 集合。",
+                        "type": "uint32"
+                    },
+                    {
+                        "n": "search_type",
+                        "note": "1=web, 2=image, 3=video。",
+                        "type": "uint8"
+                    }
+                ]
+            },
+            {
+                "fam": "検索パフォーマンス",
+                "kind": "signal",
+                "desc": "クリック・表示・CTR・掲載順位。position は列DBスキャンにリライトされ高速。",
+                "cols": [
+                    {
+                        "n": "clicks",
+                        "note": "日次クリック数。",
+                        "type": "uint32",
+                        "star": 1
+                    },
+                    {
+                        "n": "impressions",
+                        "note": "日次インプレッション数。",
+                        "type": "uint32",
+                        "star": 1
+                    },
+                    {
+                        "n": "ctr",
+                        "note": "clicks / impressions。実行時算出（post_filter）。",
+                        "star": 1
+                    },
+                    {
+                        "n": "position",
+                        "note": "平均掲載順位。position_x100 に書き換わり列DBスキャン可・高速。",
+                        "star": 1
+                    },
+                    {
+                        "n": "position_weighted",
+                        "note": "position × impressions。加重平均用。"
+                    },
+                    {
+                        "n": "position_x100",
+                        "note": "順位×100 の生値。",
+                        "type": "uint16"
+                    }
+                ],
+                "star": 1
+            },
+            {
+                "fam": "解決カラム",
+                "kind": "signal",
+                "desc": "query_id / page_id からラベル解決。",
+                "cols": [
+                    {
+                        "n": "keyword",
+                        "note": "検索語。query_id から解決。"
+                    },
+                    {
+                        "n": "url",
+                        "note": "ページURL。"
+                    },
+                    {
+                        "n": "title",
+                        "note": "ページタイトル。"
+                    },
+                    {
+                        "n": "page_type",
+                        "note": "ページタイプ。"
+                    },
+                    {
+                        "n": "page_fetch_status",
+                        "note": "取得状態。"
+                    }
+                ]
+            }
+        ]
+    },
+    "page_version": {
+        "grain": "1行 = ページの1つの版",
+        "supports_all": false,
+        "blurb": "ページ内容の版履歴。改稿の前後を混ぜずに比較できる。",
+        "groups": [
+            {
+                "fam": "キー & ID",
+                "kind": "key",
+                "desc": "allpv.version_id と結合。版は page × device 単位で管理する（PC と SP は別テンプレートで、改稿履歴が別系列）。このため device_id もキーの一部。",
+                "cols": [
+                    {
+                        "n": "version_id",
+                        "note": "PK / allpv.version_id との結合キー。",
+                        "join": 1
+                    },
+                    {
+                        "n": "page_id",
+                        "note": "ページ識別。allpv で URL 絞り→JOIN 推奨。",
+                        "join": 1
+                    },
+                    {
+                        "n": "device_id",
+                        "note": "1=PC, 2=SP, 3=tablet。PC/SP/tablet で版履歴が別系列なのでキーに含む。"
+                    }
+                ]
+            },
+            {
+                "fam": "版のメタ",
+                "kind": "signal",
+                "desc": "版番号・作成日・URL。",
+                "cols": [
+                    {
+                        "n": "version_no",
+                        "note": "同一ページ×デバイス内の版番号。1が初版。calc MAX() で最新版数。"
+                    },
+                    {
+                        "n": "update_date",
+                        "note": "版作成日。特定日の変更を探すのに。"
+                    },
+                    {
+                        "n": "url",
+                        "note": "URL。"
+                    },
+                    {
+                        "n": "title",
+                        "note": "タイトル。"
+                    },
+                    {
+                        "n": "device_type",
+                        "note": "PC/SP/tablet。"
+                    }
+                ]
+            }
+        ]
+    },
+    "summary_allpage": {
+        "grain": "1行 = ページ×次元の期間累計",
+        "supports_all": true,
+        "blurb": "全ページのサマリーデータを返すマテリアル。ページ別集計に便利。",
+        "groups": [
+            {
+                "fam": "グルーピング次元",
+                "kind": "key",
+                "desc": "集計の切り口。数値IDのまま（device_type は自動付与）。",
+                "cols": [
+                    {
+                        "n": "page_id",
+                        "note": "ページ識別。ランキングはこのマテリアル。",
+                        "type": "uint32"
+                    },
+                    {
+                        "n": "device_id",
+                        "note": "1=PC,2=SP,3=tablet。device_type 自動付与。",
+                        "type": "uint8"
+                    },
+                    {
+                        "n": "utm_source",
+                        "note": "流入元（ラベル解決済み）。"
+                    },
+                    {
+                        "n": "utm_medium",
+                        "note": "メディア。"
+                    },
+                    {
+                        "n": "utm_campaign",
+                        "note": "キャンペーン。"
+                    },
+                    {
+                        "n": "source_domain",
+                        "note": "流入元ドメイン。"
+                    },
+                    {
+                        "n": "is_newuser",
+                        "note": "新規(1)/リピート(0)。",
+                        "type": "uint8"
+                    },
+                    {
+                        "n": "is_QA",
+                        "note": "QA経由フラグ。",
+                        "type": "uint8"
+                    }
+                ]
+            },
+            {
+                "fam": "累計メジャー",
+                "kind": "signal",
+                "desc": "期間の累計値。数値範囲フィルタは post_filter。",
+                "cols": [
+                    {
+                        "n": "pv_count",
+                        "note": "期間PV累計。",
+                        "type": "uint32"
+                    },
+                    {
+                        "n": "user_count",
+                        "note": "期間ユーザー累計。",
+                        "type": "uint32"
+                    },
+                    {
+                        "n": "bounce_count",
+                        "note": "期間直帰累計。",
+                        "type": "uint32"
+                    },
+                    {
+                        "n": "exit_count",
+                        "note": "期間離脱累計。",
+                        "type": "uint32"
+                    },
+                    {
+                        "n": "time_on_page",
+                        "note": "期間滞在時間合計(秒)。",
+                        "type": "uint32"
+                    },
+                    {
+                        "n": "lp_count",
+                        "note": "入口になった回数の累計。",
+                        "type": "uint32"
+                    }
+                ]
+            },
+            {
+                "fam": "解決カラム",
+                "kind": "signal",
+                "desc": "page_id から復元。",
+                "cols": [
+                    {
+                        "n": "title",
+                        "note": "タイトル。"
+                    },
+                    {
+                        "n": "url",
+                        "note": "URL。"
+                    },
+                    {
+                        "n": "wp_qa_id",
+                        "note": "WP投稿ID。"
+                    }
+                ]
+            }
+        ]
+    }
+}
