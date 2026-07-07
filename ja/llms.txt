@@ -40,6 +40,6 @@ QA ZERO is not a general-purpose analytics dashboard and not a GA4 replacement. 
 ## Notes for AI clients
 
 - The authoritative, always-current list of materials and columns — including when each field became available (`since`) — is `for-ai/materials.yaml`, served live from each site's `/wp-json/qa-platform/guide` endpoint.
-- There is a human-facing interactive catalog at [Materials Explorer](https://docs.qazero.com/tools/materials-explorer/) (client-rendered). If you fetch it as an agent, read the static `<noscript>` fallback for the full field list — but prefer `/guide` / `for-ai/materials.yaml` as the machine-readable source of truth.
+- There is a human-facing interactive catalog at [Materials Explorer](https://docs.qazero.com/tools/materials-explorer/) (client-rendered). If you fetch it as an agent, the full field list is embedded as static HTML in the page; the same field dictionary is also available as pure JSON at `https://docs.qazero.com/tools/materials-explorer/explorer-data.json`. Prefer `/guide` / `for-ai/materials.yaml` as the live machine-readable source of truth.
 - Versioning is two-layered: **version** (`YYYY-MM-DD`, in the URL) changes only on breaking changes; **update** (`api_update`, `since`) marks non-breaking additions within a version. Read `/guide`'s `api_update` + `features` to know what a given server supports.
 - quarka (the free community edition) is documented on a separate site and is out of scope here.
