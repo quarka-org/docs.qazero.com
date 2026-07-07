@@ -162,7 +162,8 @@
       <div class="foot">
         <b>読み方:</b> <span class="dot key" style="vertical-align:middle"></span> <b>キー</b>＝JOIN・絞り込みに使う識別子／
         <span class="dot signal" style="vertical-align:middle"></span> <b>シグナル</b>＝分析対象の行動値。<span style="color:var(--coral)">✦</span> = QA 固有の行動シグナル。
-        バッジ: <span class="b type">type</span> 格納型 · <span class="b since">since</span> 追加update日 · <span class="b joinkey">join</span> 結合キー。
+        バッジ: <span class="b type">type</span> 格納型 · <span class="b since">since</span> 追加update日 · <span class="b joinkey">join</span> 結合キー。<br>
+        <b>tracking_id "all":</b> 全サイトを横断して集計する特別スコープ。「対応」ならこのマテリアルは全サイト一括で呼べる／「非対応」ならサイト単体（個別 tracking_id）でのみ呼べる。
       </div>
     </main>
   </div>
@@ -236,7 +237,7 @@ function render(){
     `<p class="desc">${esc(m.blurb)}</p>`+
     `<div class="meta"><span>${esc(m.grain)}</span>`+
     `<span><b>${countSignals(m)}</b> signals · <b>${countAll(m)}</b> fields</span>`+
-    `<span>tracking_id "all": <b>${m.supports_all?"対応":"非対応"}</b></span></div>`;
+    `<span title="tracking_id=&quot;all&quot; は全サイトを横断集計する特別スコープ。非対応のマテリアルはサイト単体（個別 tracking_id）でのみ呼べる。">tracking_id "all"（全サイト横断集計）: <b>${m.supports_all?"対応":"非対応 — このサイト単体でのみ呼べる"}</b></span></div>`;
 
   const wrap = $("#groups");
   wrap.innerHTML="";
