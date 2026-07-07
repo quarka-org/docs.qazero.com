@@ -590,11 +590,11 @@ window.MATERIALS_DATA = {
             {
                 "fam": "キー & ID",
                 "kind": "key",
-                "desc": "allpv とは page_id で N:M。JOIN 前に必ずフィルタ。",
+                "desc": "allpv とは page_id が N:M（多対多）。無フィルタで JOIN すると行が掛け算で膨張（デカルト積＝行爆発）するため、先に url / keyword 等で絞ってから JOIN する。",
                 "cols": [
                     {
                         "n": "page_id",
-                        "note": "ページ単位。allpv と N:M（要フィルタ）。",
+                        "note": "ページ単位。allpv と N:M。無フィルタ JOIN は行爆発するので先に絞る。",
                         "type": "uint32",
                         "join": 1
                     },
@@ -686,7 +686,7 @@ window.MATERIALS_DATA = {
             {
                 "fam": "キー & ID",
                 "kind": "key",
-                "desc": "allpv.version_id と結合。",
+                "desc": "allpv.version_id と結合。版は page × device 単位で管理する（PC と SP は別テンプレートで、改稿履歴が別系列）。このため device_id もキーの一部。",
                 "cols": [
                     {
                         "n": "version_id",
@@ -700,7 +700,7 @@ window.MATERIALS_DATA = {
                     },
                     {
                         "n": "device_id",
-                        "note": "1=PC, 2=SP, 3=tablet。"
+                        "note": "1=PC, 2=SP, 3=tablet。PC/SP/tablet で版履歴が別系列なのでキーに含む。"
                     }
                 ]
             },
@@ -711,7 +711,7 @@ window.MATERIALS_DATA = {
                 "cols": [
                     {
                         "n": "version_no",
-                        "note": "同一ページ内の版番号。1が初版。calc MAX() で最新版数。"
+                        "note": "同一ページ×デバイス内の版番号。1が初版。calc MAX() で最新版数。"
                     },
                     {
                         "n": "update_date",
