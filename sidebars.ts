@@ -197,7 +197,17 @@ const sidebars: SidebarsConfig = {
           ],
         },
         'developer-manual/for-ai/for-ai-index',
-        'developer-manual/integrations/integrations-index',
+        {
+          type: 'category',
+          label: 'Integrations',
+          link: {
+            type: 'doc',
+            id: 'developer-manual/integrations/integrations-index',
+          },
+          items: [
+            'developer-manual/integrations/integrations-mcp',
+          ],
+        },
         'developer-manual/extending/extending-index',
       ],
     },
