@@ -43,8 +43,10 @@
   .wordmark .z{color:var(--accent);}
   .wordmark .doc{font-weight:600;font-size:13px;color:var(--muted);margin-left:10px;
     letter-spacing:.02em;}
-  .crumb{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px;}
+  .crumb{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
   .crumb .sep{color:var(--line-strong);}
+  .crumb a{color:var(--muted);text-decoration:none;}
+  .crumb a:hover{color:var(--primary-dark);text-decoration:underline;}
   .crumb b{color:var(--ink);font-weight:700;}
   .navbar .spring{margin-left:auto;}
   .navbar .site-link{font-size:12.5px;color:var(--primary);text-decoration:none;font-weight:600;}
@@ -177,7 +179,7 @@
   <div class="navbar">
     <a class="wordmark" href="https://docs.qazero.com/">QA&nbsp;<span class="z">Z</span>ERO<span class="doc">Documentation</span></a>
     <nav class="crumb" aria-label="パンくず">
-      <span>Developer</span><span class="sep">›</span><span>Tools</span><span class="sep">›</span><b>Materials Explorer</b>
+      <a href="https://docs.qazero.com/docs/developer-manual/introduction">Developer</a><span class="sep">›</span><a href="https://docs.qazero.com/docs/developer-manual/api/">API</a><span class="sep">›</span><a href="https://docs.qazero.com/docs/developer-manual/api/materials/">Materials</a><span class="sep">›</span><b>Materials Explorer</b>
     </nav>
     <span class="spring"></span>
     <a class="site-link" href="https://docs.qazero.com/">docs.qazero.com ↗</a>
