@@ -3,59 +3,85 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QA Materials Explorer — v0 prototype</title>
-<!-- Mark JS-capable clients before body paint: humans get the interactive app and
-     never see #schema-static; fetch-only agents (no JS) keep it visible & readable. -->
+<title>QA Materials Explorer</title>
 <script>document.documentElement.className+=" js";</script>
 <style>
   :root{
-    --coral:#F28080; --coral-ink:#c85c5c; --sky:#80C6F2; --sky-ink:#3a86b8;
-    --yellow:#F2F180; --rose:#9D8888; --slate:#586973; --ink:#1b2227;
-    --bg:#f4f6f8; --surface:#ffffff; --line:#e2e7ea; --line-strong:#cdd5da;
-    --body:#3d4b5f; --muted:#7a8894;
+    /* --- QA ZERO / docs.qazero.com palette --- */
+    --primary:#127751; --primary-dark:#0f6545; --primary-light:#148359;
+    --primary-bg:#eaf5ef; --primary-line:#c9e6d6;
+    --accent:#1bc51d;                 /* bright green (logo "Z", ✦) */
+    --ink:#1c1e21;                    /* Infima base text */
+    --body:#3d4b5f; --muted:#606770;  /* Infima secondary text */
+    --bg:#f5f6f7; --surface:#ffffff;
+    --line:#e3e6e8; --line-strong:#d0d5d8;
+    --navbar-shadow:0 1px 2px 0 rgba(0,0,0,.10);
+    /* key = warm neutral identifier (secondary to green) */
     --key:#8a6d3b; --key-bg:#fbf3e3; --key-line:#ead9b8;
-    --signal:#3a86b8; --signal-bg:#eef6fb;
+    /* signal = QA ZERO green */
+    --signal:#127751; --signal-ink:#0f6545; --signal-bg:#eaf5ef; --signal-line:#c9e6d6;
+    --star:var(--accent);
+    --mark:#fff3a3;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;height:100%;}
   body{
-    font-family:-apple-system,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
     color:var(--ink); background:var(--bg); line-height:1.6;
     -webkit-font-smoothing:antialiased;
   }
   .app{display:flex;flex-direction:column;height:100vh;}
 
-  /* ---- Header ---- */
-  header{
-    background:var(--surface);border-bottom:1px solid var(--line);
-    padding:14px 22px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+  /* ---- Docusaurus-style navbar (site identity) ---- */
+  .navbar{
+    background:var(--surface);box-shadow:var(--navbar-shadow);
+    padding:0 22px;height:56px;display:flex;align-items:center;gap:18px;
+    flex-wrap:wrap;position:relative;z-index:5;
   }
-  header .brand{font-weight:800;font-size:16px;letter-spacing:.01em;}
-  header .brand .zero{color:var(--coral);}
-  header .tag{font-size:11px;color:var(--muted);border:1px solid var(--line-strong);
-    border-radius:20px;padding:1px 9px;}
-  header .lead{font-size:12px;color:var(--muted);}
-  header .counts{display:flex;gap:18px;margin-left:auto;}
-  header .counts .c{text-align:right;}
-  header .counts .n{font-weight:800;font-size:18px;color:var(--slate);line-height:1;}
-  header .counts .n b{color:var(--coral);}
-  header .counts .l{font-size:10px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;}
+  .wordmark{font-weight:800;font-size:19px;letter-spacing:.01em;color:var(--ink);
+    text-decoration:none;display:inline-flex;align-items:baseline;gap:0;}
+  .wordmark .z{color:var(--accent);}
+  .wordmark .doc{font-weight:600;font-size:13px;color:var(--muted);margin-left:10px;
+    letter-spacing:.02em;}
+  .crumb{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px;}
+  .crumb .sep{color:var(--line-strong);}
+  .crumb b{color:var(--ink);font-weight:700;}
+  .navbar .spring{margin-left:auto;}
+  .navbar .site-link{font-size:12.5px;color:var(--primary);text-decoration:none;font-weight:600;}
+  .navbar .site-link:hover{color:var(--primary-dark);text-decoration:underline;}
+
+  /* ---- Tool page header ---- */
+  header.pagehead{
+    background:var(--surface);border-bottom:1px solid var(--line);
+    padding:16px 22px;display:flex;align-items:center;gap:22px;flex-wrap:wrap;
+  }
+  .pagehead .pt h1{margin:0;font-size:20px;font-weight:800;color:var(--ink);
+    display:flex;align-items:center;gap:9px;}
+  .pagehead .pt h1 .tag{font-size:11px;font-weight:600;color:var(--primary);
+    background:var(--primary-bg);border:1px solid var(--primary-line);
+    border-radius:20px;padding:1px 10px;letter-spacing:.02em;}
+  .pagehead .pt .lead{margin:3px 0 0;font-size:12.5px;color:var(--muted);}
+  .counts{display:flex;gap:20px;margin-left:auto;}
+  .counts .c{text-align:right;}
+  .counts .n{font-weight:800;font-size:19px;color:var(--ink);line-height:1;}
+  .counts .n b{color:var(--primary);}
+  .counts .l{font-size:10px;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin-top:3px;}
 
   /* ---- Body split ---- */
   .split{display:flex;flex:1;min-height:0;}
 
   /* Sidebar: materials */
-  .side{width:246px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--line);
-    overflow-y:auto;padding:10px 0;}
+  .side{width:250px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--line);
+    overflow-y:auto;padding:12px 0;}
   .side h2{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);
-    margin:8px 16px 6px;font-weight:700;}
+    margin:8px 18px 6px;font-weight:700;}
   .mat{display:block;width:100%;text-align:left;border:none;background:none;font-family:inherit;
-    padding:9px 16px;cursor:pointer;border-left:3px solid transparent;transition:background .14s;}
+    padding:9px 18px;cursor:pointer;border-left:3px solid transparent;transition:background .14s;}
   .mat:hover{background:var(--bg);}
-  .mat:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(128,198,242,.55);}
-  .mat.active{background:#fbf1f1;border-left-color:var(--coral);}
+  .mat:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--primary-line);}
+  .mat.active{background:var(--primary-bg);border-left-color:var(--primary);}
   .mat .mn{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;font-weight:700;color:var(--ink);}
-  .mat.active .mn{color:var(--coral-ink);}
+  .mat.active .mn{color:var(--primary-dark);}
   .mat .mg{font-size:11px;color:var(--muted);margin-top:1px;line-height:1.35;}
   .mat .mc{font-size:10.5px;color:var(--muted);margin-top:3px;}
   .mat .mc b{color:var(--signal);} .mat .mc i{color:var(--key);font-style:normal;}
@@ -68,29 +94,31 @@
   .search input{width:100%;height:40px;border:1px solid var(--line-strong);border-radius:10px;
     padding:0 14px 0 38px;font-size:14px;font-family:inherit;background:var(--surface);color:var(--ink);}
   .search input::placeholder{color:var(--muted);}
-  .search input:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(128,198,242,.45);}
+  .search input:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(18,119,81,.18);}
   .search .ic{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;}
   .segbtns{display:flex;border:1px solid var(--line-strong);border-radius:9px;overflow:hidden;}
   .segbtns button{border:none;background:var(--surface);font-family:inherit;font-size:12.5px;
     padding:8px 14px;cursor:pointer;color:var(--body);display:flex;align-items:center;gap:6px;transition:background .14s;}
   .segbtns button+button{border-left:1px solid var(--line);}
-  .segbtns button[aria-pressed="true"]{background:var(--slate);color:#fff;}
-  .segbtns button:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(128,198,242,.6);}
+  .segbtns button[aria-pressed="true"]{background:var(--primary);color:#fff;}
+  .segbtns button:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--primary-line);}
   .dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
   .dot.key{background:var(--key);} .dot.signal{background:var(--signal);}
+  .segbtns button[aria-pressed="true"] .dot.key{background:#ffe0a3;}
+  .segbtns button[aria-pressed="true"] .dot.signal{background:#a8e6c6;}
 
   .mhead{margin:0 0 4px;}
   .mhead h1{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:22px;margin:0;color:var(--ink);}
   .mhead .desc{font-size:13.5px;color:var(--body);margin:4px 0 2px;max-width:74ch;}
   .mhead .meta{font-size:11.5px;color:var(--muted);margin-top:6px;display:flex;gap:14px;flex-wrap:wrap;}
-  .mhead .meta b{color:var(--slate);}
+  .mhead .meta b{color:var(--primary);}
 
   /* Groups */
   .grp{border:1px solid var(--line);border-radius:12px;background:var(--surface);margin-top:14px;overflow:hidden;}
   .grp.iskey{background:var(--key-bg);border-color:var(--key-line);}
   .grp>summary{list-style:none;cursor:pointer;padding:12px 16px;display:flex;align-items:center;gap:10px;}
   .grp>summary::-webkit-details-marker{display:none;}
-  .grp>summary:focus-visible{outline:none;box-shadow:inset 0 0 0 2px rgba(128,198,242,.55);}
+  .grp>summary:focus-visible{outline:none;box-shadow:inset 0 0 0 2px var(--primary-line);}
   .grp .tw{transition:transform .18s;color:var(--muted);font-size:12px;width:12px;}
   .grp[open] .tw{transform:rotate(90deg);}
   .grp .gname{font-weight:700;font-size:14px;color:var(--ink);}
@@ -98,7 +126,7 @@
   .grp .gtag{font-size:10px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
     padding:1px 8px;border-radius:10px;}
   .gtag.key{background:#fff;color:var(--key);border:1px solid var(--key-line);}
-  .gtag.signal{background:var(--signal-bg);color:var(--signal);border:1px solid #cfe6f5;}
+  .gtag.signal{background:var(--signal-bg);color:var(--signal);border:1px solid var(--signal-line);}
   .grp .gcount{font-size:11.5px;color:var(--muted);margin-left:auto;}
   .grp .gdesc{font-size:11.5px;color:var(--muted);padding:0 16px 4px 38px;margin-top:-4px;}
   .grp .rows{border-top:1px solid var(--line);}
@@ -110,35 +138,34 @@
   .row:last-child{border-bottom:none;}
   .row .cn{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--ink);
     font-weight:600;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
-  .row.star .cn::before{content:"✦";color:var(--coral);font-size:12px;}
+  .row.star .cn::before{content:"✦";color:var(--star);font-size:12px;}
   .row .note{font-size:12.5px;color:var(--body);}
   .badges{display:inline-flex;gap:4px;flex-wrap:wrap;margin-top:3px;}
   .b{font-size:10px;font-weight:600;padding:0 6px;border-radius:5px;line-height:16px;
     font-family:ui-monospace,Menlo,monospace;}
-  .b.type{background:#eef1f3;color:var(--slate);}
-  .b.since{background:#eaf6ee;color:#4f9166;}
+  .b.type{background:#eef1f3;color:var(--slate,#586973);}
+  .b.since{background:var(--primary-bg);color:var(--primary-dark);}
   .b.virtual{background:#f3ecfa;color:#8257b5;}
   .b.resolved{background:#fdf0e8;color:#c26a3a;}
   .b.joinkey{background:#fff;color:var(--key);border:1px solid var(--key-line);}
 
   .empty{padding:40px;text-align:center;color:var(--muted);font-size:14px;}
   .foot{margin-top:26px;font-size:11.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:14px;}
-  .foot b{color:var(--slate);}
-  mark{background:var(--yellow);color:var(--ink);padding:0 1px;border-radius:2px;}
+  .foot b{color:var(--ink);}
+  .foot a{color:var(--primary);}
+  mark{background:var(--mark);color:var(--ink);padding:0 1px;border-radius:2px;}
 
-  /* AI / MCP pointer bar (visible to humans; also read by fetch-only agents) */
-  .aibar{background:var(--signal-bg);border-bottom:1px solid #cfe6f5;color:var(--body);
+  /* AI / MCP pointer bar */
+  .aibar{background:var(--primary-bg);border-bottom:1px solid var(--primary-line);color:var(--body);
     font-size:11.5px;line-height:1.5;padding:7px 22px;}
-  .aibar b{color:var(--signal);}
-  .aibar a{color:var(--signal-ink,#2b6f99);}
+  .aibar b{color:var(--primary-dark);}
+  .aibar a{color:var(--primary);}
   .aibar code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:11px;
-    background:#fff;border:1px solid #cfe6f5;border-radius:4px;padding:0 4px;}
-  /* Static schema fallback: fetch-only AI agents (no JS) read it; JS-capable
-     humans never see it (html.js hides it before first paint). */
+    background:#fff;border:1px solid var(--primary-line);border-radius:4px;padding:0 4px;}
   html.js #schema-static{display:none;}
   .ns-schema{padding:20px 26px;max-width:80ch;}
   .ns-schema h2{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:18px;margin:22px 0 2px;}
-  .ns-schema h3{font-size:13px;margin:12px 0 2px;color:var(--slate);}
+  .ns-schema h3{font-size:13px;margin:12px 0 2px;color:var(--primary-dark);}
   .ns-schema code{font-family:ui-monospace,Menlo,Consolas,monospace;}
   .ns-schema ul{margin:2px 0 8px;padding-left:20px;}
   .ns-schema li{font-size:13px;margin:2px 0;}
@@ -146,9 +173,21 @@
 </head>
 <body>
 <div class="app">
-  <header>
-    <span class="brand">QA <span class="zero">Materials</span> Explorer</span>
-    <span class="tag">v0 prototype</span>
+  <!-- Docusaurus-style navbar: ties the tool visually to docs.qazero.com -->
+  <div class="navbar">
+    <a class="wordmark" href="https://docs.qazero.com/">QA&nbsp;<span class="z">Z</span>ERO<span class="doc">Documentation</span></a>
+    <nav class="crumb" aria-label="パンくず">
+      <span>Developer</span><span class="sep">›</span><span>Tools</span><span class="sep">›</span><b>Materials Explorer</b>
+    </nav>
+    <span class="spring"></span>
+    <a class="site-link" href="https://docs.qazero.com/">docs.qazero.com ↗</a>
+  </div>
+
+  <header class="pagehead">
+    <div class="pt">
+      <h1>Materials Explorer <span class="tag">field catalog</span></h1>
+      <p class="lead">QAL で使える全マテリアルとフィールドの対話カタログ。キー（識別子）と行動シグナルを種別ごとに一覧できます。</p>
+    </div>
     <div class="counts">
       <div class="c"><div class="n" id="cMat">–</div><div class="l">materials</div></div>
       <div class="c"><div class="n" id="cSig">–</div><div class="l">signals</div></div>
@@ -201,7 +240,7 @@
 
       <div class="foot">
         <b>読み方:</b> <span class="dot key" style="vertical-align:middle"></span> <b>キー</b>＝JOIN・絞り込みに使う識別子／
-        <span class="dot signal" style="vertical-align:middle"></span> <b>シグナル</b>＝分析対象の行動値。<span style="color:var(--coral)">✦</span> = QA 固有の行動シグナル。
+        <span class="dot signal" style="vertical-align:middle"></span> <b>シグナル</b>＝分析対象の行動値。<span style="color:var(--star)">✦</span> = QA 固有の行動シグナル。
         バッジ: <span class="b type">type</span> 格納型 · <span class="b since">since</span> 追加update日 · <span class="b joinkey">join</span> 結合キー。<br>
         <b>tracking_id "all":</b> 全サイトを横断して集計する特別スコープ。「対応」ならこのマテリアルは全サイト一括で呼べる／「非対応」ならサイト単体（個別 tracking_id）でのみ呼べる。<br>
         <b>AI・MCP で使う場合:</b> 機械可読の正本は各サイトの <code style="font-family:ui-monospace,Menlo,monospace">/wp-json/qa-platform/guide</code>（ライブ）／<a href="https://docs.qazero.com/docs/developer-manual/for-ai/">for-ai/materials.yaml</a>／MCP サーバー。
@@ -297,7 +336,7 @@ function render(){
       `<span class="tw">▶</span>`+
       `<span class="gname">${esc(g.fam)}</span>`+
       `<span class="gtag ${g.kind}">${g.kind==="key"?"キー":"シグナル"}</span>`+
-      (g.star?`<span title="QA 固有の行動シグナル" style="color:var(--coral)">✦</span>`:``)+
+      (g.star?`<span title="QA 固有の行動シグナル" style="color:var(--star)">✦</span>`:``)+
       `<span class="gcount">${cols.length}</span>`;
     d.appendChild(sum);
     if(g.desc){ const gd=el("div","gdesc"); gd.textContent=g.desc; d.appendChild(gd); }
