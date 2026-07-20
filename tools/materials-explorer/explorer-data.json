@@ -41,27 +41,27 @@
                     {
                         "n": "source_id",
                         "note": "流入元ID。ラベルは utm_source。",
-                        "type": "uint16"
+                        "type": "uint32"
                     },
                     {
                         "n": "medium_id",
                         "note": "メディアID。ラベルは utm_medium。",
-                        "type": "uint8"
+                        "type": "uint32"
                     },
                     {
                         "n": "campaign_id",
                         "note": "キャンペーンID。ラベルは utm_campaign。",
-                        "type": "uint16"
+                        "type": "uint32"
                     },
                     {
                         "n": "content_id",
                         "note": "コンテンツID。ラベルは utm_content。",
-                        "type": "uint16"
+                        "type": "uint32"
                     },
                     {
                         "n": "version_id",
                         "note": "ページ版ID。A/B・バージョン比較に使用。",
-                        "type": "uint16"
+                        "type": "uint32"
                     },
                     {
                         "n": "prev_page_id",
@@ -200,6 +200,31 @@
                     }
                 ],
                 "star": 1
+            },
+            {
+                "fam": "生データ保有フラグ",
+                "kind": "signal",
+                "desc": "スクロール/クリック/イベントの生データがそのPVにあるか（保有数）。neq:0 でヒートマップ対象PVを列DBだけで抽出できる。",
+                "cols": [
+                    {
+                        "n": "is_raw_p",
+                        "note": "スクロール生データ(raw_p)保有数(0/1/2…)。neq:0 でヒートマップ対象PVを抽出。",
+                        "type": "uint8",
+                        "since": "2026-07-09"
+                    },
+                    {
+                        "n": "is_raw_c",
+                        "note": "クリック生データ(raw_c)保有数(0/1/2…)。neq:0 でクリックヒートマップ対象PVを抽出。",
+                        "type": "uint8",
+                        "since": "2026-07-09"
+                    },
+                    {
+                        "n": "is_raw_e",
+                        "note": "イベント生データ(raw_e)保有数(0/1/2…)。neq:0 でイベント記録のあるPVを抽出。",
+                        "type": "uint8",
+                        "since": "2026-07-09"
+                    }
+                ]
             },
             {
                 "fam": "ビューポート",
@@ -521,7 +546,7 @@
                     {
                         "n": "element_text",
                         "note": "クリックされた要素のテキスト。",
-                        "type": "uint16"
+                        "type": "uint32"
                     },
                     {
                         "n": "selector",
@@ -531,7 +556,7 @@
                     {
                         "n": "to_url",
                         "note": "遷移先URL。",
-                        "type": "uint16"
+                        "type": "uint32"
                     },
                     {
                         "n": "is_external",
@@ -546,17 +571,17 @@
                     {
                         "n": "element_id",
                         "note": "要素id。",
-                        "type": "uint16"
+                        "type": "uint32"
                     },
                     {
                         "n": "element_class",
                         "note": "要素class。",
-                        "type": "uint16"
+                        "type": "uint32"
                     },
                     {
                         "n": "element_data",
                         "note": "data属性。",
-                        "type": "uint16"
+                        "type": "uint32"
                     }
                 ],
                 "star": 1
