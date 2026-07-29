@@ -2,6 +2,25 @@
 
 *The date shown is a reference. The actual timing may vary depending on the environment.*  
 
+## 3.1.7.0 — 2026-07-29
+
+### Improvements and Fixes
+
+- Updated chart displays  
+  Revised chart displays across the analytics screens to make data easier to review.
+
+- Improved date range selection  
+  Updated the calendar design and controls to make it easier to navigate by week or month and select a date range.
+
+- Improved data table displays  
+  Adjusted total rows, selected-row styling, and other display details to make data easier to review.
+
+- Improved traffic source identification  
+  Revised the handling of search engines and UTM parameters so that traffic sources are classified more appropriately.
+
+- Made additional improvements to data processing and display behavior, enhancing stability and processing accuracy.
+
+
 ## 3.1.2.3 — 2026-05-14
 
 ### Improvements & Fixes
