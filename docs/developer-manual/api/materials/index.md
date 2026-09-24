@@ -18,7 +18,7 @@ natural human question about a website.
 **[Open the Materials Explorer →](pathname:///tools/materials-explorer/index.html)** — a
 searchable, browsable view of every material and field (keys vs. signals,
 semantic families, `since` dates). Generated from the same machine-readable
-spec. *(Prototype — Japanese UI for now.)*
+spec. Available in English and Japanese. *(Prototype.)*
 :::
 
 ## In this section

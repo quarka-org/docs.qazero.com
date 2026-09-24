@@ -1,154 +1,154 @@
 {
     "allpv": {
-        "grain": "1 row = 1 pageview",
+        "grain": "1行 = 1ページビュー",
         "supports_all": true,
-        "blurb": "Raw data for every pageview. Behavioral signals such as deep read, exit position and rage clicks sit on the same row.",
+        "blurb": "全ページビューの生データ。熟読・離脱位置・イライラクリック等の行動シグナルも同じ行に持つ。",
         "groups": [
             {
-                "fam": "Keys & IDs",
+                "fam": "キー & ID",
                 "kind": "key",
-                "desc": "Identifiers used for joins and filtering. You normally filter on resolved columns such as url or device_type instead.",
+                "desc": "JOIN と絞り込みに使う識別子。フィルタは通常 url / device_type 等の解決済みカラムで行う。",
                 "cols": [
                     {
                         "n": "pv_id",
-                        "note": "Pageview identifier. Join key against click_event and others.",
+                        "note": "ページビュー識別。click_event 等との結合キー。",
                         "type": "uint32",
                         "join": 1
                     },
                     {
                         "n": "session_id",
-                        "note": "Filter by session. Fast via the column DB binary scan.",
+                        "note": "セッション単位の絞り込み。列DBバイナリスキャンで高速。",
                         "type": "uint64",
                         "join": 1
                     },
                     {
                         "n": "reader_id",
-                        "note": "Filter by user. Usually combined with url or similar.",
+                        "note": "ユーザー単位の絞り込み。url 等と組み合わせて使う。",
                         "type": "uint32",
                         "join": 1
                     },
                     {
                         "n": "page_id",
-                        "note": "Per page. You normally filter on url and use page_id as the join key.",
+                        "note": "ページ単位。通常は url で絞り、page_id は JOIN キー。",
                         "type": "uint32",
                         "join": 1
                     },
                     {
                         "n": "device_id",
-                        "note": "Device ID. 1=PC, 2=tablet, 3=SP. The label is device_type.",
+                        "note": "端末ID。1=PC, 2=tablet, 3=SP。ラベルは device_type。",
                         "type": "uint8"
                     },
                     {
                         "n": "source_id",
-                        "note": "Source ID. The label is utm_source.",
+                        "note": "流入元ID。ラベルは utm_source。",
                         "type": "uint32"
                     },
                     {
                         "n": "medium_id",
-                        "note": "Medium ID. The label is utm_medium.",
+                        "note": "メディアID。ラベルは utm_medium。",
                         "type": "uint32"
                     },
                     {
                         "n": "campaign_id",
-                        "note": "Campaign ID. The label is utm_campaign.",
+                        "note": "キャンペーンID。ラベルは utm_campaign。",
                         "type": "uint32"
                     },
                     {
                         "n": "content_id",
-                        "note": "Content ID. The label is utm_content.",
+                        "note": "コンテンツID。ラベルは utm_content。",
                         "type": "uint32"
                     },
                     {
                         "n": "version_id",
-                        "note": "Page version ID. Used for A/B and version comparison.",
+                        "note": "ページ版ID。A/B・バージョン比較に使用。",
                         "type": "uint32"
                     },
                     {
                         "n": "prev_page_id",
-                        "note": "Previous page ID. 0 selects landing pageviews.",
+                        "note": "前ページID。0 でランディング抽出。",
                         "type": "uint32",
                         "since": "2026-04-17"
                     },
                     {
                         "n": "next_page_id",
-                        "note": "Next page ID. 0 selects exit pageviews.",
+                        "note": "次ページID。0 で離脱PV抽出。",
                         "type": "uint32",
                         "since": "2026-04-17"
                     }
                 ]
             },
             {
-                "fam": "Session basics",
+                "fam": "セッションの基本",
                 "kind": "signal",
-                "desc": "Basic browsing metrics. Range filters work here (browse_sec gte:30, for example).",
+                "desc": "閲覧の基礎メトリクス。範囲フィルタ可（browse_sec gte:30 等）。",
                 "cols": [
                     {
                         "n": "access_time",
-                        "note": "UNIX time. Normally handled for you by the period parameters. You can also filter by time of day.",
+                        "note": "UNIX時刻。通常は期間パラメータで自動処理。時間帯絞り込みも可。",
                         "type": "uint32"
                     },
                     {
                         "n": "month",
-                        "note": "Month the row belongs to (YYYY-MM). A virtual column derived from access_time on the site clock. Put it in keep to aggregate by month, which is the only way to build a monthly trend. Narrow the period with time instead; filtering on this column runs as a slow post_filter.",
+                        "note": "所属月（YYYY-MM）。access_time からサイト時計で算出する仮想カラム。keep に入れると月別集計ができる（月次推移の唯一の手段）。期間の絞り込みは time で行う（この列の filter は post_filter で遅い）。",
                         "since": "2026-08-05"
                     },
                     {
                         "n": "pv",
-                        "note": "Pageview number within the session (1 = landing).",
+                        "note": "セッション内のPV番号（1=ランディング）。",
                         "type": "uint16"
                     },
                     {
                         "n": "speed_msec",
-                        "note": "Load speed in ms. Lets you pull pageviews that took 3 seconds or more.",
+                        "note": "表示速度(ms)。「3秒以上かかったPV」等も抽出可。",
                         "type": "uint16"
                     },
                     {
                         "n": "browse_sec",
-                        "note": "Time on page, in seconds.",
+                        "note": "閲覧時間(秒)。",
                         "type": "uint16"
                     },
                     {
                         "n": "is_last",
-                        "note": "Last pageview of the session (0/1). For finding exit pages.",
+                        "note": "セッション最終PV(0/1)。離脱ページ抽出に。",
                         "type": "uint8"
                     },
                     {
                         "n": "is_newuser",
-                        "note": "New user (0/1).",
+                        "note": "新規ユーザー(0/1)。",
                         "type": "uint8"
                     }
                 ]
             },
             {
-                "fam": "Read depth",
+                "fam": "読了の深さ",
                 "kind": "signal",
-                "desc": "Per-pageview scroll reach, deep read and where the reader stopped.",
+                "desc": "PV単位のスクロール到達率・熟読・停止位置。",
                 "cols": [
                     {
                         "n": "depth_position",
-                        "note": "Deepest scroll reach, 0-100%. gte:80 means read to the bottom, lte:20 means left near the top.",
+                        "note": "最深到達率(0-100%)。gte:80 で下部まで読了、lte:20 で冒頭離脱。",
                         "type": "uint8",
                         "star": 1
                     },
                     {
                         "n": "deep_read",
-                        "note": "Deep-read flag. 1 when there are 5 or more spots held for 3 seconds or longer.",
+                        "note": "熟読フラグ。3秒以上滞在の区間が5箇所以上で1。",
                         "type": "uint8",
                         "star": 1
                     },
                     {
                         "n": "stop_max_sec",
-                        "note": "Longest pause, in seconds. The spot the reader stayed on longest.",
+                        "note": "最長停止時間(秒)。最も長く留まった箇所。",
                         "type": "uint16"
                     },
                     {
                         "n": "stop_max_pos",
-                        "note": "Position of the longest pause, 0-100%. Goes with stop_max_sec.",
+                        "note": "最長停止位置(0-100%)。stop_max_sec とセット。",
                         "type": "uint8"
                     },
                     {
                         "n": "exit_pos",
-                        "note": "Exit position, 0-100%. lte:30 means the reader left within the first screen.",
+                        "note": "離脱位置(0-100%)。lte:30 でファーストビュー内離脱。",
                         "type": "uint8",
                         "star": 1
                     }
@@ -156,50 +156,50 @@
                 "star": 1
             },
             {
-                "fam": "Frustration",
+                "fam": "フラストレーション",
                 "kind": "signal",
-                "desc": "Rage clicks, dead clicks and form submits. Signals of friction with the UI.",
+                "desc": "連打・デッドクリック・フォーム送信。UI不満のシグナル。",
                 "cols": [
                     {
                         "n": "irritation_click_count",
-                        "note": "Number of rage-click bursts: 5 or more clicks within 3 seconds. gte:1 means friction with the UI.",
+                        "note": "3秒以内に5回以上の連打バースト数。gte:1 でUI不満。",
                         "type": "uint8",
                         "star": 1
                     },
                     {
                         "n": "dead_click_image_count",
-                        "note": "Clicks on images that carry no link. gte:1 means a missed opportunity.",
+                        "note": "リンクの無い画像へのクリック数。gte:1 で機会損失。",
                         "type": "uint8",
                         "star": 1
                     },
                     {
                         "n": "is_submit",
-                        "note": "Form submit fired (0/1). Observed from the native submit event, including submits via Enter. For form CVR.",
+                        "note": "フォーム送信の発火(0/1)。ネイティブsubmitイベント観測由来(Enter送信含む)。フォームCVR算出に。",
                         "type": "uint8"
                     }
                 ],
                 "star": 1
             },
             {
-                "fam": "Exploration behavior",
+                "fam": "探索行動",
                 "kind": "signal",
-                "desc": "Re-reading, skimming and hesitant mouse movement. Measures how well navigation works.",
+                "desc": "見直し・飛ばし読み・迷いのマウス挙動。ナビゲーションの質を測る。",
                 "cols": [
                     {
                         "n": "scroll_back_count",
-                        "note": "Times the reader jumped back up 1000px or more within 3 seconds, i.e. re-reading.",
+                        "note": "3秒以内に1000px以上上へ戻った回数=見直し。",
                         "type": "uint8",
                         "star": 1
                     },
                     {
                         "n": "content_skip_count",
-                        "note": "Times the reader skipped down 1000px or more, i.e. content that went unread.",
+                        "note": "1000px以上下へ飛ばした回数=読まれていない。",
                         "type": "uint8",
                         "star": 1
                     },
                     {
                         "n": "exploration_count",
-                        "note": "Times the mouse swept back and forth horizontally, i.e. hunting for something to click.",
+                        "note": "マウスが横に往復した回数=クリック対象を探して迷子。",
                         "type": "uint8",
                         "star": 1
                     }
@@ -207,300 +207,300 @@
                 "star": 1
             },
             {
-                "fam": "Raw-data presence flags",
+                "fam": "生データ保有フラグ",
                 "kind": "signal",
-                "desc": "Whether scroll / click / event raw data exists for that pageview (as a count). neq:0 finds heatmap-eligible pageviews from the column DB alone.",
+                "desc": "スクロール/クリック/イベントの生データがそのPVにあるか（保有数）。neq:0 でヒートマップ対象PVを列DBだけで抽出できる。",
                 "cols": [
                     {
                         "n": "is_raw_p",
-                        "note": "Count of scroll raw data (raw_p) held, 0/1/2 and up. neq:0 selects heatmap-eligible pageviews.",
+                        "note": "スクロール生データ(raw_p)保有数(0/1/2…)。neq:0 でヒートマップ対象PVを抽出。",
                         "type": "uint8",
                         "since": "2026-07-09"
                     },
                     {
                         "n": "is_raw_c",
-                        "note": "Count of click raw data (raw_c) held, 0/1/2 and up. neq:0 selects pageviews eligible for a click heatmap.",
+                        "note": "クリック生データ(raw_c)保有数(0/1/2…)。neq:0 でクリックヒートマップ対象PVを抽出。",
                         "type": "uint8",
                         "since": "2026-07-09"
                     },
                     {
                         "n": "is_raw_e",
-                        "note": "Count of event raw data (raw_e) held, 0/1/2 and up. neq:0 selects pageviews with recorded events.",
+                        "note": "イベント生データ(raw_e)保有数(0/1/2…)。neq:0 でイベント記録のあるPVを抽出。",
                         "type": "uint8",
                         "since": "2026-07-09"
                     }
                 ]
             },
             {
-                "fam": "Viewport",
+                "fam": "ビューポート",
                 "kind": "signal",
-                "desc": "Actual visible area. Useful for segmenting by responsive breakpoint.",
+                "desc": "実表示領域サイズ。レスポンシブ帯別のセグメントに。",
                 "cols": [
                     {
                         "n": "window_inner_width",
-                        "note": "innerWidth in px. between:768,1199 for the tablet band, gte:1200 for the desktop band.",
+                        "note": "innerWidth(px)。between:768,1199 でタブレット帯、gte:1200 でPC帯。",
                         "type": "uint16"
                     },
                     {
                         "n": "window_inner_height",
-                        "note": "innerHeight in px.",
+                        "note": "innerHeight(px)。",
                         "type": "uint16"
                     }
                 ]
             },
             {
-                "fam": "Page transitions",
+                "fam": "ページ遷移",
                 "kind": "signal",
-                "desc": "Which page came before and after. For path analysis.",
+                "desc": "前後どのページを見ていたか。導線分析に。",
                 "cols": [
                     {
                         "n": "prev_url",
-                        "note": "URL of the previous page. null on landing pageviews.",
+                        "note": "前ページURL。ランディングPVは null。",
                         "since": "2026-04-17"
                     },
                     {
                         "n": "prev_title",
-                        "note": "Title of the previous page.",
+                        "note": "前ページタイトル。",
                         "since": "2026-04-17"
                     },
                     {
                         "n": "next_url",
-                        "note": "URL of the next page. null on exit pageviews.",
+                        "note": "次ページURL。離脱PVは null。",
                         "since": "2026-04-17"
                     },
                     {
                         "n": "next_title",
-                        "note": "Title of the next page.",
+                        "note": "次ページタイトル。",
                         "since": "2026-04-17"
                     }
                 ]
             },
             {
-                "fam": "Source & referrer",
+                "fam": "流入元 & リファラー",
                 "kind": "signal",
-                "desc": "Where the visit came from.",
+                "desc": "どこから来たか。",
                 "cols": [
                     {
                         "n": "url",
-                        "note": "Page URL. Exact matches are fast via url_hash."
+                        "note": "ページURL。完全一致は url_hash で高速。"
                     },
                     {
                         "n": "title",
-                        "note": "Page title. More efficient to filter on url and keep this."
+                        "note": "ページタイトル。url で絞って keep する方が効率的。"
                     },
                     {
                         "n": "source_domain",
-                        "note": "Referring domain. Indexed, so fast."
+                        "note": "流入元ドメイン。インデックスあり・高速。"
                     },
                     {
                         "n": "referrer",
-                        "note": "Referrer."
+                        "note": "リファラー。"
                     },
                     {
                         "n": "utm_source",
-                        "note": "Source."
+                        "note": "流入元。"
                     },
                     {
                         "n": "utm_medium",
-                        "note": "Medium. Unique index, so fast."
+                        "note": "メディア。ユニークインデックス・高速。"
                     },
                     {
                         "n": "utm_campaign",
-                        "note": "Campaign. Unique index, so fast."
+                        "note": "キャンペーン。ユニークインデックス・高速。"
                     },
                     {
                         "n": "utm_content",
-                        "note": "Content."
+                        "note": "コンテンツ。"
                     },
                     {
                         "n": "utm_term",
-                        "note": "Search term (utm)."
+                        "note": "検索語(utm)。"
                     }
                 ]
             },
             {
-                "fam": "Device & user",
+                "fam": "デバイス & ユーザー",
                 "kind": "signal",
-                "desc": "Device, OS, language and country.",
+                "desc": "端末・OS・言語・国。",
                 "cols": [
                     {
                         "n": "device_type",
-                        "note": "One of three values: PC / SP / tablet. Case matters."
+                        "note": "PC / SP / tablet の3値（正確な大小文字で）。"
                     },
                     {
                         "n": "os",
-                        "note": "OS (UAos). Indexed, so fast."
+                        "note": "OS(UAos)。インデックスあり・高速。"
                     },
                     {
                         "n": "browser",
-                        "note": "Browser (UAbrowser)."
+                        "note": "ブラウザ(UAbrowser)。"
                     },
                     {
                         "n": "language",
-                        "note": "Language."
+                        "note": "言語。"
                     },
                     {
                         "n": "country_code",
-                        "note": "Country code, roughly 200 values. Indexed, so fast."
+                        "note": "国コード(約200種)。インデックスあり・高速。"
                     },
                     {
                         "n": "ua",
-                        "note": "Composed UA string. Filtering on it directly is discouraged; use os and browser instead."
+                        "note": "UA合成。直接フィルタ非推奨、os/browser を個別に。"
                     },
                     {
                         "n": "original_id",
-                        "note": "Original ID. Indexed, so fast."
+                        "note": "元ID。インデックスあり・高速。"
                     }
                 ]
             },
             {
-                "fam": "Page-type flags",
+                "fam": "ページ種別フラグ",
                 "kind": "signal",
-                "desc": "Page kind, classified automatically (generated column). Filter directly on is_*.",
+                "desc": "ページの種類を自動分類（Generated Column）。is_* で直接フィルタ。",
                 "cols": [
                     {
                         "n": "page_type",
-                        "note": "Page type as a bit flag. Filtering on is_* is normally more efficient."
+                        "note": "ページタイプ・ビットフラグ。通常は is_* で絞る方が効率的。"
                     },
                     {
                         "n": "page_fetch_status",
-                        "note": "HTML fetch status. 1 = success, -1 = failure."
+                        "note": "HTML取得状態。1=成功, -1=失敗。"
                     },
                     {
                         "n": "is_article",
-                        "note": "Article (0/1)."
+                        "note": "記事(0/1)。"
                     },
                     {
                         "n": "is_product",
-                        "note": "Product (0/1)."
+                        "note": "商品(0/1)。"
                     },
                     {
                         "n": "is_list",
-                        "note": "Listing (0/1)."
+                        "note": "一覧(0/1)。"
                     },
                     {
                         "n": "is_form",
-                        "note": "Form (0/1)."
+                        "note": "フォーム(0/1)。"
                     },
                     {
                         "n": "is_trust_info",
-                        "note": "Trust information (0/1)."
+                        "note": "信頼性情報(0/1)。"
                     },
                     {
                         "n": "is_faq",
-                        "note": "FAQ (0/1)."
+                        "note": "FAQ(0/1)。"
                     },
                     {
                         "n": "is_landing",
-                        "note": "Landing (0/1)."
+                        "note": "ランディング(0/1)。"
                     },
                     {
                         "n": "is_search",
-                        "note": "Search results (0/1)."
+                        "note": "検索結果(0/1)。"
                     },
                     {
                         "n": "is_account",
-                        "note": "Account (0/1)."
+                        "note": "アカウント(0/1)。"
                     },
                     {
                         "n": "is_cart",
-                        "note": "Cart (0/1)."
+                        "note": "カート(0/1)。"
                     },
                     {
                         "n": "is_checkout",
-                        "note": "Checkout (0/1)."
+                        "note": "決済(0/1)。"
                     },
                     {
                         "n": "is_confirm",
-                        "note": "Confirmation (0/1)."
+                        "note": "確認(0/1)。"
                     },
                     {
                         "n": "is_thanks",
-                        "note": "Thank-you (0/1)."
+                        "note": "サンクス(0/1)。"
                     },
                     {
                         "n": "is_top_page",
-                        "note": "Top page (0/1)."
+                        "note": "トップ(0/1)。"
                     },
                     {
                         "n": "is_event",
-                        "note": "Event (0/1)."
+                        "note": "イベント(0/1)。"
                     },
                     {
                         "n": "is_recipe",
-                        "note": "Recipe (0/1)."
+                        "note": "レシピ(0/1)。"
                     },
                     {
                         "n": "is_job",
-                        "note": "Job posting (0/1)."
+                        "note": "求人(0/1)。"
                     },
                     {
                         "n": "is_video",
-                        "note": "Video (0/1)."
+                        "note": "動画(0/1)。"
                     },
                     {
                         "n": "is_howto",
-                        "note": "How-to (0/1)."
+                        "note": "ハウツー(0/1)。"
                     },
                     {
                         "n": "is_qa_forum",
-                        "note": "Q&A forum (0/1)."
+                        "note": "Q&Aフォーラム(0/1)。"
                     }
                 ]
             },
             {
-                "fam": "Goal completion",
+                "fam": "ゴール達成",
                 "kind": "signal",
-                "desc": "Whether each configured goal was met. The definitions live in sites[].goals in /guide.",
+                "desc": "設定した各ゴールの達成可否。定義は /guide の sites[].goals。",
                 "cols": [
                     {
                         "n": "is_goal_1",
-                        "note": "Goal 1 met (0/1).",
+                        "note": "ゴール1達成(0/1)。",
                         "type": "uint8"
                     },
                     {
                         "n": "is_goal_2",
-                        "note": "Goal 2 met (0/1).",
+                        "note": "ゴール2達成(0/1)。",
                         "type": "uint8"
                     },
                     {
                         "n": "is_goal_3",
-                        "note": "Goal 3 met (0/1).",
+                        "note": "ゴール3達成(0/1)。",
                         "type": "uint8"
                     },
                     {
                         "n": "is_goal_4",
-                        "note": "Goal 4 met (0/1).",
+                        "note": "ゴール4達成(0/1)。",
                         "type": "uint8"
                     },
                     {
                         "n": "is_goal_5",
-                        "note": "Goal 5 met (0/1).",
+                        "note": "ゴール5達成(0/1)。",
                         "type": "uint8"
                     },
                     {
                         "n": "is_goal_6",
-                        "note": "Goal 6 met (0/1).",
+                        "note": "ゴール6達成(0/1)。",
                         "type": "uint8"
                     },
                     {
                         "n": "is_goal_7",
-                        "note": "Goal 7 met (0/1).",
+                        "note": "ゴール7達成(0/1)。",
                         "type": "uint8"
                     },
                     {
                         "n": "is_goal_8",
-                        "note": "Goal 8 met (0/1).",
+                        "note": "ゴール8達成(0/1)。",
                         "type": "uint8"
                     },
                     {
                         "n": "is_goal_9",
-                        "note": "Goal 9 met (0/1).",
+                        "note": "ゴール9達成(0/1)。",
                         "type": "uint8"
                     },
                     {
                         "n": "is_goal_10",
-                        "note": "Goal 10 met (0/1).",
+                        "note": "ゴール10達成(0/1)。",
                         "type": "uint8"
                     }
                 ]
@@ -508,102 +508,102 @@
         ]
     },
     "click_event": {
-        "grain": "1 row = 1 click",
+        "grain": "1行 = 1クリック",
         "supports_all": true,
-        "blurb": "Raw data in which every click is stored automatically. Carries the selector and coordinates, and joins to the raw pageview log.",
+        "blurb": "全クリックを自動保存している生データ。セレクタや座標なども保有し、生PVログとJOIN可能。",
         "groups": [
             {
-                "fam": "Keys & IDs",
+                "fam": "キー & ID",
                 "kind": "key",
-                "desc": "Keys for joining to allpv.",
+                "desc": "allpv と結合するキー。",
                 "cols": [
                     {
                         "n": "pv_id",
-                        "note": "Which pageview the click happened on. Joins to allpv.",
+                        "note": "どのPV上のクリックか。allpv と結合。",
                         "type": "uint32",
                         "join": 1
                     },
                     {
                         "n": "session_id",
-                        "note": "Per session.",
+                        "note": "セッション単位。",
                         "type": "uint64",
                         "join": 1
                     },
                     {
                         "n": "page_id",
-                        "note": "Per page.",
+                        "note": "ページ単位。",
                         "type": "uint32",
                         "join": 1
                     }
                 ]
             },
             {
-                "fam": "What was clicked",
+                "fam": "クリックの中身",
                 "kind": "signal",
-                "desc": "What was pressed and when. event_sec tells you whether they read before clicking.",
+                "desc": "何が・いつ押されたか。event_sec で「読んでから押したか」が分かる。",
                 "cols": [
                     {
                         "n": "event_sec",
-                        "note": "Seconds from page display to the click.",
+                        "note": "ページ表示からクリックまでの秒数。",
                         "type": "uint16",
                         "star": 1
                     },
                     {
                         "n": "element_text",
-                        "note": "Text of the clicked element.",
+                        "note": "クリックされた要素のテキスト。",
                         "type": "uint32"
                     },
                     {
                         "n": "selector",
-                        "note": "CSS selector.",
+                        "note": "CSSセレクタ。",
                         "type": "uint32"
                     },
                     {
                         "n": "to_url",
-                        "note": "Destination URL.",
+                        "note": "遷移先URL。",
                         "type": "uint32"
                     },
                     {
                         "n": "is_external",
-                        "note": "External link (0/1).",
+                        "note": "外部リンク(0/1)。",
                         "type": "uint8"
                     },
                     {
                         "n": "action_id",
-                        "note": "What was clicked, as an observed fact. 1: click / 2: form (a click inside a form area) / 3: tel / 4: mailto.",
+                        "note": "クリック対象の事実分類。1:click / 2:form(フォーム領域内クリック) / 3:tel / 4:mailto。",
                         "type": "uint8"
                     },
                     {
                         "n": "element_id",
-                        "note": "Element id.",
+                        "note": "要素id。",
                         "type": "uint32"
                     },
                     {
                         "n": "element_class",
-                        "note": "Element class.",
+                        "note": "要素class。",
                         "type": "uint32"
                     },
                     {
                         "n": "element_data",
-                        "note": "data attribute.",
+                        "note": "data属性。",
                         "type": "uint32"
                     }
                 ],
                 "star": 1
             },
             {
-                "fam": "Click coordinates",
+                "fam": "クリック座標",
                 "kind": "signal",
-                "desc": "Click position in %. For heatmap-style aggregation.",
+                "desc": "クリック位置(%)。ヒートマップ的な集計に。",
                 "cols": [
                     {
                         "n": "page_x_pct",
-                        "note": "Click X position in %.",
+                        "note": "クリックX位置(%)。",
                         "type": "uint16"
                     },
                     {
                         "n": "page_y_pct",
-                        "note": "Click Y position in %. For analysing upper vs lower page.",
+                        "note": "クリックY位置(%)。上部/下部の分析に。",
                         "type": "uint16"
                     }
                 ]
@@ -611,269 +611,269 @@
         ]
     },
     "gsc": {
-        "grain": "1 row = (page x query x day x search surface)",
+        "grain": "1行 = (ページ×検索語×日×検索面)",
         "supports_all": false,
-        "blurb": "Search Console stored at (page x query x day) grain. Joins to the raw pageview log.",
+        "blurb": "Search Console を (ページ×検索語×日) の粒度で保存。生PVログとJOIN可能。",
         "groups": [
             {
-                "fam": "Keys & IDs",
+                "fam": "キー & ID",
                 "kind": "key",
-                "desc": "page_id is N:M against allpv. Joining with no filter multiplies the rows out (a Cartesian product, i.e. row explosion), so narrow on url or keyword first, then join.",
+                "desc": "allpv とは page_id が N:M（多対多）。無フィルタで JOIN すると行が掛け算で膨張（デカルト積＝行爆発）するため、先に url / keyword 等で絞ってから JOIN する。",
                 "cols": [
                     {
                         "n": "page_id",
-                        "note": "Per page. N:M against allpv. An unfiltered join explodes the row count, so narrow first.",
+                        "note": "ページ単位。allpv と N:M。無フィルタ JOIN は行爆発するので先に絞る。",
                         "type": "uint32",
                         "join": 1
                     },
                     {
                         "n": "query_id",
-                        "note": "Keyword ID. Search on keyword to get a set of query_id.",
+                        "note": "キーワードID。keyword で検索→query_id 集合。",
                         "type": "uint32"
                     },
                     {
                         "n": "search_type",
-                        "note": "1 = web, 2 = image, 3 = video.",
+                        "note": "1=web, 2=image, 3=video。",
                         "type": "uint8"
                     }
                 ]
             },
             {
-                "fam": "Search performance",
+                "fam": "検索パフォーマンス",
                 "kind": "signal",
-                "desc": "Clicks, impressions, CTR and position. position is rewritten into a column DB scan, so it is fast.",
+                "desc": "クリック・表示・CTR・掲載順位。position は列DBスキャンにリライトされ高速。",
                 "cols": [
                     {
                         "n": "clicks",
-                        "note": "Daily clicks.",
+                        "note": "日次クリック数。",
                         "type": "uint32",
                         "star": 1
                     },
                     {
                         "n": "impressions",
-                        "note": "Daily impressions.",
+                        "note": "日次インプレッション数。",
                         "type": "uint32",
                         "star": 1
                     },
                     {
                         "n": "ctr",
-                        "note": "clicks / impressions. Computed at execution time (post_filter).",
+                        "note": "clicks / impressions。実行時算出（post_filter）。",
                         "star": 1
                     },
                     {
                         "n": "position",
-                        "note": "Average position. Rewritten to position_x100 so it can be scanned in the column DB, which is fast.",
+                        "note": "平均掲載順位。position_x100 に書き換わり列DBスキャン可・高速。",
                         "star": 1
                     },
                     {
                         "n": "position_weighted",
-                        "note": "position x impressions. For weighted averages."
+                        "note": "position × impressions。加重平均用。"
                     },
                     {
                         "n": "position_x100",
-                        "note": "Raw value of position x 100.",
+                        "note": "順位×100 の生値。",
                         "type": "uint16"
                     }
                 ],
                 "star": 1
             },
             {
-                "fam": "Time dimension",
+                "fam": "期間の次元",
                 "kind": "signal",
-                "desc": "A gsc row carries no date of its own. This is the axis to use when you want monthly aggregation.",
+                "desc": "gsc の行自体は日付を持たない。月別に集計したいときの切り口。",
                 "cols": [
                     {
                         "n": "month",
-                        "note": "Month the row belongs to (YYYY-MM). Derived from the date Storage injects as it loops over the daily files. Put it in keep to aggregate by month. Narrow the period with time instead.",
+                        "note": "所属月（YYYY-MM）。Storage が日別ファイルのループから注入した日付で算出する。keep に入れると月別集計ができる。期間の絞り込みは time で行う。",
                         "since": "2026-08-05"
                     }
                 ]
             },
             {
-                "fam": "Resolved columns",
+                "fam": "解決カラム",
                 "kind": "signal",
-                "desc": "Labels resolved from query_id and page_id.",
+                "desc": "query_id / page_id からラベル解決。",
                 "cols": [
                     {
                         "n": "keyword",
-                        "note": "Search query. Resolved from query_id."
+                        "note": "検索語。query_id から解決。"
                     },
                     {
                         "n": "url",
-                        "note": "Page URL."
+                        "note": "ページURL。"
                     },
                     {
                         "n": "title",
-                        "note": "Page title."
+                        "note": "ページタイトル。"
                     },
                     {
                         "n": "page_type",
-                        "note": "Page type."
+                        "note": "ページタイプ。"
                     },
                     {
                         "n": "page_fetch_status",
-                        "note": "Fetch status."
+                        "note": "取得状態。"
                     }
                 ]
             }
         ]
     },
     "page_version": {
-        "grain": "1 row = one version of a page",
+        "grain": "1行 = ページの1つの版",
         "supports_all": false,
-        "blurb": "Version history of page content. Lets you compare before and after a revision without mixing the two.",
+        "blurb": "ページ内容の版履歴。改稿の前後を混ぜずに比較できる。",
         "groups": [
             {
-                "fam": "Keys & IDs",
+                "fam": "キー & ID",
                 "kind": "key",
-                "desc": "Joins to allpv.version_id. Versions are tracked per page x device, because PC and SP use different templates and so have separate revision histories. That is why device_id is part of the key.",
+                "desc": "allpv.version_id と結合。版は page × device 単位で管理する（PC と SP は別テンプレートで、改稿履歴が別系列）。このため device_id もキーの一部。",
                 "cols": [
                     {
                         "n": "version_id",
-                        "note": "PK, and the join key against allpv.version_id.",
+                        "note": "PK / allpv.version_id との結合キー。",
                         "join": 1
                     },
                     {
                         "n": "page_id",
-                        "note": "Page identifier. Narrowing by URL in allpv and then joining is recommended.",
+                        "note": "ページ識別。allpv で URL 絞り→JOIN 推奨。",
                         "join": 1
                     },
                     {
                         "n": "device_id",
-                        "note": "1=PC, 2=tablet, 3=SP. Part of the key because PC, SP and tablet each have their own revision history."
+                        "note": "1=PC, 2=tablet, 3=SP。PC/SP/tablet で版履歴が別系列なのでキーに含む。"
                     }
                 ]
             },
             {
-                "fam": "Version metadata",
+                "fam": "版のメタ",
                 "kind": "signal",
-                "desc": "Version number, creation date and URL.",
+                "desc": "版番号・作成日・URL。",
                 "cols": [
                     {
                         "n": "version_no",
-                        "note": "Version number within the same page x device. 1 is the first version. calc MAX() gives the latest."
+                        "note": "同一ページ×デバイス内の版番号。1が初版。calc MAX() で最新版数。"
                     },
                     {
                         "n": "update_date",
-                        "note": "Date the version was created. For finding changes made on a particular day."
+                        "note": "版作成日。特定日の変更を探すのに。"
                     },
                     {
                         "n": "url",
-                        "note": "URL."
+                        "note": "URL。"
                     },
                     {
                         "n": "title",
-                        "note": "Title."
+                        "note": "タイトル。"
                     },
                     {
                         "n": "device_type",
-                        "note": "PC / SP / tablet."
+                        "note": "PC/SP/tablet。"
                     }
                 ]
             }
         ]
     },
     "summary_allpage": {
-        "grain": "1 row = period totals per page x dimension",
+        "grain": "1行 = ページ×次元の期間累計",
         "supports_all": true,
-        "blurb": "Returns summary data for every page. Convenient for per-page aggregation.",
+        "blurb": "全ページのサマリーデータを返すマテリアル。ページ別集計に便利。",
         "groups": [
             {
-                "fam": "Grouping dimensions",
+                "fam": "グルーピング次元",
                 "kind": "key",
-                "desc": "The axes you aggregate along. Kept as numeric IDs; device_type is added for you.",
+                "desc": "集計の切り口。数値IDのまま（device_type は自動付与）。",
                 "cols": [
                     {
                         "n": "page_id",
-                        "note": "Page identifier. Use this material for rankings.",
+                        "note": "ページ識別。ランキングはこのマテリアル。",
                         "type": "uint32"
                     },
                     {
                         "n": "device_id",
-                        "note": "1=PC, 2=tablet, 3=SP. device_type is added for you.",
+                        "note": "1=PC,2=tablet,3=SP。device_type 自動付与。",
                         "type": "uint8"
                     },
                     {
                         "n": "utm_source",
-                        "note": "Source, with the label already resolved."
+                        "note": "流入元（ラベル解決済み）。"
                     },
                     {
                         "n": "utm_medium",
-                        "note": "Medium."
+                        "note": "メディア。"
                     },
                     {
                         "n": "utm_campaign",
-                        "note": "Campaign."
+                        "note": "キャンペーン。"
                     },
                     {
                         "n": "source_domain",
-                        "note": "Referring domain."
+                        "note": "流入元ドメイン。"
                     },
                     {
                         "n": "is_newuser",
-                        "note": "New (1) or returning (0).",
+                        "note": "新規(1)/リピート(0)。",
                         "type": "uint8"
                     },
                     {
                         "n": "is_QA",
-                        "note": "Flag for traffic that came through QA.",
+                        "note": "QA経由フラグ。",
                         "type": "uint8"
                     }
                 ]
             },
             {
-                "fam": "Cumulative measures",
+                "fam": "累計メジャー",
                 "kind": "signal",
-                "desc": "Totals over the period. Numeric range filters run as post_filter.",
+                "desc": "期間の累計値。数値範囲フィルタは post_filter。",
                 "cols": [
                     {
                         "n": "pv_count",
-                        "note": "Total pageviews over the period.",
+                        "note": "期間PV累計。",
                         "type": "uint32"
                     },
                     {
                         "n": "user_count",
-                        "note": "Total users over the period.",
+                        "note": "期間ユーザー累計。",
                         "type": "uint32"
                     },
                     {
                         "n": "bounce_count",
-                        "note": "Total bounces over the period.",
+                        "note": "期間直帰累計。",
                         "type": "uint32"
                     },
                     {
                         "n": "exit_count",
-                        "note": "Total exits over the period.",
+                        "note": "期間離脱累計。",
                         "type": "uint32"
                     },
                     {
                         "n": "time_on_page",
-                        "note": "Total time on page over the period, in seconds.",
+                        "note": "期間滞在時間合計(秒)。",
                         "type": "uint32"
                     },
                     {
                         "n": "lp_count",
-                        "note": "Total number of times the page was the entry point.",
+                        "note": "入口になった回数の累計。",
                         "type": "uint32"
                     }
                 ]
             },
             {
-                "fam": "Resolved columns",
+                "fam": "解決カラム",
                 "kind": "signal",
-                "desc": "Restored from page_id.",
+                "desc": "page_id から復元。",
                 "cols": [
                     {
                         "n": "title",
-                        "note": "Title."
+                        "note": "タイトル。"
                     },
                     {
                         "n": "url",
-                        "note": "URL."
+                        "note": "URL。"
                     },
                     {
                         "n": "wp_qa_id",
-                        "note": "WordPress post ID."
+                        "note": "WP投稿ID。"
                     }
                 ]
             }

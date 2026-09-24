@@ -11,7 +11,7 @@ sidebar_position: 1
 > マテリアルを一番速く理解する方法は、そのマテリアルのページにあるサンプル表を見ることです。人間はカラム一覧よりサンプル行の方が速く読めます。
 
 :::tip 対話型 — Materials Explorer
-**[Materials Explorer を開く →](pathname:///tools/materials-explorer/index.html)** — 全マテリアル・全フィールドを検索して探せるビュー（キー/シグナル、意味ファミリー、`since` 日付）。同じ機械可読仕様から生成。*（プロトタイプ）*
+**[Materials Explorer を開く →](pathname:///ja/tools/materials-explorer/index.html)** — 全マテリアル・全フィールドを検索して探せるビュー（キー/シグナル、意味ファミリー、`since` 日付）。同じ機械可読仕様から生成。*（プロトタイプ）*
 :::
 
 ## このセクションの内容
