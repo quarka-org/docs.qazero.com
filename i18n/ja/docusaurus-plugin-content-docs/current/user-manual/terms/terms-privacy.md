@@ -25,3 +25,9 @@ SaaSプランをご利用のお客様に適用される追加規約です。デ�
 
 ▼QA ZERO プライバシーポリシー  
 [https://qazero.com/privacy-policy/](https://qazero.com/privacy-policy/)
+
+
+## データ収集方針
+
+▼QA ZERO データ収集方針  
+[https://qazero.com/data-collection/](https://qazero.com/data-collection/)
