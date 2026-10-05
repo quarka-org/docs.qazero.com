@@ -2,6 +2,34 @@
 
 *The date shown is a reference. The actual timing may vary depending on the environment.*  
 
+## 3.2.1.0 — 2026-10-05
+
+### New Features
+
+- Goal tracking using dataLayer values  
+  Values sent to the dataLayer on tracked pages can now be collected and used to determine goal completions.
+
+### Improvements and Fixes
+
+- Additional date range options  
+  Added “Last 28 Days” and “Last 90 Days” for quick date range selection.  
+
+- Session replay improvements  
+  Fixed issues with thumbnail retrieval and the display of new and returning visitors in historical data.
+
+- Improved data processing stability  
+  Revised date range handling for goal aggregation and error handling when page HTML could not be retrieved.
+
+- Cookie consent banner improvements  
+  Improved and corrected tracking processes used with cookie consent banners.
+
+- Improved assistant infrastructure  
+  Improved internal processing to support assistants offering a wider range of analyses in the future.
+
+- Other updates include security enhancements and improvements and fixes to settings screens, Japanese translations, and license activation.
+
+---
+
 ## 3.1.7.0 — 2026-07-29
 
 ### Improvements and Fixes
@@ -20,6 +48,7 @@
 
 - Made additional improvements to data processing and display behavior, enhancing stability and processing accuracy.
 
+---
 
 ## 3.1.2.3 — 2026-05-14
 
@@ -46,6 +75,8 @@
 
 - Minor improvements to translations and UI display
 
+---
+
 ## 3.1.0.0 — 2026-04-16
 
 ### Improvements & Fixes
@@ -66,6 +97,8 @@
 
 - Enhanced anomaly detection  
   Strengthened mechanisms for early issue detection, including communication status checks.
+
+---
 
 ## 3.0.1.0 — 2026-02-24
 
