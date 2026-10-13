@@ -11,6 +11,27 @@ Some behaviors may be related to specifications or specific environments.
 
 ---
 
+
+## Channel classification may change depending on the capitalization of medium names
+
+**Status**: Fix planned
+
+### Overview
+
+Channel classification in the Acquisition report may vary depending on the capitalization of the `utm_medium` value in incoming URLs.
+
+For example, traffic with `utm_medium=Social` instead of `social` may cause traffic previously classified as “Social” to appear under “Other.”
+
+### Additional information
+
+This issue occurs during channel classification when generating the report display and may also affect reports for past periods.
+
+Session counts and goal completion counts within a channel may also become inconsistent.
+
+We plan to update the related processing.
+
+---
+
 ## Some traffic may be classified as "Other" in the Acquisition Report
 
 **Status**: Improvement planned
