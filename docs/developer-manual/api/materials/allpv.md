@@ -2,6 +2,8 @@
 id: material-allpv
 title: allpv
 sidebar_position: 2
+last_updated: 2026-11-02
+api_update: 2026-11-02
 ---
 
 # `allpv` — one row per page view
@@ -81,6 +83,59 @@ are documented in [`ai/materials.yaml`](../../for-ai/materials.yaml):
   three ID columns shown in the sample (`pv_id`, `session_id`,
   `page_id`) are the ones you will typically JOIN on.
 
+## Time buckets: `month`, `hour`, `weekday` {#time-buckets}
+
+QAL has no function that rounds a timestamp to a month, hour, or day of
+week (`calc` is a fixed whitelist). Instead, `allpv` exposes three
+virtual columns computed from `access_time` at query time. Put one in
+`keep` and the rows are grouped by it.
+
+| Column | Type | Values | Since |
+|---|---|---|---|
+| `month` | string | `"YYYY-MM"` | 2026-08-05 |
+| `hour` | int | `0`–`23` | 2026-11-02 |
+| `weekday` | int | `0`–`6`, `0` = Sunday (same as PHP `w`) | 2026-11-02 |
+
+- **Site clock.** All three are computed on the site's own clock (the
+  WordPress timezone). `time.tz` does not change them; it only decides
+  which day files are read.
+- **Daylight saving time.** Hours are counted on the wall clock. On the
+  autumn fall-back day, `hour = 1` holds two hours of traffic; on the
+  spring-forward day, `hour = 2` has no rows. GA4 counts the same way.
+- **Narrow with `time` first.** These columns are meant for `keep`.
+  Filtering on them runs as a post-filter after every row has been
+  decoded, which is slow. Narrow the period with `time`, and use
+  physical columns (`source_id`, `medium_id`, `is_newuser`, …) in
+  `filter` before adding a bucket to `keep`. A 12-month query with no
+  narrowing is heavy whether or not you use these columns.
+- **Integers only.** `hour` and `weekday` are integers, so `prefix` and
+  `contains` do not apply.
+- **No zero-fill, no implicit order.** An hour or weekday with no page
+  views returns no row. Rows come out in first-seen order, so add a
+  `sort` on the bucket column to get clock or calendar order.
+- **Labels are yours.** `weekday` returns numbers; map them to "Sun",
+  "Mon", … on the client side.
+
+Example — page views by hour of day, in clock order:
+
+```json
+"make": {
+  "by_hour": {
+    "from": "allpv",
+    "keep": ["hour"],
+    "calc": { "views": { "count": "*" } },
+    "sort": [{ "column": "hour", "direction": "asc" }]
+  }
+}
+```
+
+`gsc` has `month` too, but not `hour` or `weekday` (its rows are per
+day). See [`gsc`](./gsc.md#month).
+
+**Since:** `month` 2026-08-05 · `hour` / `weekday` 2026-11-02. Check
+`features.material_month_bucket` and `features.material_hour_weekday_bucket`
+in `/guide` before relying on them.
+
 ## Common JOIN keys
 
 - `pv_id` → `click_event.pv_id` (which clicks happened on this
@@ -97,6 +152,8 @@ are documented in [`ai/materials.yaml`](../../for-ai/materials.yaml):
 - "What is the mobile vs. desktop split on the checkout page?"
 - "Which pages have high deep-read but low conversion?"
 - "Which pages show unusually high `irritation_click_count`?"
+- "At what hours and on which weekdays does direct traffic arrive?"
+  (`keep: ["hour", "weekday"]`)
 
 Any of these can be expressed as one or two QAL views on `allpv`.
 

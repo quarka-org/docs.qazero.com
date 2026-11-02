@@ -2,6 +2,8 @@
 id: reference-guide-2025-10-20
 title: GET /guide
 sidebar_position: 3
+last_updated: 2026-11-02
+api_update: 2026-11-02
 ---
 
 # `GET /wp-json/qa-platform/guide`
@@ -31,7 +33,7 @@ Authorization: Basic <base64 user:app_password>
 ```json
 {
   "version": "2025-10-20",
-  "api_update": "2026-04-29",
+  "api_update": "2026-11-02",
   "timestamp": "2026-04-29T08:30:00Z",
   "plugin_version": "3.0.0.0",
 
@@ -43,6 +45,8 @@ Authorization: Basic <base64 user:app_password>
     "sort":          true,
     "allpv_prev_next_page": true,
     "materials_supports_all": true,
+    "material_month_bucket": true,
+    "material_hour_weekday_bucket": true,
     "sample":        false,
     "include_count": false,
     "return_file":   false,
@@ -58,6 +62,8 @@ Authorization: Basic <base64 user:app_password>
     "sort":                  { "enabled": true,  "since": "2025-10-20" },
     "allpv_prev_next_page":  { "enabled": true,  "since": "2026-04-17" },
     "materials_supports_all":{ "enabled": true,  "since": "2026-04-29" },
+    "material_month_bucket": { "enabled": true, "since": "2026-08-05" },
+    "material_hour_weekday_bucket": { "enabled": true, "since": "2026-11-02" },
     "sample":                { "enabled": false },
     "include_count":         { "enabled": false },
     "return_file":           { "enabled": false },

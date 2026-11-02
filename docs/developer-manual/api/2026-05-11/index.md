@@ -2,15 +2,15 @@
 id: version-2026-05-11
 title: Version 2026-05-11
 sidebar_position: 1
-last_updated: 2026-05-21
-api_update: 2026-05-21
+last_updated: 2026-11-02
+api_update: 2026-11-02
 ---
 
 # Version 2026-05-11
 
 :::info Version Information
 **API Version:** 2026-05-11
-**API Update:** 2026-05-21
+**API Update:** 2026-11-02
 **Plugin Version Required:** 3.0.0.0+
 **Status:** Current Release
 

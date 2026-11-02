@@ -2,6 +2,8 @@
 id: reference-guide-2026-05-11
 title: GET /guide
 sidebar_position: 3
+last_updated: 2026-11-02
+api_update: 2026-11-02
 ---
 
 # `GET /wp-json/qa-platform/guide`
@@ -31,7 +33,7 @@ Authorization: Basic <base64 user:app_password>
 ```json
 {
   "version": "2026-05-11",
-  "api_update": "2026-05-11",
+  "api_update": "2026-11-02",
   "timestamp": "2026-05-11T08:30:00Z",
   "plugin_version": "3.0.0.0",
 
@@ -46,6 +48,8 @@ Authorization: Basic <base64 user:app_password>
     "calc_join_symmetric":   true,
     "guide_local_source":    true,
     "datalayer_observed_events": true,
+    "material_month_bucket": true,
+    "material_hour_weekday_bucket": true,
     "sample":                false,
     "include_count":         false,
     "return_file":           false,
@@ -64,6 +68,8 @@ Authorization: Basic <base64 user:app_password>
     "calc_join_symmetric":   { "enabled": true,  "since": "2026-05-11" },
     "guide_local_source":    { "enabled": true,  "since": "2026-05-11" },
     "datalayer_observed_events": { "enabled": true, "since": "2026-05-11" },
+    "material_month_bucket": { "enabled": true, "since": "2026-08-05" },
+    "material_hour_weekday_bucket": { "enabled": true, "since": "2026-11-02" },
     "sample":                { "enabled": false },
     "include_count":         { "enabled": false },
     "return_file":           { "enabled": false },

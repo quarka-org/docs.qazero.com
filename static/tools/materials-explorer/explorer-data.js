@@ -97,6 +97,16 @@ window.MATERIALS_DATA = {
                             "since": "2026-08-05"
                         },
                         {
+                            "n": "hour",
+                            "note": "Hour of day (integer 0-23). A virtual column derived from access_time on the site clock. Put it in keep to aggregate by hour; add a sort to get clock order. Narrow with time and physical columns first; filtering on this column runs as a slow post_filter.",
+                            "since": "2026-11-02"
+                        },
+                        {
+                            "n": "weekday",
+                            "note": "Day of week (integer 0-6, 0 = Sunday). A virtual column derived from access_time on the site clock. Put it in keep to aggregate by weekday; labels (Sun, Mon, ...) are up to the client. Narrow with time and physical columns first; filtering on this column runs as a slow post_filter.",
+                            "since": "2026-11-02"
+                        },
+                        {
                             "n": "pv",
                             "note": "Pageview number within the session (1 = landing).",
                             "type": "uint16"
@@ -977,6 +987,16 @@ window.MATERIALS_DATA = {
                             "n": "month",
                             "note": "所属月（YYYY-MM）。access_time からサイト時計で算出する仮想カラム。keep に入れると月別集計ができる（月次推移の唯一の手段）。期間の絞り込みは time で行う（この列の filter は post_filter で遅い）。",
                             "since": "2026-08-05"
+                        },
+                        {
+                            "n": "hour",
+                            "note": "時間帯（整数 0〜23）。access_time をサイト時計で丸めた「時」（0〜23）の仮想カラム。keep に入れると時間帯別集計ができる。時刻順に並べるには sort が要る。絞り込みは time と物理列で先に行う（この列の filter は post_filter で遅い）。",
+                            "since": "2026-11-02"
+                        },
+                        {
+                            "n": "weekday",
+                            "note": "曜日（整数 0〜6、0=日曜）。access_time をサイト時計で丸めた日の曜日の仮想カラム。keep に入れると曜日別集計ができる。ラベル（日/月/…）は利用側で付ける。絞り込みは time と物理列で先に行う（この列の filter は post_filter で遅い）。",
+                            "since": "2026-11-02"
                         },
                         {
                             "n": "pv",

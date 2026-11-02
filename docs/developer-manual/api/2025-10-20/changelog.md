@@ -2,13 +2,37 @@
 id: changelog-2025-10-20
 title: Update History
 sidebar_position: 6
-last_updated: 2026-04-29
-api_update: 2026-04-29
+last_updated: 2026-11-02
+api_update: 2026-11-02
 ---
 
 # Update History (2025-10-20)
 
 This is the **Update History** for API version `2025-10-20`: one living document per version, new entries on top. Each entry is tagged with the `api_update` date that the plugin will report in its `/guide` response. Read this top-to-bottom to see how the API has grown since the initial release, and match the most recent entry against your server's `api_update` to know which features are actually available to you.
+
+### 2026-11-02 — `api_update: 2026-11-02` — `allpv` hour-of-day and weekday columns (T144a)
+
+**Added:**
+- ✅ **`allpv.hour` (int `0`–`23`) and `allpv.weekday` (int `0`–`6`, `0` = Sunday)** — two virtual columns computed from `access_time` on the site clock. Put them in `keep` to group page views by hour of day or day of week (for example, `keep: ["hour", "weekday"]` for an hour × weekday grid). Hours are counted on the wall clock on DST days; `time.tz` does not change the bucket. See [`allpv` time buckets](../materials/allpv.md#time-buckets) and [`materials.yaml`](../../for-ai/materials.yaml). **Since:** 2026-11-02
+- ✅ **`features.material_hour_weekday_bucket`** reported in `/guide` (see [`qal-validation.yaml`](./qal-validation.yaml)).
+
+**Usage notes:**
+- 🔸 Narrow with `time` and physical-column filters first. Filtering on `hour` / `weekday` is a post-filter applied after decoding every row, so it is slow on large sites. Rows are not zero-filled and come out in first-seen order — add a `sort` for clock or calendar order. `gsc` does not have these columns.
+
+**Why this update is still non-breaking:**
+- Both columns are additive and virtual. Queries that do not reference them are unaffected.
+
+### 2026-08-05 — `api_update: 2026-08-05` — `allpv` / `gsc` month column (T133a)
+
+**Added:**
+- ✅ **`allpv.month` and `gsc.month` (string `"YYYY-MM"`)** — a virtual column for monthly trends. QAL has no way to round a date to a month in `calc`, so putting `month` in `keep` is the way to build a month-by-month table in a single query. `allpv` computes it from `access_time` on the site clock; `gsc` uses the date of the day file each row was read from. See [`allpv` time buckets](../materials/allpv.md#time-buckets) and [`gsc` month](../materials/gsc.md#month). **Since:** 2026-08-05
+- ✅ **`features.material_month_bucket`** reported in `/guide`.
+
+**Known limitation:**
+- 🚧 When `gsc` is on the `join.with` side, `month` is `null`. Use `gsc.month` with `gsc` in `from`.
+
+**Why this update is still non-breaking:**
+- The column is additive and virtual. Queries that do not reference it are unaffected.
 
 ### 2026-04-29 — `api_update: 2026-04-29` — `materials.supports_all` flag
 

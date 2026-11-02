@@ -2,6 +2,8 @@
 id: material-gsc
 title: gsc
 sidebar_position: 4
+last_updated: 2026-11-02
+api_update: 2026-11-02
 ---
 
 # `gsc` — Google Search Console data
@@ -64,6 +66,20 @@ Things the sample is trying to show at a glance:
   JOIN `allpv` just to get the URL of a page.
 
 See [`ai/materials.yaml`](../../for-ai/materials.yaml) for the full list.
+
+## `month` {#month}
+
+`month` (string, `"YYYY-MM"`) is a virtual column for monthly trends.
+GSC rows carry no date of their own, so the value comes from the day
+file each row was read from. Put it in `keep` to group by month;
+narrow the period with `time`, not with a filter on `month`.
+
+- **Not available on the right side of a join.** When `gsc` is the
+  `join.with` side, `month` is `null`. Use it with `gsc` in `from`.
+- `gsc` has no `hour` or `weekday` (rows are per day). Those exist on
+  [`allpv`](./allpv.md#time-buckets).
+
+**Since:** 2026-08-05 (`features.material_month_bucket` in `/guide`)
 
 ## ⚠️ JOIN caution
 

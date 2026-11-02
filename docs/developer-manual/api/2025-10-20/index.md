@@ -2,15 +2,15 @@
 id: version-2025-10-20
 title: Version 2025-10-20
 sidebar_position: 1
-last_updated: 2026-04-29
-api_update: 2026-04-29
+last_updated: 2026-11-02
+api_update: 2026-11-02
 ---
 
 # Version 2025-10-20
 
 :::info Version Information
 **API Version:** 2025-10-20  
-**API Update:** 2026-04-29  
+**API Update:** 2026-11-02  
 **Plugin Version Required:** 3.0.0.0+  
 **Status:** Previous (supported — 24-month archive)
 
