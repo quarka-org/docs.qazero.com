@@ -93,6 +93,16 @@
                         "since": "2026-08-05"
                     },
                     {
+                        "n": "hour",
+                        "note": "Hour of day (integer 0-23). A virtual column derived from access_time on the site clock. Put it in keep to aggregate by hour; add a sort to get clock order. Narrow with time and physical columns first; filtering on this column runs as a slow post_filter.",
+                        "since": "2026-11-02"
+                    },
+                    {
+                        "n": "weekday",
+                        "note": "Day of week (integer 0-6, 0 = Sunday). A virtual column derived from access_time on the site clock. Put it in keep to aggregate by weekday; labels (Sun, Mon, ...) are up to the client. Narrow with time and physical columns first; filtering on this column runs as a slow post_filter.",
+                        "since": "2026-11-02"
+                    },
+                    {
                         "n": "pv",
                         "note": "Pageview number within the session (1 = landing).",
                         "type": "uint16"
