@@ -187,6 +187,9 @@ features:
   # T144a: allpv に時間帯 hour（0〜23）・曜日 weekday（0〜6、0=日曜）の整数列を追加。
   # access_time をサイト時計で丸める virtual 列（Material 層で算出）。gsc には無い（日単位の行のため）。
   material_hour_weekday_bucket: { enabled: true, since: "2026-11-02" }
+  # T144b: allpv に集客チャネル channel（文字列）を追加。値は QAHM_Channel::CHANNELS のチャネル名で、
+  # 集客画面と同じ判定（QAHM_Channel::classify）。virtual 列なので Material 層で読み出し時に算出。
+  material_channel_column: { enabled: true, since: "2026-11-02" }
   # Not yet implemented. sample / include_count pass
   # validation but are not processed; return_file/csv/parquet likewise.
   sample:         { enabled: false }
