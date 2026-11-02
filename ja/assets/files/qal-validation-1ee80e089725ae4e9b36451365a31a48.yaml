@@ -1,7 +1,7 @@
 id: qal-validation-2026-05-11
 title: QAL Validation Manifest (for Executor and AI)
 version: "2026-05-11"
-update: "2026-05-11"
+update: "2026-11-02"
 type: validation_manifest
 description: >
   Defines strict validation rules for QAL JSON execution requests.
@@ -192,6 +192,13 @@ features:
   # スキーマのみ（値の集約は QAL の calc で取得）。AI クライアントが「観測されたイベント名・
   # パラメータキー・型」を知り、events.{name} マテリアルへの問い合わせを正しく組み立てられる。
   datalayer_observed_events: { enabled: true, since: "2026-05-11" }
+  # T133: allpv / gsc に月バケット列 month（"YYYY-MM"）を追加。QAL には日付を月に丸める
+  # 手段が無い（calc は固定関数ホワイトリスト・transform に日付粒度が無い）ため、
+  # 月次推移の集計は keep にこの列を入れる以外の方法が無い。virtual 列なので Material 層で算出。
+  material_month_bucket: { enabled: true, since: "2026-08-05" }
+  # T144a: allpv に時間帯 hour（0〜23）・曜日 weekday（0〜6、0=日曜）の整数列を追加。
+  # access_time をサイト時計で丸める virtual 列（Material 層で算出）。gsc には無い（日単位の行のため）。
+  material_hour_weekday_bucket: { enabled: true, since: "2026-11-02" }
   # Not yet implemented. sample / include_count pass
   # validation but are not processed; return_file/csv/parquet likewise.
   sample:         { enabled: false }
