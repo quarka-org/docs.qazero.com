@@ -2,13 +2,37 @@
 id: changelog-2025-10-20
 title: アップデート履歴
 sidebar_position: 6
-last_updated: 2026-04-29
-api_update: 2026-04-29
+last_updated: 2026-11-02
+api_update: 2026-11-02
 ---
 
 # アップデート履歴 (2025-10-20)
 
 これは API バージョン `2025-10-20` の **アップデート履歴** です。バージョンごとに 1 つのリビングドキュメントを持ち、新しいエントリーを最上部に追加していきます。各エントリーには、プラグインが `/guide` レスポンスで返す `api_update` の日付をタグ付けしています。上から下へ読むことで、初回リリース以降の API の成長を追うことができ、最新エントリーをお使いのサーバーの `api_update` と突き合わせれば、実際にどの機能が利用可能かを把握できます。
+
+### 2026-11-02 — `api_update: 2026-11-02` — `allpv` の時間帯・曜日カラム（T144a）
+
+**追加:**
+- ✅ **`allpv.hour`（int `0`〜`23`）と `allpv.weekday`（int `0`〜`6`、`0` = 日曜）** — `access_time` からサイト時計で算出する仮想カラム2本。`keep` に入れると、ページビューを時間帯別・曜日別にグループ化できます（たとえば `keep: ["hour", "weekday"]` で時間帯 × 曜日の表）。夏時間の日は壁時計の時刻で数え、`time.tz` はバケットを変えません。[`allpv` の時間バケット](../materials/allpv.md#time-buckets) と [`materials.yaml`](../../for-ai/materials.yaml) を参照してください。**Since:** 2026-11-02
+- ✅ **`features.material_hour_weekday_bucket`** を `/guide` で返します（[`qal-validation.yaml`](./qal-validation.yaml) を参照）。
+
+**使い方の注意:**
+- 🔸 先に `time` と物理カラムの filter で絞ってください。`hour` / `weekday` での絞り込みは全行を復号した後のポストフィルターなので、大規模サイトでは遅くなります。行はゼロ埋めされず初出順で返るため、時刻順・曜日順にするには `sort` を指定してください。`gsc` にはこれらのカラムはありません。
+
+**このアップデートが非破壊である理由:**
+- 2本とも追加のみの仮想カラムです。これらを参照しないクエリには影響しません。
+
+### 2026-08-05 — `api_update: 2026-08-05` — `allpv` / `gsc` の月カラム（T133a）
+
+**追加:**
+- ✅ **`allpv.month` と `gsc.month`（string `"YYYY-MM"`）** — 月次推移のための仮想カラム。QAL の `calc` には日付を月に丸める手段が無いため、`month` を `keep` に入れるのが1クエリで月別の表を作る方法です。`allpv` は `access_time` からサイト時計で、`gsc` は各行を読んだ日別ファイルの日付で算出します。[`allpv` の時間バケット](../materials/allpv.md#time-buckets) と [`gsc` の month](../materials/gsc.md#month) を参照してください。**Since:** 2026-08-05
+- ✅ **`features.material_month_bucket`** を `/guide` で返します。
+
+**既知の制限:**
+- 🚧 `gsc` を `join.with` 側に置くと、`month` は `null` になります。`gsc.month` は `gsc` を `from` に置いて使ってください。
+
+**このアップデートが非破壊である理由:**
+- 追加のみの仮想カラムです。これを参照しないクエリには影響しません。
 
 ### 2026-04-29 — `api_update: 2026-04-29` — `materials.supports_all` フラグ
 

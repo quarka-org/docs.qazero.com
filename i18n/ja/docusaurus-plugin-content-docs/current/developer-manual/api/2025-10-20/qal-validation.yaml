@@ -1,7 +1,7 @@
 id: qal-validation-2025-10-20
 title: QAL Validation Manifest (for Executor and AI)
 version: "2025-10-20"
-update: "2026-04-29"
+update: "2026-11-02"
 type: validation_manifest
 description: >
   Defines strict validation rules for QAL JSON execution requests.
@@ -28,8 +28,8 @@ rules:
       properties:
         name:
           type: string
-          description: "Material name. Allowed values: 'allpv', 'gsc', 'ga4_age_gender', 'ga4_country', 'ga4_region', 'goal_N', 'click_event', 'datalayer_event', 'page_version', or 'events.{name}'."
-          pattern: "^(allpv|gsc|ga4_age_gender|ga4_country|ga4_region|goal_[1-9]\d*|click_event|datalayer_event|page_version|events\.[a-zA-Z0-9_]+)$"
+          description: "Material name. Allowed values: 'allpv', 'gsc', 'ga4_age_gender', 'ga4_country', 'ga4_region', 'goal_N', 'click_event', 'datalayer_event', 'page_version', 'wp_posts' (QA Assistants only), or 'events.{name}'."
+          pattern: "^(allpv|gsc|ga4_age_gender|ga4_country|ga4_region|goal_[1-9]\d*|click_event|datalayer_event|page_version|wp_posts|events\.[a-zA-Z0-9_]+)$"
       additionalProperties: false
     minItems: 1
     errors:
@@ -62,7 +62,7 @@ rules:
           from:
             type: array
             description: "Specify which material to use. Must contain exactly one material name."
-            items: { type: string, pattern: "^(allpv|gsc|ga4_age_gender|ga4_country|ga4_region|goal_[1-9]\\d*|click_event|datalayer_event|page_version|events\\.[a-zA-Z0-9_]+)$" }
+            items: { type: string, pattern: "^(allpv|gsc|ga4_age_gender|ga4_country|ga4_region|goal_[1-9]\\d*|click_event|datalayer_event|page_version|wp_posts|events\\.[a-zA-Z0-9_]+)$" }
             minItems: 1
             maxItems: 1
           keep:
@@ -70,11 +70,11 @@ rules:
             description: "List of columns to include in the result. Must use fully qualified names in the format 'material.column_name' (e.g., 'allpv.url', 'gsc.keyword'). Empty array is allowed when calc is present (aggregate-all pattern)."
             items:
               type: string
-              pattern: "^(allpv|gsc|ga4_age_gender|ga4_country|ga4_region|goal_[1-9]\d*|click_event|datalayer_event|page_version|events\.[a-zA-Z0-9_]+)\.[a-zA-Z0-9_]+$"
+              pattern: "^(allpv|gsc|ga4_age_gender|ga4_country|ga4_region|goal_[1-9]\d*|click_event|datalayer_event|page_version|wp_posts|events\.[a-zA-Z0-9_]+)\.[a-zA-Z0-9_]+$"
             minItems: 0
           filter:
             type: object
-            description: "Filter conditions to apply. Keys are plain column names (not qualified). Values are either an array (IN clause) or an object with operator keys. Supported fields depend on material type: allpv (utm_source, utm_medium, utm_campaign, device_type, country_code, depth_position, deep_read, stop_max_sec, stop_max_pos, exit_pos, is_submit, dead_click_image_count, irritation_click_count, scroll_back_count, content_skip_count, exploration_count, prev_page_id, next_page_id, page_type, page_fetch_status, is_article, is_product, is_list, is_form, is_trust_info, is_faq, is_landing, is_search, is_account, is_cart, is_checkout, is_confirm, is_thanks, is_top_page, is_event, is_recipe, is_job, is_video, is_howto, is_qa_forum), gsc (search_type, keyword), ga4_age_gender (age, gender, sessions, active_users), ga4_country (country, sessions, active_users), ga4_region (region, sessions, active_users), goal_x (utm_source, utm_medium, utm_campaign, device_id, is_reject), click_event (is_external, action_id, page_id, to_url, selector, event_sec), page_version (page_id, device_id, version_no, update_date). Multiple conditions are implicitly AND."
+            description: "Filter conditions to apply. Keys are plain column names (not qualified). Values are either an array (IN clause) or an object with operator keys. Supported fields depend on material type: allpv (utm_source, utm_medium, utm_campaign, device_type, country_code, depth_position, deep_read, stop_max_sec, stop_max_pos, exit_pos, is_submit, dead_click_image_count, irritation_click_count, scroll_back_count, content_skip_count, exploration_count, prev_page_id, next_page_id, page_type, page_fetch_status, is_article, is_product, is_list, is_form, is_trust_info, is_faq, is_landing, is_search, is_account, is_cart, is_checkout, is_confirm, is_thanks, is_top_page, is_event, is_recipe, is_job, is_video, is_howto, is_qa_forum), gsc (search_type, keyword, ctr, position, position_weighted), ga4_age_gender (age, gender, sessions, active_users), ga4_country (country, sessions, active_users), ga4_region (region, sessions, active_users), goal_x (utm_source, utm_medium, utm_campaign, device_id, is_reject), click_event (is_external, action_id, page_id, to_url, selector, event_sec), page_version (page_id, device_id, version_no, update_date), wp_posts (url, post_type, post_status, id; QA Assistants only). Multiple conditions are implicitly AND. Performance hint: prefer filtering by indexed columns (e.g. search_type, keyword, page_id) over computed virtual columns (e.g. ctr, position_weighted) for large datasets."
             additionalProperties:
               oneOf:
                 - type: array
@@ -180,6 +180,13 @@ features:
   # Manifest metadata exposed via /guide (not executor processing).
   # Clients read materials.yaml in sections[] to learn the capability.
   materials_supports_all: { enabled: true, since: "2026-04-29" }
+  # T133: allpv / gsc に月バケット列 month（"YYYY-MM"）を追加。QAL には日付を月に丸める
+  # 手段が無い（calc は固定関数ホワイトリスト・transform に日付粒度が無い）ため、
+  # 月次推移の集計は keep にこの列を入れる以外の方法が無い。virtual 列なので Material 層で算出。
+  material_month_bucket: { enabled: true, since: "2026-08-05" }
+  # T144a: allpv に時間帯 hour（0〜23）・曜日 weekday（0〜6、0=日曜）の整数列を追加。
+  # access_time をサイト時計で丸める virtual 列（Material 層で算出）。gsc には無い（日単位の行のため）。
+  material_hour_weekday_bucket: { enabled: true, since: "2026-11-02" }
   # Not yet implemented. sample / include_count pass
   # validation but are not processed; return_file/csv/parquet likewise.
   sample:         { enabled: false }

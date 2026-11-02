@@ -2,6 +2,8 @@
 id: material-gsc
 title: gsc
 sidebar_position: 4
+last_updated: 2026-11-02
+api_update: 2026-11-02
 ---
 
 # `gsc` — Google Search Console データ
@@ -38,6 +40,15 @@ sidebar_position: 4
 - **`url`**, **`title`**, **`page_type`**, **`page_fetch_status`** — マスター解決カラム (`page_id` 経由)。URL を得るだけのために `allpv` を JOIN しなくて済む。
 
 全リストは [`ai/materials.yaml`](../../for-ai/materials.yaml)。
+
+## `month` {#month}
+
+`month`（string、`"YYYY-MM"`）は月次推移のための仮想カラムです。GSC の行はそれ自体に日付を持たないため、各行を読んだ日別ファイルの日付から値を算出します。`keep` に入れると月別にグループ化されます。期間は `month` の filter ではなく `time` で絞ってください。
+
+- **JOIN の右側では使えません。** `gsc` を `join.with` 側に置くと、`month` は `null` になります。`gsc` を `from` に置いて使ってください。
+- `gsc` に `hour` と `weekday` はありません（行が日単位のため）。これらは [`allpv`](./allpv.md#time-buckets) にあります。
+
+**Since:** 2026-08-05（`/guide` の `features.material_month_bucket`）
 
 ## ⚠️ JOIN 注意
 

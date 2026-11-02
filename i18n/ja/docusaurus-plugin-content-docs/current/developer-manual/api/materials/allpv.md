@@ -2,6 +2,8 @@
 id: material-allpv
 title: allpv
 sidebar_position: 2
+last_updated: 2026-11-02
+api_update: 2026-11-02
 ---
 
 # `allpv` — 1行 = 1ページビュー
@@ -44,6 +46,40 @@ sidebar_position: 2
 - **ゴールフラグ**: `is_goal_1` から `is_goal_10` — このページビューが設定済みゴールを発火したか。
 - **他の ID**: `reader_id`, `device_id`, `version_id` 等。サンプルに出している3つ (`pv_id`, `session_id`, `page_id`) が、通常 JOIN に使うものです。
 
+## 時間バケット: `month`、`hour`、`weekday` {#time-buckets}
+
+QAL にはタイムスタンプを月・時間帯・曜日に丸める関数がありません（`calc` は固定のホワイトリストです）。代わりに `allpv` は、クエリ実行時に `access_time` から算出する仮想カラムを3本持っています。どれかを `keep` に入れると、その値で行がグループ化されます。
+
+| カラム | 型 | 値 | Since |
+|---|---|---|---|
+| `month` | string | `"YYYY-MM"` | 2026-08-05 |
+| `hour` | int | `0`〜`23` | 2026-11-02 |
+| `weekday` | int | `0`〜`6`、`0` = 日曜（PHP の `w` と同じ） | 2026-11-02 |
+
+- **サイト時計で算出します。** 3本ともサイト自身の時計（WordPress のタイムゾーン）で算出します。`time.tz` はこれらの値を変えません。`time.tz` が決めるのは、どの日のファイルを読むかだけです。
+- **夏時間（DST）。** 時間帯は壁時計の時刻で数えます。秋の夏時間の終了日は `hour = 1` に2時間分のアクセスが入り、春の開始日は `hour = 2` が0件になります。GA4 も同じ数え方です。
+- **先に `time` で絞ります。** これらのカラムは `keep` で使う前提です。これらのカラムでの絞り込みは全行を復号した後のポストフィルターになるため遅くなります。期間は `time` で絞り、物理カラム（`source_id`、`medium_id`、`is_newuser` など）の `filter` で先に絞ってから、バケットを `keep` に入れてください。絞り込みの無い12ヶ月分のクエリは、これらのカラムを使うかどうかに関係なく重くなります。
+- **整数のみです。** `hour` と `weekday` は整数なので、`prefix` と `contains` は効きません。
+- **ゼロ埋めせず、並び順も保証しません。** ページビューの無い時間帯・曜日は行が出ません。行は初出順で返るので、時刻順・曜日順にするにはバケットのカラムで `sort` を指定してください。
+- **ラベルはクライアント側で付けます。** `weekday` は数値を返します。「日」「月」… への対応づけはクライアント側で行ってください。
+
+例 — 時間帯別のページビュー数を時刻順に:
+
+```json
+"make": {
+  "by_hour": {
+    "from": "allpv",
+    "keep": ["hour"],
+    "calc": { "views": { "count": "*" } },
+    "sort": [{ "column": "hour", "direction": "asc" }]
+  }
+}
+```
+
+`gsc` にも `month` はありますが、`hour` と `weekday` はありません（行が日単位のため）。[`gsc`](./gsc.md#month) を参照してください。
+
+**Since:** `month` 2026-08-05 · `hour` / `weekday` 2026-11-02。使う前に `/guide` の `features.material_month_bucket` と `features.material_hour_weekday_bucket` を確認してください。
+
 ## よく使う JOIN キー
 
 - `pv_id` → `click_event.pv_id` (このページビューで起きたクリック)
@@ -58,6 +94,7 @@ sidebar_position: 2
 - 「チェックアウトページの mobile vs desktop 比は?」
 - 「deep_read は高いが conversion は低いページは?」
 - 「`irritation_click_count` が異常に高いページは?」
+- 「ダイレクト流入は何時台・何曜日に来ている?」（`keep: ["hour", "weekday"]`）
 
 どれも `allpv` の1-2ビューで書けます。
 

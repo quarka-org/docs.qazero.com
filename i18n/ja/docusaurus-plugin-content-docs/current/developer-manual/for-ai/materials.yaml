@@ -1,6 +1,6 @@
 id: materials-manifest
 version: "2025-10-20"
-update: "2026-05-21"
+update: "2026-11-02"
 Plugin version:
   QA ZERO: "3.0.0.0"
   QA Assistants: "5.0.0.0"
@@ -49,6 +49,25 @@ types:
 # - dev:    開発中（コードあり、テスト中）
 # - plan:   計画中（まだコードなし）
 
+# semantics 定義（列の「意味」の機械可読宣言・2026-07-15 導入・#1486）
+# 数値としての演算が意味を持つかを検証器・ツールが機械判定するための宣言。
+# 運用原則（2026-07-15 丸山: 拡張判断はすべてここに帰着させる）:
+#   - semantics に入れてよいのは「演算の妥当性として機械検査できる宣言」だけ。判断を要する文脈は note に残す。
+#   - 名前と semantics で表現できた情報は note からむしろ削る（宣言の追加＝note 空間からの圧縮・追い出し）。
+#   - 網羅しない。実測でミスが出た/出やすい箇所への段階導入。無宣言＝検査しない、を維持する。
+#   - note が空欄の列は欠陥ではない（note を埋める基準は「機械検査で表現できない判断を含む列」のみ）。
+# - id:      識別・分類のための番号（一意 ID・区分コード・enum・ビットフラグ）。
+#            合計・平均は無意味。COUNT / COUNTUNIQUE は正当。
+# - ordinal: 位置番号（まとまりの中で 1 に戻る連番。例: allpv.pv はセッション内 PV 番号）。
+#            合計・平均は無意味。MAX / MIN / COUNT は正当（例: MAX(version_no)＝最新版）。
+# - rate:    比率の性質を持つ列（例: gsc.ctr, gsc.position, gsc.position_x100＝比率の格納形も含む）。
+#            単純な合計・平均は「平均の平均」になり狂う。分子・分母をそれぞれ合計してから割る（要加重）。
+#            判定基準は統計的性質であって「導出列かどうか」ではない（gsc.position_weighted は導出列だが
+#            加重平均の分子＝SUM が唯一の正しい使い方なので rate にしない＝無宣言。2026-07-15 裏取りで確認）。
+#            ※「ratio」という語は使わない（測定理論の比率尺度＝「最も合計してよいデータ」と
+#            衝突し、統計語彙を学習した AI が逆に解釈するため。2026-07-15 丸山）。
+# - percent: 1行ごとに実測した％（例: 到達率・クリック座標）。平均は正当・合計だけ無意味。
+
 # =============================================================================
 # マテリアル定義
 # =============================================================================
@@ -68,6 +87,7 @@ materials:
             type: uint32
             nullable: false
             status: dev
+            semantics: id
             search_hint:
               note: "JOINキー（click_event, datalayer_event等との結合用）。フィルタ対象にはしない"
           - material_column: "session_id"
@@ -75,6 +95,7 @@ materials:
             type: uint64
             nullable: false
             status: dev
+            semantics: id
             search_hint:
               note: "セッション単位の絞り込みに使用。列DBバイナリスキャンで高速。値は YYYYMM × 10^9 + month_seq の合成 uint64 で月内連番（月をまたぐとリセット）"
           - material_column: "reader_id"
@@ -82,6 +103,7 @@ materials:
             type: uint32
             nullable: false
             status: dev
+            semantics: id
             search_hint:
               note: "ユーザー単位の絞り込みに使用。列DBバイナリスキャンで高速。人間にはIDが分からないのでurl等と組み合わせて使う"
           - material_column: "page_id"
@@ -89,6 +111,7 @@ materials:
             type: uint32
             nullable: false
             status: dev
+            semantics: id
             search_hint:
               note: "ページ単位の絞り込みに使用。列DBバイナリスキャンで高速。人間にはIDが分からないので通常はurlでフィルタし、page_idはJOINキーとして使う"
           - material_column: "device_id"
@@ -96,44 +119,49 @@ materials:
             type: uint8
             nullable: false
             status: dev
+            semantics: id
             search_hint:
-              note: "3〜5種（1=PC, 2=SP, 3=tablet）。列DBバイナリスキャンで高速。人間向けにはdevice_typeを使う"
+              note: "3〜5種（1=PC, 2=tablet, 3=SP）。列DBバイナリスキャンで高速。人間向けにはdevice_typeを使う"
             value_mappings:
               label_column: "device_type"
               map:
                 1: "PC"
-                2: "SP"
-                3: "tablet"
+                2: "tablet"
+                3: "SP"
           - material_column: "source_id"
             physical_column: "source_id"
-            type: uint16
+            type: uint32
             nullable: true
             default: 0
             status: dev
+            semantics: id
             search_hint:
               note: "流入元の絞り込み。列DBバイナリスキャンで高速。IDを知っていれば直接指定可能だが、人間にはutm_sourceの方が自然"
           - material_column: "medium_id"
             physical_column: "medium_id"
-            type: uint8
+            type: uint32
             nullable: true
             default: 0
             status: dev
+            semantics: id
             search_hint:
               note: "メディアの絞り込み。列DBバイナリスキャンで高速。IDを知っていれば直接指定可能だが、人間にはutm_mediumの方が自然"
           - material_column: "campaign_id"
             physical_column: "campaign_id"
-            type: uint16
+            type: uint32
             nullable: true
             default: 0
             status: dev
+            semantics: id
             search_hint:
               note: "キャンペーンの絞り込み。列DBバイナリスキャンで高速。同上、utm_campaignの方が自然"
           - material_column: "content_id"
             physical_column: "content_id"
-            type: uint16
+            type: uint32
             nullable: true
             default: 0
             status: dev
+            semantics: id
             search_hint:
               note: "コンテンツの絞り込み。列DBバイナリスキャンで高速。同上、utm_contentの方が自然"
           - material_column: "access_time"
@@ -148,6 +176,7 @@ materials:
             type: uint16
             nullable: false
             status: dev
+            semantics: ordinal
             search_hint:
               note: "セッション内のPV番号（1=ランディング）。keepで取得する用途が主。pv=1でランディングページ分析"
           - material_column: "speed_msec"
@@ -182,10 +211,11 @@ materials:
               note: "新規ユーザーフラグ（0/1）。新規/リピーター分析に使用。eq:1で新規ユーザーのPVを抽出"
           - material_column: "version_id"
             physical_column: "version_id"
-            type: uint16
+            type: uint32
             nullable: true
             default: 0
             status: dev
+            semantics: id
             search_hint:
               note: "ページバージョンID。A/Bテスト・バージョン比較に使用。列DBバイナリスキャンで高速"
 
@@ -196,6 +226,7 @@ materials:
             nullable: true
             default: 0
             status: dev
+            semantics: percent
             search_hint:
               note: "最深到達率(0-100%)。ページをどこまでスクロールしたか。gte:80で下部まで読んだPV、lte:20で冒頭離脱。browse_sec・deep_readと組み合わせて読了分析に使う"
           - material_column: "deep_read"
@@ -220,6 +251,7 @@ materials:
             nullable: true
             default: 0
             status: dev
+            semantics: percent
             search_hint:
               note: "最長停止位置(0-100%)。stop_max_secを記録した位置。between:20,80でメインコンテンツ帯。stop_max_secと常にセットで使う"
           - material_column: "exit_pos"
@@ -228,10 +260,11 @@ materials:
             nullable: true
             default: 0
             status: dev
+            semantics: percent
             search_hint:
               note: "離脱位置(0-100%)。最後に閲覧していた位置。lte:30で上部離脱（ファーストビュー内離脱）。is_last=1と組み合わせて離脱パターン分析に使う"
 
-          # --- 行動カラム C-2: raw_c由来 (3カラム) ---
+          # --- 行動カラム: is_submit は raw_p ヘッダー由来(submit イベント観測)、dead_click/irritation は raw_c 由来 ---
           - material_column: "is_submit"
             physical_column: "is_submit"
             type: uint8
@@ -239,7 +272,7 @@ materials:
             default: 0
             status: dev
             search_hint:
-              note: "フォーム送信フラグ(0/1)。ACTION_ID=2のクリックがあれば1。eq:1でCV(送信)したPVを抽出。page_idと組み合わせてフォームCVR算出に使う"
+              note: "フォーム送信フラグ(0/1)。ネイティブ submit イベント観測由来(Enter送信も含む・action_id 非依存)のPV単位フラグ。eq:1で実際にフォーム送信が発火したPVを抽出。page_idと組み合わせてフォームCVR算出に使う"
           - material_column: "dead_click_image_count"
             physical_column: "dead_click_image_count"
             type: uint8
@@ -309,6 +342,7 @@ materials:
             default: 0
             status: dev
             since: "2026-04-17"
+            semantics: id
             search_hint:
               note: "前ページID。ランディングPV（セッション最初）は0。prev_page_id=0でLP抽出。group_byで流入元分析"
           - material_column: "next_page_id"
@@ -318,8 +352,39 @@ materials:
             default: 0
             status: dev
             since: "2026-04-17"
+            semantics: id
             search_hint:
               note: "次ページID。離脱PV（セッション最後）は0。next_page_id=0で離脱PV抽出。group_byで遷移先分析"
+
+          # --- 計測フラグ: 生データ保有の有無（Issue #1462・view_pv 廃止 P7-D） ---
+          # is_raw_p/c/e は qa_pv_log 由来（get_pv_log と同一値）。is_raw_g（datalayer 保有）は follow-up（別 Issue）。
+          - material_column: "is_raw_p"
+            physical_column: "is_raw_p"
+            type: uint8
+            nullable: true
+            default: 0
+            status: dev
+            since: "2026-07-09"
+            search_hint:
+              note: "スクロール生データ(raw_p)保有数(0/1/2…＝captures 数)。>0（neq:0）でヒートマップ対象PVを抽出（eq:1 だと is_raw≥2 を取りこぼす）。ヒートマップ生成が列DBだけで完結する土台"
+          - material_column: "is_raw_c"
+            physical_column: "is_raw_c"
+            type: uint8
+            nullable: true
+            default: 0
+            status: dev
+            since: "2026-07-09"
+            search_hint:
+              note: "クリック生データ(raw_c)保有数(0/1/2…)。>0（neq:0）でクリックヒートマップ対象PVを抽出"
+          - material_column: "is_raw_e"
+            physical_column: "is_raw_e"
+            type: uint8
+            nullable: true
+            default: 0
+            status: dev
+            since: "2026-07-09"
+            search_hint:
+              note: "イベント生データ(raw_e)保有数(0/1/2…)。>0（neq:0）でイベント記録のあるPVを抽出"
 
           # --- 遷移カラム: prev/next マスター参照 ---
           - material_column: "prev_url"
@@ -483,6 +548,7 @@ materials:
           - material_column: "original_id"
             physical_column: "original_id"
             resolve_via: "reader_id"
+            semantics: id
             search_hint:
               rows: "ユーザー数依存"
               exact: "original_idインデックスあり。高速"
@@ -492,6 +558,7 @@ materials:
           - material_column: "page_type"
             physical_column: "page_type"
             resolve_via: "page_id"
+            semantics: id
             search_hint:
               rows: "数千〜数万件（サイト規模依存）"
               exact: "page_idで逆引き。高速"
@@ -500,6 +567,7 @@ materials:
           - material_column: "page_fetch_status"
             physical_column: "page_fetch_status"
             resolve_via: "page_id"
+            semantics: id
             search_hint:
               rows: "数千〜数万件（サイト規模依存）"
               exact: "page_idで逆引き。高速"
@@ -667,6 +735,29 @@ materials:
               note: "Q&Aフォーラムページフラグ(0/1)。Generated Column"
 
           # --- 仮想カラム（virtual: true = 列DBに物理カラムなし、QAL実行時に動的算出） ---
+          # 月バケット（T133）
+          - material_column: "month"
+            physical_column: "month"
+            virtual: true
+            status: dev
+            since: "2026-08-05"
+            search_hint:
+              note: "所属月（\"YYYY-MM\"）。access_time からサイト時計で算出（列DB経路・view_pv経路とも同一境界）。keep に入れると月別に集計できる（月次推移レポートの唯一の手段。QAL に日付を丸める calc は無い）。期間の絞り込みは time で行うこと（この列の filter は復号後の post_filter で遅い）。gsc を join 右側に置くと month は null になる（T133a フォローアップで対応予定）"
+          # 時間帯・曜日バケット（T144a）
+          - material_column: "hour"
+            physical_column: "hour"
+            virtual: true
+            status: dev
+            since: "2026-11-02"
+            search_hint:
+              note: "時間帯（整数 0〜23）。access_time をサイト時計の壁時計時刻で丸めた時。DST の日は壁時計で数える（秋の巻き戻し日は hour=1 に2時間分入り、春は hour=2 が0件）。keep に入れると時間帯別に集計できる。期間の絞り込みは time で行い、物理列（source_id / medium_id / is_newuser 等）の filter で先に絞ること（この列の filter は復号後の post_filter で遅い）。整数列なので prefix / contains は効かない。値の無い時間帯は行が出ない（ゼロ埋めしない）。並びは初出順なので、時刻順にするには sort が要る"
+          - material_column: "weekday"
+            physical_column: "weekday"
+            virtual: true
+            status: dev
+            since: "2026-11-02"
+            search_hint:
+              note: "曜日（整数 0〜6、0=日曜。PHP の w と同じ）。access_time をサイト時計の壁時計時刻で丸めた日の曜日。DST の日も壁時計で数える。ラベル（日/月/…）はアシスタント側で付ける。keep に入れると曜日別に集計できる。期間の絞り込みは time で行い、物理列（source_id / medium_id / is_newuser 等）の filter で先に絞ること（この列の filter は復号後の post_filter で遅い）。整数列なので prefix / contains は効かない。値の無い曜日は行が出ない（ゼロ埋めしない）。並びは初出順なので、曜日順にするには sort が要る"
           # ゴール達成フラグ（is_goal_1..10）
           # - keep: 各PVがゴールNを達成したかを0/1で返す
           # - filter: is_goal_N=1のみ対応（=0は非対応）
@@ -738,16 +829,19 @@ materials:
             type: uint32
             nullable: false
             status: dev
+            semantics: id
           - material_column: "session_id"
             physical_column: "session_id"
             type: uint64
             nullable: false
             status: dev
+            semantics: id
           - material_column: "page_id"
             physical_column: "page_id"
             type: uint32
             nullable: false
             status: dev
+            semantics: id
           - material_column: "event_sec"
             physical_column: "event_sec"
             type: uint16
@@ -760,31 +854,31 @@ materials:
             status: dev
           - material_column: "element_text"
             physical_column: "element_text_id"
-            type: uint16
+            type: uint32
             nullable: true
             default: 0
             status: dev
           - material_column: "element_id"
             physical_column: "element_id_id"
-            type: uint16
+            type: uint32
             nullable: true
             default: 0
             status: dev
           - material_column: "element_class"
             physical_column: "element_class_id"
-            type: uint16
+            type: uint32
             nullable: true
             default: 0
             status: dev
           - material_column: "element_data"
             physical_column: "element_data_id"
-            type: uint16
+            type: uint32
             nullable: true
             default: 0
             status: dev
           - material_column: "to_url"
             physical_column: "to_url_id"
-            type: uint16
+            type: uint32
             nullable: true
             default: 0
             status: dev
@@ -799,16 +893,21 @@ materials:
             type: uint8
             nullable: false
             status: dev
+            semantics: id
+            search_hint:
+              note: "クリック対象の事実分類コード。1:click(汎用・リンク含む) / 2:form(クリックが<form>領域内で起きたDOM事実・フォーム摩擦や離脱の funnel 信号) / 3:tel / 4:mailto。相互排他で tel/mailto を form より優先。送信成否そのものは is_submit を、CVは goal(is_goal_x)を見る。to_url と併せれば 1:click のうちリンク遷移を判別できる"
           - material_column: "page_x_pct"
             physical_column: "page_x_pct"
             type: uint16
             nullable: false
             status: dev
+            semantics: percent
           - material_column: "page_y_pct"
             physical_column: "page_y_pct"
             type: uint16
             nullable: false
             status: dev
+            semantics: percent
 
   datalayer_event:
     dataset_id: 3
@@ -822,24 +921,27 @@ materials:
             type: uint32
             nullable: false
             status: dev
+            semantics: id
           - material_column: "session_id"
             physical_column: "session_id"
             type: uint64
             nullable: false
             status: dev
+            semantics: id
           - material_column: "page_id"
             physical_column: "page_id"
             type: uint32
             nullable: false
             status: dev
+            semantics: id
           - material_column: "event_name"
             physical_column: "event_name_id"
-            type: uint16
+            type: uint32
             nullable: false
             status: dev
           - material_column: "params_json"
             physical_column: "params_id"
-            type: uint16
+            type: uint32
             nullable: false
             status: dev
 
@@ -855,9 +957,11 @@ materials:
           - material_column: "pv_id"
             physical_column: "pv_id"
             status: dev
+            semantics: id
           - material_column: "session_id"
             physical_column: "session_id"
             status: dev
+            semantics: id
 
   gsc:
     dataset_id: 4
@@ -872,6 +976,7 @@ materials:
             type: uint32
             nullable: false
             status: dev
+            semantics: id
             search_hint:
               note: "ページ単位の絞り込み。列DBバイナリスキャンで高速"
           - material_column: "query_id"
@@ -879,6 +984,7 @@ materials:
             type: uint32
             nullable: false
             status: dev
+            semantics: id
             search_hint:
               note: "キーワードID。qa_gsc_{tid}_query_logのFK。keywordフィルタはDB検索→query_id集合→binary_scan"
           - material_column: "search_type"
@@ -886,6 +992,7 @@ materials:
             type: uint8
             nullable: false
             status: dev
+            semantics: id
             search_hint:
               note: "1=web, 2=image, 3=video。列DBバイナリスキャンで高速"
           - material_column: "clicks"
@@ -907,6 +1014,7 @@ materials:
             type: uint16
             nullable: false
             status: dev
+            semantics: rate
             search_hint:
               note: "平均掲載順位×100。Material層でposition（float）に復号。数値範囲フィルタはpost_filter"
           # --- マスター解決カラム（resolve_via指定） ---
@@ -932,17 +1040,27 @@ materials:
             physical_column: "page_fetch_status"
             resolve_via: "page_id"
             status: dev
+            semantics: id
           # --- 算出カラム（virtual） ---
+          - material_column: "month"
+            physical_column: "month"
+            virtual: true
+            status: dev
+            since: "2026-08-05"
+            search_hint:
+              note: "所属月（\"YYYY-MM\"）。gsc の行は日付を持たないため、Storage が日別ファイルのループから注入した日付で算出する。keep に入れると月別に集計できる。期間の絞り込みは time で行うこと。gsc を join 右側に置くと month は null になる（T133a フォローアップで対応予定）"
           - material_column: "ctr"
             physical_column: "ctr"
             virtual: true
             status: dev
+            semantics: rate
             search_hint:
               note: "clicks / impressions。Material層で算出。filter は復号後の post_filter（大量行では遅い）"
           - material_column: "position"
             physical_column: "position"
             virtual: true
             status: dev
+            semantics: rate
             search_hint:
               note: "position_x100 / 100。Material層で算出。filter は position_x100 にリライトされ列DBスキャン可能（速い）"
           - material_column: "position_weighted"
@@ -974,6 +1092,7 @@ materials:
             type: uint8
             nullable: false
             status: dev
+            semantics: id
             search_hint:
               note: "年齢帯ID。0=unknown, 1=18-24, 2=25-34, 3=35-44, 4=45-54, 5=55-64, 6=65+"
           - material_column: "gender"
@@ -981,6 +1100,7 @@ materials:
             type: uint8
             nullable: false
             status: dev
+            semantics: id
             search_hint:
               note: "性別ID。0=unknown, 1=male, 2=female"
           - material_column: "sessions"
@@ -1019,6 +1139,7 @@ materials:
             type: uint16
             nullable: false
             status: dev
+            semantics: id
             search_hint:
               note: "国コードをASCII値でuint16化。例: JP=0x4A50=19024"
           - material_column: "sessions"
@@ -1051,6 +1172,7 @@ materials:
             type: uint16
             nullable: false
             status: dev
+            semantics: id
             search_hint:
               note: "地域ID。1-47=都道府県、0=その他/海外"
           - material_column: "sessions"
@@ -1080,12 +1202,16 @@ materials:
         fields:
           - material_column: "session_index"
             physical_column: "session_index"
+            semantics: ordinal
           - material_column: "pv_index"
             physical_column: "pv_index"
+            semantics: ordinal
           - material_column: "pv_id"
             physical_column: "pv_id"
+            semantics: id
           - material_column: "reader_id"
             physical_column: "reader_id"
+            semantics: id
           - material_column: "UAos"
             physical_column: "UAos"
           - material_column: "UAbrowser"
@@ -1096,6 +1222,7 @@ materials:
             physical_column: "is_reject"
           - material_column: "page_id"
             physical_column: "page_id"
+            semantics: id
           - material_column: "url"
             physical_column: "url"
           - material_column: "title"
@@ -1104,26 +1231,33 @@ materials:
             physical_column: "access_time"
           - material_column: "device_id"
             physical_column: "device_id"
+            semantics: id
           - material_column: "version_id"
             physical_column: "version_id"
+            semantics: id
           - material_column: "source_id"
             physical_column: "source_id"
+            semantics: id
           - material_column: "utm_source"
             physical_column: "utm_source"
           - material_column: "source_domain"
             physical_column: "source_domain"
           - material_column: "medium_id"
             physical_column: "medium_id"
+            semantics: id
           - material_column: "utm_medium"
             physical_column: "utm_medium"
           - material_column: "campaign_id"
             physical_column: "campaign_id"
+            semantics: id
           - material_column: "utm_campaign"
             physical_column: "utm_campaign"
           - material_column: "session_no"
             physical_column: "session_no"
+            semantics: ordinal
           - material_column: "pv"
             physical_column: "pv"
+            semantics: ordinal
           - material_column: "speed_msec"
             physical_column: "speed_msec"
           - material_column: "browse_sec"
@@ -1140,6 +1274,7 @@ materials:
             physical_column: "is_raw_e"
           - material_column: "version_no"
             physical_column: "version_no"
+            semantics: ordinal
 
   page_version:
     dataset_id: 5
@@ -1151,21 +1286,25 @@ materials:
           - material_column: "version_id"
             physical_column: "version_id"
             status: dev
+            semantics: id
             search_hint:
-              note: "PK / JOINキー。allpv.version_idとの結合用。直接指定よりallpv JOIN page_versionを推奨。大規模サイトではallpv側のversion_id精度に制約あり（uint16上限65535）"
+              note: "PK / JOINキー。allpv.version_idとの結合用。直接指定よりallpv JOIN page_versionを推奨"
           - material_column: "page_id"
             physical_column: "page_id"
             status: dev
+            semantics: id
             search_hint:
               note: "ページ識別。通常はallpvでURL絞り込み→page_version JOINで取得。直接指定する場合はpage_idを事前に知っている必要がある"
           - material_column: "device_id"
             physical_column: "device_id"
             status: dev
+            semantics: id
             search_hint:
-              note: "デバイス識別（1=PC, 2=SP, 3=tablet）"
+              note: "デバイス識別（1=PC, 2=tablet, 3=SP）"
           - material_column: "version_no"
             physical_column: "version_no"
             status: dev
+            semantics: ordinal
             search_hint:
               note: "同一page_id+device_id内の版番号。1が初版。calcでMAX()を使って最新版数を取得可能"
           - material_column: "update_date"
@@ -1207,7 +1346,7 @@ materials:
   #    日次トレンドが必要なら allpv（date 次元あり）を使う。
   #  - ID→ラベル変換は loader 側で完了済み。utm_source / utm_medium /
   #    utm_campaign はラベル文字列が入った状態で返る → resolve_via は貼らない。
-  #  - device_id は数値ID（1=PC, 2=SP, 3=tablet）のまま返る。
+  #  - device_id は数値ID（1=PC, 2=tablet, 3=SP）のまま返る。
   #  - 任意期間（年跨ぎ含む）に対応。group_by は固定（柔軟化しない）。
   # ---------------------------------------------------------------------------
 
@@ -1222,20 +1361,22 @@ materials:
             physical_column: "page_id"
             type: uint32
             status: dev
+            semantics: id
             search_hint:
               note: "サマリー由来。入口ページ識別。ページ別の絞り込みは page_id で行う（page_url 部分一致は未対応、必要なら allpv）"
           - material_column: "device_id"
             physical_column: "device_id"
             type: uint8
             status: dev
+            semantics: id
             search_hint:
-              note: "サマリー由来。デバイス識別（1=PC, 2=SP, 3=tablet）。数値IDのまま。表示用ラベルは value_mappings 経由で device_type 列が自動付与される"
+              note: "サマリー由来。デバイス識別（1=PC, 2=tablet, 3=SP）。数値IDのまま。表示用ラベルは value_mappings 経由で device_type 列が自動付与される"
             value_mappings:
               label_column: "device_type"
               map:
                 1: "PC"
-                2: "SP"
-                3: "tablet"
+                2: "tablet"
+                3: "SP"
           - material_column: "utm_source"
             physical_column: "utm_source"
             status: dev
@@ -1266,6 +1407,7 @@ materials:
             physical_column: "second_page"
             type: uint32
             status: dev
+            semantics: id
             search_hint:
               note: "サマリー由来。入口の次に閲覧したページID（2ページ目）。0は離脱"
           - material_column: "is_QA"
@@ -1317,6 +1459,7 @@ materials:
           - material_column: "wp_qa_id"
             physical_column: "wp_qa_id"
             status: dev
+            semantics: id
             search_hint:
               note: "サマリー由来。WordPress 投稿ID（loader 側で page_id から復元）"
 
@@ -1331,20 +1474,22 @@ materials:
             physical_column: "page_id"
             type: uint32
             status: dev
+            semantics: id
             search_hint:
               note: "サマリー由来。ページ識別。ページ別ランキングはこのマテリアル。page_url 部分一致は未対応、必要なら allpv"
           - material_column: "device_id"
             physical_column: "device_id"
             type: uint8
             status: dev
+            semantics: id
             search_hint:
-              note: "サマリー由来。デバイス識別（1=PC, 2=SP, 3=tablet）。数値IDのまま。表示用ラベルは value_mappings 経由で device_type 列が自動付与される"
+              note: "サマリー由来。デバイス識別（1=PC, 2=tablet, 3=SP）。数値IDのまま。表示用ラベルは value_mappings 経由で device_type 列が自動付与される"
             value_mappings:
               label_column: "device_type"
               map:
                 1: "PC"
-                2: "SP"
-                3: "tablet"
+                2: "tablet"
+                3: "SP"
           - material_column: "utm_source"
             physical_column: "utm_source"
             status: dev
@@ -1426,6 +1571,7 @@ materials:
           - material_column: "wp_qa_id"
             physical_column: "wp_qa_id"
             status: dev
+            semantics: id
             search_hint:
               note: "サマリー由来。WordPress 投稿ID（loader 側で page_id から復元）"
 
@@ -1440,14 +1586,15 @@ materials:
             physical_column: "device_id"
             type: uint8
             status: dev
+            semantics: id
             search_hint:
-              note: "サマリー由来。デバイス識別（1=PC, 2=SP, 3=tablet）。数値IDのまま。表示用ラベルは value_mappings 経由で device_type 列が自動付与される"
+              note: "サマリー由来。デバイス識別（1=PC, 2=tablet, 3=SP）。数値IDのまま。表示用ラベルは value_mappings 経由で device_type 列が自動付与される"
             value_mappings:
               label_column: "device_type"
               map:
                 1: "PC"
-                2: "SP"
-                3: "tablet"
+                2: "tablet"
+                3: "SP"
           - material_column: "utm_source"
             physical_column: "utm_source"
             status: dev
