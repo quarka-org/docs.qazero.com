@@ -80,6 +80,32 @@ QAL にはタイムスタンプを月・時間帯・曜日に丸める関数が�
 
 **Since:** `month` 2026-08-05 · `hour` / `weekday` 2026-11-02。使う前に `/guide` の `features.material_month_bucket` と `features.material_hour_weekday_bucket` を確認してください。
 
+## 集客チャネル: `channel` {#channel}
+
+`channel`（string）は、そのページビューのセッションがどの集客チャネルから来たかを表す仮想カラムです。QA ZERO の集客画面にあるチャネル表と同じルールで判定するので、両者の数字は一致します。
+
+- **値。** 16種の固定の英語名のどれかです: `"Direct"`、`"Organic Search"`、`"Paid Search"`、`"Organic Social"`、`"Paid Social"`、`"Organic Video"`、`"Paid Video"`、`"Organic Shopping"`、`"Paid Shopping"`、`"Display"`、`"Paid Other"`、`"Email"`、`"Affiliates"`、`"Referral"`、`"AI Referral"`、`"Unassigned"`。判定できない行は `"Unassigned"` になり、`null` にはなりません（JOIN の右側で左に一致しない行は、他の右側カラムと同じく `null` になります）。表示ラベルの翻訳はクライアント側で行い、知らない値は「その他」として扱ってください。
+- **読み出し時に判定します。** 値は保存されていません。サイトの *現在の* チャネルルール（カスタムチャネルを含む）で算出します。ルールを変えると、過去期間の数字も次のクエリから変わります。集客画面と同じ挙動です。
+- **セッション数の数え方。** 各ページビューは、そのセッションの流入元で判定されます。ページビュー数ではなくセッション数を数えるには、着地 PV（`pv` `eq` `1`）で絞ってください。
+- **先に絞ります。** `channel` での絞り込みは全行を復号した後のポストフィルターなので遅く、`count_only` のクエリも遅くなります。`time` と物理カラム（`source_id`、`medium_id`、`is_newuser` など）で先に絞ってください。特定の参照元1つだけを見るなら、`channel` より `source_domain` の filter のほうが速く動きます。
+- チャネルルールを読み込めない場合、`channel` を要求したクエリは、全行を `Direct` / `Unassigned` として返すのではなく `E_DEPENDENCY_NOT_AVAILABLE` で失敗します。
+
+例 — チャネル別のセッション数:
+
+```json
+"make": {
+  "by_channel": {
+    "from": "allpv",
+    "keep": ["channel"],
+    "filter": { "pv": { "eq": 1 } },
+    "calc": { "sessions": { "count": "*" } },
+    "sort": [{ "column": "sessions", "direction": "desc" }]
+  }
+}
+```
+
+**Since:** 2026-11-02（`/guide` の `features.material_channel_column`）
+
 ## よく使う JOIN キー
 
 - `pv_id` → `click_event.pv_id` (このページビューで起きたクリック)
@@ -94,7 +120,7 @@ QAL にはタイムスタンプを月・時間帯・曜日に丸める関数が�
 - 「チェックアウトページの mobile vs desktop 比は?」
 - 「deep_read は高いが conversion は低いページは?」
 - 「`irritation_click_count` が異常に高いページは?」
-- 「ダイレクト流入は何時台・何曜日に来ている?」（`keep: ["hour", "weekday"]`）
+- 「ダイレクト流入は何時台・何曜日に来ている?」（`keep: ["channel", "hour", "weekday"]`）
 
 どれも `allpv` の1-2ビューで書けます。
 

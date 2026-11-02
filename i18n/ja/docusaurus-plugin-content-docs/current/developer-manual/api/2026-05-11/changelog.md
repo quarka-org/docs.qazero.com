@@ -12,17 +12,19 @@ api_update: 2026-11-02
 
 **`2026-05-11` 初回リリース** セクション以下のエントリーは、前バージョン `2025-10-20` から文脈のために引き継いだものです。最上部の破壊的変更エントリーが、`2025-10-20` から移行する際に把握すべき契約の差分を説明しています。
 
-### 2026-11-02 — `api_update: 2026-11-02` — `allpv` の時間帯・曜日カラム（T144a）
+### 2026-11-02 — `api_update: 2026-11-02` — `allpv` の時間帯・曜日・集客チャネルカラム（T144a / T144b）
 
 **追加:**
 - ✅ **`allpv.hour`（int `0`〜`23`）と `allpv.weekday`（int `0`〜`6`、`0` = 日曜）** — `access_time` からサイト時計で算出する仮想カラム2本。`keep` に入れると、ページビューを時間帯別・曜日別にグループ化できます（たとえば `keep: ["hour", "weekday"]` で時間帯 × 曜日の表）。夏時間の日は壁時計の時刻で数え、`time.tz` はバケットを変えません。[`allpv` の時間バケット](../materials/allpv.md#time-buckets) と [`materials.yaml`](../../for-ai/materials.yaml) を参照してください。**Since:** 2026-11-02
-- ✅ **`features.material_hour_weekday_bucket`** を `/guide` で返します（[`qal-validation.yaml`](./qal-validation.yaml) を参照）。
+- ✅ **`allpv.channel`（string）** — そのページビューのセッションの集客チャネル。16種の固定名（`"Direct"`、`"Organic Search"`、… `"AI Referral"`、`"Unassigned"`）のどれかです。集客画面のチャネル表と同じルールで判定し、サイトの現在のルールで読み出し時に判定するため、ルール（カスタムチャネルを含む）を変えると過去期間の値も変わります。`null` にはならず、判定できない行は `"Unassigned"` です。[`allpv` の channel](../materials/allpv.md#channel) を参照してください。**Since:** 2026-11-02
+- ✅ **`features.material_hour_weekday_bucket`** と **`features.material_channel_column`** を `/guide` で返します（[`qal-validation.yaml`](./qal-validation.yaml) を参照）。
 
 **使い方の注意:**
 - 🔸 先に `time` と物理カラムの filter で絞ってください。`hour` / `weekday` での絞り込みは全行を復号した後のポストフィルターなので、大規模サイトでは遅くなります。行はゼロ埋めされず初出順で返るため、時刻順・曜日順にするには `sort` を指定してください。`gsc` にはこれらのカラムはありません。
+- 🔸 `channel` はページビューごとにセッションの流入元で判定されます。セッション数を数えるには `pv` `eq` `1` で絞ってください。`channel` の filter もポストフィルターで、`count_only` のクエリも遅くなります。チャネルルールを読み込めない場合、クエリは `E_DEPENDENCY_NOT_AVAILABLE` で失敗します。
 
 **このアップデートが非破壊である理由:**
-- 2本とも追加のみの仮想カラムです。これらを参照しないクエリには影響しません。
+- 3本とも追加のみの仮想カラムです。これらを参照しないクエリには影響しません。
 
 ### 2026-08-05 — `api_update: 2026-08-05` — `allpv` / `gsc` の月カラム（T133a）
 
