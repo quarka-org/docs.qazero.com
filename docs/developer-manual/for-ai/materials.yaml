@@ -758,6 +758,14 @@ materials:
             since: "2026-11-02"
             search_hint:
               note: "曜日（整数 0〜6、0=日曜。PHP の w と同じ）。access_time をサイト時計の壁時計時刻で丸めた日の曜日。DST の日も壁時計で数える。ラベル（日/月/…）はアシスタント側で付ける。keep に入れると曜日別に集計できる。期間の絞り込みは time で行い、物理列（source_id / medium_id / is_newuser 等）の filter で先に絞ること（この列の filter は復号後の post_filter で遅い）。整数列なので prefix / contains は効かない。値の無い曜日は行が出ない（ゼロ埋めしない）。並びは初出順なので、曜日順にするには sort が要る"
+          # 集客チャネル（T144b）
+          - material_column: "channel"
+            physical_column: "channel"
+            virtual: true
+            status: dev
+            since: "2026-11-02"
+            search_hint:
+              note: "集客チャネル（文字列）。値は QAHM_Channel::CHANNELS のチャネル名で、集客画面のチャネル表と同じ判定（QAHM_Channel::classify）で決まる。事実の列ではなく、このサイトの現在のチャネル定義で読み出し時に評価するビューで、ルール変更（カスタムチャネルを含む）で過去期間の数字も変わる。判定できない行は Unassigned になり、null は無い。行ごとにその PV のセッション流入元で判定するので、セッション数は pv eq 1 で絞って数えること。この列の filter は復号後の post_filter で遅いので、期間は time で、物理列（source_id / medium_id / is_newuser 等）の filter で先に絞ること。件数だけのクエリ（count_only）でも遅い（channel の filter があると count_only は降格され、全行の復元と判定を通る）"
           # ゴール達成フラグ（is_goal_1..10）
           # - keep: 各PVがゴールNを達成したかを0/1で返す
           # - filter: is_goal_N=1のみ対応（=0は非対応）

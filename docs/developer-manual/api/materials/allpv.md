@@ -136,6 +136,53 @@ day). See [`gsc`](./gsc.md#month).
 `features.material_month_bucket` and `features.material_hour_weekday_bucket`
 in `/guide` before relying on them.
 
+## Acquisition channel: `channel` {#channel}
+
+`channel` (string) is a virtual column that tells you which acquisition
+channel a page view's session came from. It uses the same rules as the
+channel table on the QA ZERO acquisition screen, so the two agree.
+
+- **Values.** One of 16 fixed English names: `"Direct"`,
+  `"Organic Search"`, `"Paid Search"`, `"Organic Social"`,
+  `"Paid Social"`, `"Organic Video"`, `"Paid Video"`,
+  `"Organic Shopping"`, `"Paid Shopping"`, `"Display"`, `"Paid Other"`,
+  `"Email"`, `"Affiliates"`, `"Referral"`, `"AI Referral"`,
+  `"Unassigned"`. Rows that cannot be classified are `"Unassigned"`;
+  the column is never `null` (except for unmatched rows on the right
+  side of a join, like any other right-side column). Translate the
+  labels on the client side, and treat unknown values as "other".
+- **Evaluated at read time.** The value is not stored. It is computed
+  with the site's *current* channel rules, including custom channels.
+  If the rules change, the numbers for past periods change on the next
+  query — the same as the acquisition screen.
+- **Counting sessions.** Each page view is classified by its session's
+  traffic source. To count sessions rather than page views, filter on
+  landing page views (`pv` `eq` `1`).
+- **Narrow first.** Filtering on `channel` runs as a post-filter after
+  every row has been decoded, so it is slow — and it also makes
+  `count_only` queries slow. Narrow with `time` and physical columns
+  (`source_id`, `medium_id`, `is_newuser`, …) first. For one known
+  referrer, a `source_domain` filter is faster than a `channel` filter.
+- If the channel rules cannot be loaded, a query that asks for
+  `channel` fails with `E_DEPENDENCY_NOT_AVAILABLE` instead of
+  returning every row as `Direct` / `Unassigned`.
+
+Example — sessions by channel:
+
+```json
+"make": {
+  "by_channel": {
+    "from": "allpv",
+    "keep": ["channel"],
+    "filter": { "pv": { "eq": 1 } },
+    "calc": { "sessions": { "count": "*" } },
+    "sort": [{ "column": "sessions", "direction": "desc" }]
+  }
+}
+```
+
+**Since:** 2026-11-02 (`features.material_channel_column` in `/guide`)
+
 ## Common JOIN keys
 
 - `pv_id` → `click_event.pv_id` (which clicks happened on this
@@ -153,7 +200,7 @@ in `/guide` before relying on them.
 - "Which pages have high deep-read but low conversion?"
 - "Which pages show unusually high `irritation_click_count`?"
 - "At what hours and on which weekdays does direct traffic arrive?"
-  (`keep: ["hour", "weekday"]`)
+  (`keep: ["channel", "hour", "weekday"]`)
 
 Any of these can be expressed as one or two QAL views on `allpv`.
 

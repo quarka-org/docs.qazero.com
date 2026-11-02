@@ -26,7 +26,8 @@ spec. Available in English and Japanese. *(Prototype.)*
 - **[`allpv`](./allpv.md)** — one row per page view. Start here when
   the question is about traffic, sessions, referrers, or page
   popularity. Also carries the `month` / `hour` / `weekday`
-  time-bucket columns for trend, hour-of-day, and weekday breakdowns.
+  time-bucket columns for trend, hour-of-day, and weekday breakdowns,
+  and the `channel` column for acquisition-channel breakdowns.
 - **[`click_event`](./click_event.md)** — one row per recorded click.
   Use for click-through rates, rage clicks, element-level interest.
 - **[`gsc`](./gsc.md)** — Google Search Console data. Use for search

@@ -329,6 +329,11 @@ window.MATERIALS_DATA = {
                         {
                             "n": "utm_term",
                             "note": "Search term (utm)."
+                        },
+                        {
+                            "n": "channel",
+                            "note": "Acquisition channel (string), a virtual column. Values are the channel names in QAHM_Channel::CHANNELS, decided by the same rules as the channel table on the acquisition screen. It is evaluated at read time with the site's current channel rules, so changing the rules also changes the values for past periods. Rows that cannot be classified are Unassigned (never null). To count sessions, filter with pv eq 1. Narrow with time and physical columns first; filtering on this column runs as a slow post_filter, and count-only queries are slow too.",
+                            "since": "2026-11-02"
                         }
                     ]
                 },
@@ -1221,6 +1226,11 @@ window.MATERIALS_DATA = {
                         {
                             "n": "utm_term",
                             "note": "検索語(utm)。"
+                        },
+                        {
+                            "n": "channel",
+                            "note": "集客チャネル（文字列）の仮想カラム。値は QAHM_Channel::CHANNELS のチャネル名で、集客画面のチャネル表と同じ判定。サイトの現在のチャネル定義で読み出し時に判定するので、ルールを変えると過去期間の値も変わる。判定できない行は Unassigned（null は無い）。セッション数は pv eq 1 で絞って数える。絞り込みは time と物理列で先に行う（この列の filter は post_filter で遅く、件数だけのクエリでも遅い）。",
+                            "since": "2026-11-02"
                         }
                     ]
                 },

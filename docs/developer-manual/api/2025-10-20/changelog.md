@@ -10,17 +10,19 @@ api_update: 2026-11-02
 
 This is the **Update History** for API version `2025-10-20`: one living document per version, new entries on top. Each entry is tagged with the `api_update` date that the plugin will report in its `/guide` response. Read this top-to-bottom to see how the API has grown since the initial release, and match the most recent entry against your server's `api_update` to know which features are actually available to you.
 
-### 2026-11-02 — `api_update: 2026-11-02` — `allpv` hour-of-day and weekday columns (T144a)
+### 2026-11-02 — `api_update: 2026-11-02` — `allpv` hour-of-day, weekday, and channel columns (T144a / T144b)
 
 **Added:**
 - ✅ **`allpv.hour` (int `0`–`23`) and `allpv.weekday` (int `0`–`6`, `0` = Sunday)** — two virtual columns computed from `access_time` on the site clock. Put them in `keep` to group page views by hour of day or day of week (for example, `keep: ["hour", "weekday"]` for an hour × weekday grid). Hours are counted on the wall clock on DST days; `time.tz` does not change the bucket. See [`allpv` time buckets](../materials/allpv.md#time-buckets) and [`materials.yaml`](../../for-ai/materials.yaml). **Since:** 2026-11-02
-- ✅ **`features.material_hour_weekday_bucket`** reported in `/guide` (see [`qal-validation.yaml`](./qal-validation.yaml)).
+- ✅ **`allpv.channel` (string)** — the acquisition channel of the page view's session, one of 16 fixed names (`"Direct"`, `"Organic Search"`, … `"AI Referral"`, `"Unassigned"`). It uses the same rules as the channel table on the acquisition screen and is evaluated at read time with the site's current rules, so changing the rules (including custom channels) also changes past periods. Never `null`; unclassifiable rows are `"Unassigned"`. See [`allpv` channel](../materials/allpv.md#channel). **Since:** 2026-11-02
+- ✅ **`features.material_hour_weekday_bucket`** and **`features.material_channel_column`** reported in `/guide` (see [`qal-validation.yaml`](./qal-validation.yaml)).
 
 **Usage notes:**
 - 🔸 Narrow with `time` and physical-column filters first. Filtering on `hour` / `weekday` is a post-filter applied after decoding every row, so it is slow on large sites. Rows are not zero-filled and come out in first-seen order — add a `sort` for clock or calendar order. `gsc` does not have these columns.
+- 🔸 `channel` is classified per page view from the session's traffic source; filter `pv` `eq` `1` to count sessions. A `channel` filter is also a post-filter and makes `count_only` queries slow. If the channel rules cannot be loaded, the query fails with `E_DEPENDENCY_NOT_AVAILABLE`.
 
 **Why this update is still non-breaking:**
-- Both columns are additive and virtual. Queries that do not reference them are unaffected.
+- All three columns are additive and virtual. Queries that do not reference them are unaffected.
 
 ### 2026-08-05 — `api_update: 2026-08-05` — `allpv` / `gsc` month column (T133a)
 
