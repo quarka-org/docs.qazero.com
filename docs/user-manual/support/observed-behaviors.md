@@ -11,6 +11,25 @@ Some behaviors may be related to specifications or specific environments.
 
 ---
 
+## Page content may not display correctly in the heatmap
+
+**Status**: Improvement planned
+
+### Overview
+
+Images or other elements may stretch vertically or keep expanding, making the page content difficult to view.
+
+This is a QA ZERO heatmap display issue affecting pages where element heights depend on the screen height.
+
+We plan to improve the display to prevent these elements from stretching vertically.
+
+### Another way to view the heatmap
+
+Use **Live View URL** on the heatmap screen to overlay the heatmap on the target page. 
+
+Opening the page this way is recorded as one visit. The overlay uses data from the selected period on the current page, so its position may shift if the page layout has changed.
+
+---
 
 ## Channel classification may change depending on the capitalization of medium names
 
