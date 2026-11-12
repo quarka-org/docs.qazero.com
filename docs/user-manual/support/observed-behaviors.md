@@ -11,7 +11,7 @@ Some behaviors may be related to specifications or specific environments.
 
 ---
 
-## Page content may not display correctly in the heatmap
+## Page content may not display correctly in the heatmap (some elements stretch vertically)
 
 **Status**: Improvement planned
 
