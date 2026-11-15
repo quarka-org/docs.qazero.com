@@ -47,7 +47,6 @@ const sidebars: SidebarsConfig = {
           label: '📊 Using QA ZERO',
           items: [
             'user-manual/using/ai-reports-direct',
-            'user-manual/using/ai-reports',
             'user-manual/using/assistants',
             'user-manual/using/realtime',
             'user-manual/using/audience',
