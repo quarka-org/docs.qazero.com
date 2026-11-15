@@ -2,6 +2,14 @@
 
 *The date shown is a reference. The actual timing may vary depending on the environment.*  
 
+## 3.2.1.1 / 3.2.0.1 — 2026-11-02
+
+### Security fixes
+
+Applied security fixes.
+
+---
+
 ## 3.2.1.0 — 2026-10-05
 
 ### New Features
