@@ -61,6 +61,8 @@ const sidebars: SidebarsConfig = {
             'user-manual/using/pageview-data-export',
             'user-manual/using/goal-settings',
             'user-manual/using/google-search-console',
+            'user-manual/using/ai-mcp',
+            'user-manual/using/ai-mcp-prompts',
           ],
         },
         {
