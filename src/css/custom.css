@@ -59,3 +59,11 @@
     height: 2rem;
   }
 }
+
+/* プロンプト例の表：1列目（あいまいな聞き方）が細くなりすぎないよう最小幅を確保
+   スマホ幅では表が横スクロールになるため、PC 幅（サイドバーが出る幅）だけに効かせる */
+@media screen and (min-width: 997px) {
+  .prompt-examples-table th:first-child {
+    min-width: 12em;
+  }
+}
