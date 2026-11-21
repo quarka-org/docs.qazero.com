@@ -27,7 +27,7 @@ const FeatureList: FeatureItem[] = [
         Learn how to install, configure, and use QA ZERO. Complete guides for getting started and troubleshooting.
       </Translate>
     ),
-    link: '/docs/user-manual/introduction',
+    link: 'https://qazero.com/guide/',
   },
   {
     title: translate({

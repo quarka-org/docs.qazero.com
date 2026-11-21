@@ -25,7 +25,7 @@ function HomepageHeader() {
         <div className={styles.buttons}>
           <Link
             className="button button--secondary button--lg"
-            to="/docs/user-manual/introduction">
+            to="https://qazero.com/guide/">
             <Translate id="homepage.getStarted">Get Started</Translate>
           </Link>
         </div>

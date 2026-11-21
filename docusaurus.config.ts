@@ -128,8 +128,8 @@ const config: Config = {
       },
       items: [
         {
-          type: 'docSidebar',
-          sidebarId: 'userManualSidebar',
+          // 2026-11-21 ユーザーガイドは qazero.com/guide/ へ移転
+          href: 'https://qazero.com/guide/',
           position: 'left',
           label: 'User Guide',
         },
@@ -165,7 +165,7 @@ const config: Config = {
           items: [
             {
               label: 'User Guide',
-              to: '/docs/user-manual/introduction',
+              href: 'https://qazero.com/guide/',
             },
             {
               label: 'Developer Guide',
